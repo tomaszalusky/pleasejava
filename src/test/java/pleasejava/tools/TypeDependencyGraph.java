@@ -1,8 +1,11 @@
 package pleasejava.tools;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -20,13 +23,13 @@ import org.xml.sax.SAXException;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Throwables;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import com.google.common.io.Closeables;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * @author Tomas Zalusky
@@ -50,11 +53,17 @@ public class TypeDependencyGraph {
 			Document doc =  builder.build(new StringReader(xml));
 			Element rootElement = doc.getRootElement();
 			RecognitionContext rctx = new RecognitionContext(rootElement);
+			ImmutableMultimap.Builder<TypeNode,TypeNode> predecessorsBuilder = ImmutableMultimap.builder();
 			for (Element typeElement : rootElement.getChildren()) {
 				String name = typeElement.getAttributeValue("name");
-				rctx.ensureTypeNode(name);
-				System.out.println(name);
+				TypeNode typeNode = rctx.ensureTypeNode(name);
+				for (TypeNode child : typeNode.getChildren()) {
+					predecessorsBuilder.put(child,typeNode);
+				}
 			}
+			ImmutableMultimap<TypeNode,TypeNode> predecessors = predecessorsBuilder.build();
+			System.out.println(predecessors);
+			//predecessors.inverse();
 		} catch (Exception e) {
 			throw Throwables.propagate(e);
 		} finally {
@@ -70,6 +79,10 @@ public class TypeDependencyGraph {
 			this.name = checkNotNull(name);
 		}
 		
+		final List<TypeNode> getChildren() {
+			return accept(new GetChildren());
+		}
+
 		static final String PROTOTYPE_DUMMY_NAME = "#";
 		
 		static final TypeNode PROTOTYPE_DUMMY_TYPE_NODE = new TypeNode(PROTOTYPE_DUMMY_NAME) {
@@ -210,6 +223,49 @@ public class TypeDependencyGraph {
 
 	}
 	
+	static class GetChildren implements TypeNodeVisitor<List<TypeNode>> {
+
+		@Override
+		public List<TypeNode> visitRecordNode(RecordNode node) {
+			return ImmutableList.copyOf(node.getFields().values());
+		}
+
+		@Override
+		public List<TypeNode> visitVarrayNode(VarrayNode node) {
+			return ImmutableList.of(node.getElementTypeNode());
+		}
+
+		@Override
+		public List<TypeNode> visitNestedTableNode(NestedTableNode node) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public List<TypeNode> visitIndexByTableNode(IndexByTableNode node) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public List<TypeNode> visitProcedureSignatureNode(ProcedureSignatureNode node) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public List<TypeNode> visitFunctionSignatureNode(FunctionSignatureNode node) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public List<TypeNode> visitPrimitiveNode(PrimitiveNode node) {
+			return ImmutableList.of();
+		}
+		
+	}
+	
 	static class RecordNode extends TypeNode {
 		
 		private static final RecordNode PROTOTYPE = new RecordNode(PROTOTYPE_DUMMY_NAME,ImmutableMap.<String,TypeNode>of());
@@ -218,11 +274,15 @@ public class TypeDependencyGraph {
 		
 		RecordNode(String name, Map<String,TypeNode> fields) {
 			super(name);
-			this.fields = checkNotNull(fields);
+			this.fields = ImmutableMap.copyOf(checkNotNull(fields));
 		}
 
 		<R> R accept(TypeNodeVisitor<R> visitor) {
 			return visitor.visitRecordNode(this);
+		}
+		
+		public Map<String,TypeNode> getFields() {
+			return fields;
 		}
 		
 	}
@@ -240,6 +300,10 @@ public class TypeDependencyGraph {
 		
 		<R> R accept(TypeNodeVisitor<R> visitor) {
 			return visitor.visitVarrayNode(this);
+		}
+		
+		public TypeNode getElementTypeNode() {
+			return elementTypeNode;
 		}
 		
 	}
@@ -349,6 +413,12 @@ XMLStreamReader reader = inputFactory.createXMLStreamReader(stringReader);
 Set<String> waiting = Sets.newLinkedHashSet();
 Set<String> closed = Sets.newLinkedHashSet();
 
+
+
+- prendat XML do resource souboru
+- doplnit dalsi testcasy
+- rozchodit vsechny typy
+- otestovat poradi v acyklickem grafu
 
 
 
