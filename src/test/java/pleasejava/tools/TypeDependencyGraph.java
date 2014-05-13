@@ -3,6 +3,7 @@ package pleasejava.tools;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.List;
@@ -46,11 +47,10 @@ public class TypeDependencyGraph {
 	 */
 	//final ImmutableListMultimap<TypeNode,TypeNode> dependencies;
 	
-	public TypeDependencyGraph(String xml) {
-		Reader stringReader = new StringReader(xml);
+	public TypeDependencyGraph(InputStream xml) {
 		try {
 			SAXBuilder builder = new SAXBuilder();
-			Document doc =  builder.build(new StringReader(xml));
+			Document doc =  builder.build(xml);
 			Element rootElement = doc.getRootElement();
 			RecognitionContext rctx = new RecognitionContext(rootElement);
 			ImmutableMultimap.Builder<TypeNode,TypeNode> predecessorsBuilder = ImmutableMultimap.builder();
@@ -66,8 +66,6 @@ public class TypeDependencyGraph {
 			//predecessors.inverse();
 		} catch (Exception e) {
 			throw Throwables.propagate(e);
-		} finally {
-			Closeables.closeQuietly(stringReader);
 		}
 	}
 	
@@ -389,20 +387,20 @@ public class TypeDependencyGraph {
 	}
 	
 	
-	public static void main(String[] args) throws ParserConfigurationException, IOException, JDOMException {
-		String xml = ""
-				+ "<tdg>                                                   \n"
-				+ "  <record name='a_test_package.rec1'>                   \n"
-				//+ "    <field name='f_varray' type='a_test_package.var1' />\n"
-				+ "    <field name='f_integer' type='integer' />           \n"
-				+ "    <field name='f_plsinteger' type='pls_integer' />    \n"
-				+ "    <field name='f_varchar' type='varchar2(100)' />     \n"
-				+ "  </record>                                             \n"
-				//+ "  <varray name='a_test_package.var1' of='a_test_package.rec2' />\n"
-				+ "</tdg>                                                  \n"
-		;
-		new TypeDependencyGraph(xml);
-	}
+//	public static void main(String[] args) throws ParserConfigurationException, IOException, JDOMException {
+//		String xml = ""
+//				+ "<tdg>                                                   \n"
+//				+ "  <record name='a_test_package.rec1'>                   \n"
+//				//+ "    <field name='f_varray' type='a_test_package.var1' />\n"
+//				+ "    <field name='f_integer' type='integer' />           \n"
+//				+ "    <field name='f_plsinteger' type='pls_integer' />    \n"
+//				+ "    <field name='f_varchar' type='varchar2(100)' />     \n"
+//				+ "  </record>                                             \n"
+//				//+ "  <varray name='a_test_package.var1' of='a_test_package.rec2' />\n"
+//				+ "</tdg>                                                  \n"
+//		;
+//		new TypeDependencyGraph(xml);
+//	}
 	
 }
 
@@ -415,10 +413,9 @@ Set<String> closed = Sets.newLinkedHashSet();
 
 
 
-- prendat XML do resource souboru
+- otestovat poradi v acyklickem grafu
 - doplnit dalsi testcasy
 - rozchodit vsechny typy
-- otestovat poradi v acyklickem grafu
 
 
 
