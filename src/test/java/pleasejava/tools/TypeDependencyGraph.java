@@ -1,13 +1,13 @@
 package pleasejava.tools;
 
+import static com.google.common.base.Functions.constant;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Reader;
-import java.io.StringReader;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -30,7 +30,6 @@ import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
-import com.google.common.io.Closeables;
 
 /**
  * @author Tomas Zalusky
@@ -54,16 +53,17 @@ public class TypeDependencyGraph {
 			Element rootElement = doc.getRootElement();
 			RecognitionContext rctx = new RecognitionContext(rootElement);
 			ImmutableMultimap.Builder<TypeNode,TypeNode> predecessorsBuilder = ImmutableMultimap.builder();
+			ImmutableSet.Builder<TypeNode> allTypeNodesBuilder = ImmutableSet.builder();
 			for (Element typeElement : rootElement.getChildren()) {
 				String name = typeElement.getAttributeValue("name");
 				TypeNode typeNode = rctx.ensureTypeNode(name);
-				for (TypeNode child : typeNode.getChildren()) {
-					predecessorsBuilder.put(child,typeNode);
-				}
+				List<TypeNode> children = typeNode.getChildren();
+				allTypeNodesBuilder.add(typeNode).addAll(children);
+				predecessorsBuilder.putAll(Maps.toMap(children,constant(typeNode)).asMultimap());
 			}
 			ImmutableMultimap<TypeNode,TypeNode> predecessors = predecessorsBuilder.build();
 			System.out.println(predecessors);
-			//predecessors.inverse();
+			System.out.println(allTypeNodesBuilder.build());
 		} catch (Exception e) {
 			throw Throwables.propagate(e);
 		}
@@ -303,7 +303,20 @@ public class TypeDependencyGraph {
 		public TypeNode getElementTypeNode() {
 			return elementTypeNode;
 		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj) return true;
+			if (!(obj instanceof VarrayNode)) return false;
+			VarrayNode that = (VarrayNode)obj;
+			boolean result = Objects.equals(this.name,that.name) && Objects.equals(this.elementTypeNode,that.elementTypeNode);
+			return result;
+		}
 		
+		@Override
+		public int hashCode() {
+			return Objects.hash(this.name,this.elementTypeNode);
+		}
 	}
 	
 	static class NestedTableNode extends TypeNode {
@@ -373,7 +386,21 @@ public class TypeDependencyGraph {
 		<R> R accept(TypeNodeVisitor<R> visitor) {
 			return visitor.visitPrimitiveNode(this);
 		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj) return true;
+			if (!(obj instanceof PrimitiveNode)) return false;
+			PrimitiveNode that = (PrimitiveNode)obj;
+			boolean result = Objects.equals(this.name,that.name);
+			return result;
+		}
 		
+		@Override
+		public int hashCode() {
+			return Objects.hash(this.name);
+		}
+
 	}
 
 	interface TypeNodeVisitor<R> {
