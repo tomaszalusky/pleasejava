@@ -5,6 +5,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -22,6 +24,7 @@ import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 import org.xml.sax.SAXException;
 
+import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableList;
@@ -29,7 +32,10 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Sets;
 
 /**
  * @author Tomas Zalusky
@@ -45,6 +51,8 @@ public class TypeDependencyGraph {
 	 * @throws SAXException 
 	 */
 	//final ImmutableListMultimap<TypeNode,TypeNode> dependencies;
+	
+	final List<TypeNode> topologicalOrdering;
 	
 	public TypeDependencyGraph(InputStream xml) {
 		try {
@@ -62,11 +70,29 @@ public class TypeDependencyGraph {
 				predecessorsBuilder.putAll(Maps.toMap(children,constant(typeNode)).asMultimap());
 			}
 			ImmutableMultimap<TypeNode,TypeNode> predecessors = predecessorsBuilder.build();
-			System.out.println(predecessors);
-			System.out.println(allTypeNodesBuilder.build());
+			ImmutableSet<TypeNode> allTypeNodes = allTypeNodesBuilder.build();
+			
+			Multimap<TypeNode,TypeNode> exhaust = LinkedHashMultimap.create(predecessors); // copy of predecessors multimap, its elements are removed during build in order to reveal another nodes
+			ImmutableList.Builder<TypeNode> topologicalOrderingBuilder = ImmutableList.builder();
+			Set<TypeNode> seed = Sets.difference(allTypeNodes,predecessors.keySet()); // initial set of nodes with no incoming edge
+			for (Deque<TypeNode> queue = new ArrayDeque<TypeNode>(seed); !queue.isEmpty(); ) { // queue of nodes with no incoming edge
+				TypeNode top = queue.pollFirst();
+				topologicalOrderingBuilder.add(top); // queue invariant: polled node has no incoming edge -> it is safe to push it to output
+				for (TypeNode child : ImmutableSet.copyOf(top.getChildren())) { // set prevents duplicate offer of child in case of duplicate children
+					exhaust.get(child).remove(top); // removing edges to all children
+					if (exhaust.get(child).isEmpty()) { // if no edge remains, child becomes top 
+						queue.offerLast(child);
+					}
+				}
+			}
+			this.topologicalOrdering = topologicalOrderingBuilder.build();
 		} catch (Exception e) {
 			throw Throwables.propagate(e);
 		}
+	}
+	
+	public List<TypeNode> getTopologicalOrdering() {
+		return topologicalOrdering;
 	}
 	
 	abstract static class TypeNode {
@@ -88,6 +114,16 @@ public class TypeDependencyGraph {
 		};
 		
 		abstract <R> R accept(TypeNodeVisitor<R> visitor);
+		
+		public String getName() {
+			return name;
+		}
+		
+		public static Function<TypeNode,String> _getName = new Function<TypeNode,String>() {
+			public String apply(TypeNode input) {
+				return input.getName();
+			}
+		};
 		
 		@Override
 		public String toString() {
@@ -439,9 +475,8 @@ Set<String> waiting = Sets.newLinkedHashSet();
 Set<String> closed = Sets.newLinkedHashSet();
 
 
-
-- otestovat poradi v acyklickem grafu
-- doplnit dalsi testcasy
+- doplnit dalsi testcasy vcetne nevalidnich
+- TDG stavet pomoci buildru
 - rozchodit vsechny typy
 
 
