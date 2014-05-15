@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+import javax.lang.model.type.PrimitiveType;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamException;
 
@@ -26,6 +27,7 @@ import org.xml.sax.SAXException;
 
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
+import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -112,7 +114,11 @@ public class TypeDependencyGraph {
 		static final TypeNode PROTOTYPE_DUMMY_TYPE_NODE = new TypeNode(PROTOTYPE_DUMMY_NAME) {
 			<R> R accept(TypeNodeVisitor<R> visitor) {return null;}
 		};
-		
+
+		static final PrimitiveNode PROTOTYPE_DUMMY_PRIMITIVE_TYPE_NODE = new PrimitiveNode(PROTOTYPE_DUMMY_NAME) {
+			<R> R accept(TypeNodeVisitor<R> visitor) {return null;}
+		};
+
 		abstract <R> R accept(TypeNodeVisitor<R> visitor);
 		
 		public String getName() {
@@ -147,7 +153,6 @@ public class TypeDependencyGraph {
 				ProcedureSignatureNode.PROTOTYPE,
 				FunctionSignatureNode.PROTOTYPE
 		);
-
 
 		RecognitionContext(Element rootElement) {
 			this.rootElement = rootElement;
@@ -329,7 +334,7 @@ public class TypeDependencyGraph {
 
 		VarrayNode(String name, TypeNode elementTypeNode) {
 			super(name);
-			this.elementTypeNode = elementTypeNode;
+			this.elementTypeNode = checkNotNull(elementTypeNode);
 		}
 		
 		<R> R accept(TypeNodeVisitor<R> visitor) {
@@ -353,34 +358,84 @@ public class TypeDependencyGraph {
 		public int hashCode() {
 			return Objects.hash(this.name,this.elementTypeNode);
 		}
+
 	}
 	
 	static class NestedTableNode extends TypeNode {
 		
-		private static final NestedTableNode PROTOTYPE = new NestedTableNode(PROTOTYPE_DUMMY_NAME);
+		private static final NestedTableNode PROTOTYPE = new NestedTableNode(PROTOTYPE_DUMMY_NAME,PROTOTYPE_DUMMY_TYPE_NODE);
 
-		NestedTableNode(String name) {
+		private final TypeNode elementTypeNode;
+
+		NestedTableNode(String name, TypeNode elementTypeNode) {
 			super(name);
+			this.elementTypeNode = checkNotNull(elementTypeNode);
 		}
 		
 		<R> R accept(TypeNodeVisitor<R> visitor) {
 			return visitor.visitNestedTableNode(this);
 		}
 		
+		public TypeNode getElementTypeNode() {
+			return elementTypeNode;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj) return true;
+			if (!(obj instanceof NestedTableNode)) return false;
+			NestedTableNode that = (NestedTableNode)obj;
+			boolean result = Objects.equals(this.name,that.name) && Objects.equals(this.elementTypeNode,that.elementTypeNode);
+			return result;
+		}
+		
+		@Override
+		public int hashCode() {
+			return Objects.hash(this.name,this.elementTypeNode);
+		}
+
 	}
 	
 	static class IndexByTableNode extends TypeNode {
 		
-		private static final IndexByTableNode PROTOTYPE = new IndexByTableNode(PROTOTYPE_DUMMY_NAME);
+		private static final IndexByTableNode PROTOTYPE = new IndexByTableNode(PROTOTYPE_DUMMY_NAME,PROTOTYPE_DUMMY_TYPE_NODE,PROTOTYPE_DUMMY_PRIMITIVE_TYPE_NODE);
 
-		IndexByTableNode(String name) {
+		private final TypeNode elementTypeNode;
+
+		private final PrimitiveNode indexTypeNode;
+
+		IndexByTableNode(String name, TypeNode elementTypeNode, PrimitiveNode indexTypeNode) {
 			super(name);
+			Preconditions.checkArgument(elementTypeNode == PROTOTYPE_DUMMY_TYPE_NODE || indexTypeNode != null && indexTypeNode.getName().matches("(?i)binary_integer|pls_integer|varchar2\\(\\d+?\\)|varchar|string|long")); // http://docs.oracle.com/cd/B10500_01/appdev.920/a96624/05_colls.htm#19661
+			this.indexTypeNode = indexTypeNode;
+			this.elementTypeNode = checkNotNull(elementTypeNode);
 		}
 		
 		<R> R accept(TypeNodeVisitor<R> visitor) {
 			return visitor.visitIndexByTableNode(this);
 		}
 		
+		public TypeNode getElementTypeNode() {
+			return elementTypeNode;
+		}
+
+		public PrimitiveNode getIndexTypeNode() {
+			return indexTypeNode;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj) return true;
+			if (!(obj instanceof IndexByTableNode)) return false;
+			IndexByTableNode that = (IndexByTableNode)obj;
+			boolean result = Objects.equals(this.name,that.name) && Objects.equals(this.elementTypeNode,that.elementTypeNode) && Objects.equals(this.indexTypeNode,that.indexTypeNode);
+			return result;
+		}
+		
+		@Override
+		public int hashCode() {
+			return Objects.hash(this.name,this.elementTypeNode,this.indexTypeNode);
+		}
 	}
 	
 	static class ProcedureSignatureNode extends TypeNode {
