@@ -138,6 +138,41 @@ public class TypeDependencyGraph {
 
 	}
 	
+	/**
+	 * http://docs.oracle.com/cd/E11882_01/appdev.112/e25519/subprograms.htm#LNPLS665
+	 * @author Tomas Zalusky
+	 */
+	enum ParameterMode {
+		IN,
+		OUT,
+		INOUT;
+	}
+	
+	static final class Parameter {
+		
+		private final ParameterMode parameterMode;
+		
+		private final TypeNode typeNode;
+		
+		private Parameter(ParameterMode parameterMode, TypeNode typeNode) {
+			this.parameterMode = parameterMode;
+			this.typeNode = typeNode;
+		}
+		
+		public static Parameter in(TypeNode typeNode) {
+			return new Parameter(ParameterMode.IN, typeNode);
+		}
+		
+		public static Parameter out(TypeNode typeNode) {
+			return new Parameter(ParameterMode.OUT, typeNode);
+		}
+		
+		public static Parameter inout(TypeNode typeNode) {
+			return new Parameter(ParameterMode.INOUT, typeNode);
+		}
+		
+	}
+	
 	static class RecognitionContext {
 		
 		private final Element rootElement;
@@ -324,6 +359,8 @@ public class TypeDependencyGraph {
 			return fields;
 		}
 		
+		//TODO equals+hC
+		
 	}
 	
 	static class VarrayNode extends TypeNode {
@@ -440,16 +477,24 @@ public class TypeDependencyGraph {
 	
 	static class ProcedureSignatureNode extends TypeNode {
 		
-		private static final ProcedureSignatureNode PROTOTYPE = new ProcedureSignatureNode(PROTOTYPE_DUMMY_NAME);
+		private static final ProcedureSignatureNode PROTOTYPE = new ProcedureSignatureNode(PROTOTYPE_DUMMY_NAME,ImmutableMap.<String,Parameter>of());
 
-		ProcedureSignatureNode(String name) {
+		private final Map<String,Parameter> parameters;
+		
+		ProcedureSignatureNode(String name, Map<String,Parameter> parameters) {
 			super(name);
+			this.parameters = ImmutableMap.copyOf(checkNotNull(parameters));
 		}
 		
 		<R> R accept(TypeNodeVisitor<R> visitor) {
 			return visitor.visitProcedureSignatureNode(this);
 		}
 		
+		public Map<String, Parameter> getParameters() {
+			return parameters;
+		}
+		
+		//TODO equals+hC
 	}
 	
 	static class FunctionSignatureNode extends TypeNode {
