@@ -705,7 +705,6 @@ Set<String> waiting = Sets.newLinkedHashSet();
 Set<String> closed = Sets.newLinkedHashSet();
 
 
-- doplnit testcase na acyklicky graf
 - doplnit testcase na atp3
 - doplnit nevalidni testcasy a dalsi krajni pripady
 - RecCtx nahradit za obycejnou factory, odstranit matouci prototypy

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<tdg>
+	<procedure name="main">
+		<in name="pa" type="a" />
+		<in name="pd" type="d" />
+	</procedure>
+	<record name="a">
+		<field name="fb" type="b" />
+		<field name="fc" type="c" />
+	</record>
+	<nestedtable name="b" of="f" />
+	<record name="f">
+		<field name="fg" type="g" />
+		<field name="fi" type="i" />
+	</record>
+	<indexbytable name="i" of="varchar2(100)" indexby="pls_integer" />
+	<record name="g">
+		<field name="fi" type="i" />
+		<field name="fh" type="h" />
+	</record>
+	<record name="c">
+		<field name="ff" type="f" />
+		<field name="fg" type="g" />
+	</record>
+	<record name="d">
+		<field name="fc" type="c" />
+		<field name="fe" type="e" />
+	</record>
+	<record name="e">
+		<field name="fg" type="g" />
+		<field name="fh" type="h" />
+	</record>
+	<record name="h">
+		<field name="fi" type="i" />
+		<field name="fj" type="varchar2(100)" />
+	</record>
+</tdg>

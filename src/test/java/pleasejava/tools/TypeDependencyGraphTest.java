@@ -30,6 +30,7 @@ public class TypeDependencyGraphTest {
 		}
 	}
 	
-	@Test public void simple() {t("a_test_package.var1", "integer");}
+	@Test public void simple() {t("a_test_package.var1","integer");}
+	@Test public void dag1() {t("main","a","d","b","c","e","f","g","h","i","varchar2(100)");}
 
 }
