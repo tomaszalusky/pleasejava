@@ -388,6 +388,8 @@ public class TypeDependencyGraph {
 			return Objects.hash(ObjectArrays.concat(this.name, this.fields.entrySet().toArray()));
 		}
 		
+		//TODO equals+hC
+		
 	}
 	
 	static class VarrayNode extends TypeNode {
@@ -507,7 +509,7 @@ public class TypeDependencyGraph {
 		private static final ProcedureSignatureNode PROTOTYPE = new ProcedureSignatureNode(PROTOTYPE_DUMMY_NAME,ImmutableMap.<String,Parameter>of());
 
 		private final ImmutableMap<String,Parameter> parameters;
-		
+
 		ProcedureSignatureNode(String name, Map<String,Parameter> parameters) {
 			super(name);
 			this.parameters = ImmutableMap.copyOf(checkNotNull(parameters));
