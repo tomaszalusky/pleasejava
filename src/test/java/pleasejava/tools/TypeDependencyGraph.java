@@ -2,6 +2,7 @@ package pleasejava.tools;
 
 import static com.google.common.base.Functions.constant;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.collect.FluentIterable.from;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -175,6 +176,20 @@ public class TypeDependencyGraph {
 			return new Parameter(ParameterMode.INOUT, typeNode);
 		}
 
+		public ParameterMode getParameterMode() {
+			return parameterMode;
+		}
+		
+		public TypeNode getTypeNode() {
+			return typeNode;
+		}
+		
+		public static final Function<Parameter,TypeNode> _getTypeNode = new Function<Parameter,TypeNode>() {
+			public TypeNode apply(Parameter input) {
+				return input.getTypeNode();
+			}
+		};
+		
 		@Override
 		public boolean equals(Object obj) {
 			if (this == obj) return true;
@@ -369,26 +384,25 @@ public class TypeDependencyGraph {
 
 		@Override
 		public List<TypeNode> visitNestedTableNode(NestedTableNode node) {
-			// TODO Auto-generated method stub
-			return null;
+			return ImmutableList.of(node.getElementTypeNode());
 		}
 
 		@Override
 		public List<TypeNode> visitIndexByTableNode(IndexByTableNode node) {
-			// TODO Auto-generated method stub
-			return null;
+			return ImmutableList.of(node.getElementTypeNode());
 		}
 
 		@Override
 		public List<TypeNode> visitProcedureSignatureNode(ProcedureSignatureNode node) {
-			// TODO Auto-generated method stub
-			return null;
+			return from(node.getParameters().values()).transform(Parameter._getTypeNode).toList();
 		}
 
 		@Override
 		public List<TypeNode> visitFunctionSignatureNode(FunctionSignatureNode node) {
-			// TODO Auto-generated method stub
-			return null;
+			ImmutableList.Builder<TypeNode> builder = ImmutableList.builder();
+			builder.add(node.getReturnTypeNode());
+			builder.addAll(from(node.getParameters().values()).transform(Parameter._getTypeNode));
+			return builder.build();
 		}
 
 		@Override
@@ -599,6 +613,14 @@ public class TypeDependencyGraph {
 		<R> R accept(TypeNodeVisitor<R> visitor) {
 			return visitor.visitFunctionSignatureNode(this);
 		}
+
+		public TypeNode getReturnTypeNode() {
+			return returnTypeNode;
+		}
+		
+		public Map<String,Parameter> getParameters() {
+			return parameters;
+		}
 		
 		@Override
 		public boolean equals(Object obj) {
@@ -683,13 +705,11 @@ Set<String> waiting = Sets.newLinkedHashSet();
 Set<String> closed = Sets.newLinkedHashSet();
 
 
-- rozchodit nacteni vsechn typu z XML
-- rozchodit GetChildren pro vsechny ttypy
-- RecCtx nahradit za obycejnou factory, odstranit matouci prototypy
-- TDG stavet pomoci buildru
 - doplnit testcase na acyklicky graf
 - doplnit testcase na atp3
 - doplnit nevalidni testcasy a dalsi krajni pripady
+- RecCtx nahradit za obycejnou factory, odstranit matouci prototypy
+- TDG stavet pomoci buildru
 
 
 
