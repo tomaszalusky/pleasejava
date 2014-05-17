@@ -12,7 +12,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-import javax.lang.model.type.PrimitiveType;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamException;
 
@@ -37,6 +36,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
+import com.google.common.collect.ObjectArrays;
 import com.google.common.collect.Sets;
 
 /**
@@ -138,6 +138,55 @@ public class TypeDependencyGraph {
 
 	}
 	
+	/**
+	 * http://docs.oracle.com/cd/E11882_01/appdev.112/e25519/subprograms.htm#LNPLS665
+	 * @author Tomas Zalusky
+	 */
+	enum ParameterMode {
+		IN,
+		OUT,
+		INOUT;
+	}
+	
+	static final class Parameter {
+		
+		private final ParameterMode parameterMode;
+		
+		private final TypeNode typeNode;
+		
+		private Parameter(ParameterMode parameterMode, TypeNode typeNode) {
+			this.parameterMode = parameterMode;
+			this.typeNode = typeNode;
+		}
+		
+		public static Parameter in(TypeNode typeNode) {
+			return new Parameter(ParameterMode.IN, typeNode);
+		}
+		
+		public static Parameter out(TypeNode typeNode) {
+			return new Parameter(ParameterMode.OUT, typeNode);
+		}
+		
+		public static Parameter inout(TypeNode typeNode) {
+			return new Parameter(ParameterMode.INOUT, typeNode);
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj) return true;
+			if (!(obj instanceof Parameter)) return false;
+			Parameter that = (Parameter)obj;
+			boolean result = Objects.equals(this.parameterMode,that.parameterMode) && Objects.equals(this.typeNode,that.typeNode);
+			return result;
+		}
+		
+		@Override
+		public int hashCode() {
+			return Objects.hash(this.parameterMode,this.typeNode);
+		}
+
+	}
+	
 	static class RecognitionContext {
 		
 		private final Element rootElement;
@@ -217,7 +266,7 @@ public class TypeDependencyGraph {
 		}
 
 		@Override
-		public TypeNode visitVarrayNode(VarrayNode node) {
+		public VarrayNode visitVarrayNode(VarrayNode node) {
 			VarrayNode result = null;
 			if ("varray".equals(typeElement.getName())) {
 				String elementType = typeElement.getAttributeValue("of");
@@ -309,7 +358,7 @@ public class TypeDependencyGraph {
 		
 		private static final RecordNode PROTOTYPE = new RecordNode(PROTOTYPE_DUMMY_NAME,ImmutableMap.<String,TypeNode>of());
 		
-		private final Map<String,TypeNode> fields;
+		private final ImmutableMap<String,TypeNode> fields;
 		
 		RecordNode(String name, Map<String,TypeNode> fields) {
 			super(name);
@@ -322,6 +371,21 @@ public class TypeDependencyGraph {
 		
 		public Map<String,TypeNode> getFields() {
 			return fields;
+		}
+		
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj) return true;
+			if (!(obj instanceof RecordNode)) return false;
+			RecordNode that = (RecordNode)obj;
+			// cannot just use Objects.equals(this.fields,that.fields) because order matters
+			boolean result = Objects.equals(this.name,that.name) && Iterables.elementsEqual(this.fields.entrySet(),that.fields.entrySet());
+			return result;
+		}
+		
+		@Override
+		public int hashCode() {
+			return Objects.hash(ObjectArrays.concat(this.name, this.fields.entrySet().toArray()));
 		}
 		
 	}
@@ -440,30 +504,75 @@ public class TypeDependencyGraph {
 	
 	static class ProcedureSignatureNode extends TypeNode {
 		
-		private static final ProcedureSignatureNode PROTOTYPE = new ProcedureSignatureNode(PROTOTYPE_DUMMY_NAME);
+		private static final ProcedureSignatureNode PROTOTYPE = new ProcedureSignatureNode(PROTOTYPE_DUMMY_NAME,ImmutableMap.<String,Parameter>of());
 
-		ProcedureSignatureNode(String name) {
+		private final ImmutableMap<String,Parameter> parameters;
+		
+		ProcedureSignatureNode(String name, Map<String,Parameter> parameters) {
 			super(name);
+			this.parameters = ImmutableMap.copyOf(checkNotNull(parameters));
 		}
 		
 		<R> R accept(TypeNodeVisitor<R> visitor) {
 			return visitor.visitProcedureSignatureNode(this);
 		}
 		
+		public Map<String,Parameter> getParameters() {
+			return parameters;
+		}
+		
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj) return true;
+			if (!(obj instanceof ProcedureSignatureNode)) return false;
+			ProcedureSignatureNode that = (ProcedureSignatureNode)obj;
+			// cannot just use Objects.equals(this.parameters,that.parameters) because order matters
+			boolean result = Objects.equals(this.name,that.name) && Iterables.elementsEqual(this.parameters.entrySet(),that.parameters.entrySet());
+			return result;
+		}
+		
+		@Override
+		public int hashCode() {
+			return Objects.hash(ObjectArrays.concat(this.name, this.parameters.entrySet().toArray()));
+		}
+
 	}
 	
 	static class FunctionSignatureNode extends TypeNode {
 		
-		private static final FunctionSignatureNode PROTOTYPE = new FunctionSignatureNode(PROTOTYPE_DUMMY_NAME);
+		private static final FunctionSignatureNode PROTOTYPE = new FunctionSignatureNode(PROTOTYPE_DUMMY_NAME,ImmutableMap.<String,Parameter>of(),PROTOTYPE_DUMMY_TYPE_NODE);
 
-		FunctionSignatureNode(String name) {
+		private final TypeNode returnTypeNode;
+		
+		private final ImmutableMap<String,Parameter> parameters;
+
+		FunctionSignatureNode(String name, Map<String,Parameter> parameters, TypeNode returnTypeNode) {
 			super(name);
+			this.parameters = ImmutableMap.copyOf(checkNotNull(parameters));
+			this.returnTypeNode = returnTypeNode;
 		}
 		
 		<R> R accept(TypeNodeVisitor<R> visitor) {
 			return visitor.visitFunctionSignatureNode(this);
 		}
 		
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj) return true;
+			if (!(obj instanceof FunctionSignatureNode)) return false;
+			FunctionSignatureNode that = (FunctionSignatureNode)obj;
+			// cannot just use Objects.equals(this.parameters,that.parameters) because order matters
+			boolean result = Objects.equals(this.name,that.name)
+					&& Iterables.elementsEqual(this.parameters.entrySet(),that.parameters.entrySet())
+					&& Objects.equals(this.returnTypeNode,that.returnTypeNode);
+			return result;
+		}
+		
+		@Override
+		public int hashCode() {
+			return Objects.hash(ObjectArrays.concat(new Object[] {this.name,this.returnTypeNode}, this.parameters.entrySet().toArray(), Object.class));
+		}
+
 	}
 	
 	static class PrimitiveNode extends TypeNode {
