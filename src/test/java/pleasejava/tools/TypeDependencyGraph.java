@@ -159,6 +159,10 @@ public class TypeDependencyGraph {
 			this.typeNode = typeNode;
 		}
 		
+		public static Parameter create(ParameterMode mode, TypeNode typeNode) {
+			return new Parameter(mode, typeNode);
+		}
+		
 		public static Parameter in(TypeNode typeNode) {
 			return new Parameter(ParameterMode.IN, typeNode);
 		}
@@ -277,27 +281,67 @@ public class TypeDependencyGraph {
 		}
 
 		@Override
-		public TypeNode visitNestedTableNode(NestedTableNode node) {
-			// TODO Auto-generated method stub
-			return null;
+		public NestedTableNode visitNestedTableNode(NestedTableNode node) {
+			NestedTableNode result = null;
+			if ("nestedtable".equals(typeElement.getName())) {
+				String elementType = typeElement.getAttributeValue("of");
+				TypeNode elementTypeNode = rctx.ensureTypeNode(elementType);
+				result = new NestedTableNode(typeElement.getAttributeValue("name"),elementTypeNode);
+			}
+			return result;
 		}
 
 		@Override
-		public TypeNode visitIndexByTableNode(IndexByTableNode node) {
-			// TODO Auto-generated method stub
-			return null;
+		public IndexByTableNode visitIndexByTableNode(IndexByTableNode node) {
+			IndexByTableNode result = null;
+			if ("indexbytable".equals(typeElement.getName())) {
+				String elementType = typeElement.getAttributeValue("of");
+				TypeNode elementTypeNode = rctx.ensureTypeNode(elementType);
+				String indexType = typeElement.getAttributeValue("indexby");
+				PrimitiveNode indexTypeNode = (PrimitiveNode)rctx.ensureTypeNode(indexType);
+				result = new IndexByTableNode(typeElement.getAttributeValue("name"),elementTypeNode,indexTypeNode);
+			}
+			return result;
 		}
 
 		@Override
-		public TypeNode visitProcedureSignatureNode(ProcedureSignatureNode node) {
-			// TODO Auto-generated method stub
-			return null;
+		public ProcedureSignatureNode visitProcedureSignatureNode(ProcedureSignatureNode node) {
+			ProcedureSignatureNode result = null;
+			if ("procedure".equals(typeElement.getName())) {
+				ImmutableMap.Builder<String,Parameter> builder = ImmutableMap.builder();
+				for (Element parameterElement : typeElement.getChildren()) {
+					String modeName = parameterElement.getName();
+					ParameterMode mode = ParameterMode.valueOf(modeName.toUpperCase());
+					String parameterName = parameterElement.getAttributeValue("name");
+					String parameterType = parameterElement.getAttributeValue("type");
+					TypeNode parameterTypeNode = rctx.ensureTypeNode(parameterType);
+					Parameter parameter = Parameter.create(mode, parameterTypeNode);
+					builder.put(parameterName,parameter);
+				}
+				result = new ProcedureSignatureNode(typeElement.getAttributeValue("name"),builder.build());
+			}
+			return result;
 		}
 
 		@Override
-		public TypeNode visitFunctionSignatureNode(FunctionSignatureNode node) {
-			// TODO Auto-generated method stub
-			return null;
+		public FunctionSignatureNode visitFunctionSignatureNode(FunctionSignatureNode node) {
+			FunctionSignatureNode result = null;
+			if ("function".equals(typeElement.getName())) {
+				ImmutableMap.Builder<String,Parameter> builder = ImmutableMap.builder();
+				for (Element parameterElement : typeElement.getChildren()) {
+					String modeName = parameterElement.getName();
+					ParameterMode mode = ParameterMode.valueOf(modeName.toUpperCase());
+					String parameterName = parameterElement.getAttributeValue("name");
+					String parameterType = parameterElement.getAttributeValue("type");
+					TypeNode parameterTypeNode = rctx.ensureTypeNode(parameterType);
+					Parameter parameter = Parameter.create(mode, parameterTypeNode);
+					builder.put(parameterName,parameter);
+				}
+				String returnType = typeElement.getAttributeValue("returntype");
+				TypeNode returnTypeNode = rctx.ensureTypeNode(returnType);
+				result = new FunctionSignatureNode(typeElement.getAttributeValue("name"),builder.build(),returnTypeNode);
+			}
+			return result;
 		}
 
 		@Override
@@ -387,8 +431,6 @@ public class TypeDependencyGraph {
 		public int hashCode() {
 			return Objects.hash(ObjectArrays.concat(this.name, this.fields.entrySet().toArray()));
 		}
-		
-		//TODO equals+hC
 		
 	}
 	
@@ -641,9 +683,13 @@ Set<String> waiting = Sets.newLinkedHashSet();
 Set<String> closed = Sets.newLinkedHashSet();
 
 
-- doplnit dalsi testcasy vcetne nevalidnich
+- rozchodit nacteni vsechn typu z XML
+- rozchodit GetChildren pro vsechny ttypy
+- RecCtx nahradit za obycejnou factory, odstranit matouci prototypy
 - TDG stavet pomoci buildru
-- rozchodit vsechny typy
+- doplnit testcase na acyklicky graf
+- doplnit testcase na atp3
+- doplnit nevalidni testcasy a dalsi krajni pripady
 
 
 
