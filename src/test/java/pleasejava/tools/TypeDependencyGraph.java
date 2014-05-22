@@ -233,18 +233,64 @@ public class TypeDependencyGraph {
 				typeByName.put(name, Optional.<TypeNode>absent()); // marked as being built
 				XPathExpression<Element> xpath = XPathFactory.instance().compile("*[@name='" + name + "']", Filters.element());
 				Element typeElement = Iterables.getOnlyElement(xpath.evaluate(rootElement),null);
-				Recognizer recognizer = new Recognizer(this,name,typeElement);
-				TypeNode recognized = null;
-				for (TypeNode prototype : PROTOTYPES) {
-					if ((recognized = prototype.accept(recognizer)) != null) {
-						break;
+
+				TypeNode result;
+				if (name.matches("integer|pls_integer|boolean|varchar2\\(\\d+\\)")) {
+					result = new PrimitiveNode(name);
+				} else if ("record".equals(typeElement.getName())) {
+					ImmutableMap.Builder<String,TypeNode> builder = ImmutableMap.builder();
+					for (Element fieldElement : typeElement.getChildren("field")) {
+						String fieldName = fieldElement.getAttributeValue("name");
+						String fieldType = fieldElement.getAttributeValue("type");
+						TypeNode fieldTypeNode = ensureTypeNode(fieldType);
+						builder.put(fieldName,fieldTypeNode);
 					}
-				}
-				if (recognized == null) {
+					result = new RecordNode(typeElement.getAttributeValue("name"),builder.build());
+				} else if ("varray".equals(typeElement.getName())) {
+					String elementType = typeElement.getAttributeValue("of");
+					TypeNode elementTypeNode = ensureTypeNode(elementType);
+					result = new VarrayNode(typeElement.getAttributeValue("name"),elementTypeNode);
+				} else if ("nestedtable".equals(typeElement.getName())) {
+					String elementType = typeElement.getAttributeValue("of");
+					TypeNode elementTypeNode = ensureTypeNode(elementType);
+					result = new NestedTableNode(typeElement.getAttributeValue("name"),elementTypeNode);
+				} else if ("indexbytable".equals(typeElement.getName())) {
+					String elementType = typeElement.getAttributeValue("of");
+					TypeNode elementTypeNode = ensureTypeNode(elementType);
+					String indexType = typeElement.getAttributeValue("indexby");
+					PrimitiveNode indexTypeNode = (PrimitiveNode)ensureTypeNode(indexType);
+					result = new IndexByTableNode(typeElement.getAttributeValue("name"),elementTypeNode,indexTypeNode);
+				} else if ("procedure".equals(typeElement.getName())) {
+					ImmutableMap.Builder<String,Parameter> builder = ImmutableMap.builder();
+					for (Element parameterElement : typeElement.getChildren()) {
+						String modeName = parameterElement.getName();
+						ParameterMode mode = ParameterMode.valueOf(modeName.toUpperCase());
+						String parameterName = parameterElement.getAttributeValue("name");
+						String parameterType = parameterElement.getAttributeValue("type");
+						TypeNode parameterTypeNode = ensureTypeNode(parameterType);
+						Parameter parameter = Parameter.create(mode, parameterTypeNode);
+						builder.put(parameterName,parameter);
+					}
+					result = new ProcedureSignatureNode(typeElement.getAttributeValue("name"),builder.build());
+				} else if ("function".equals(typeElement.getName())) {
+					ImmutableMap.Builder<String,Parameter> builder = ImmutableMap.builder();
+					for (Element parameterElement : typeElement.getChildren()) {
+						String modeName = parameterElement.getName();
+						ParameterMode mode = ParameterMode.valueOf(modeName.toUpperCase());
+						String parameterName = parameterElement.getAttributeValue("name");
+						String parameterType = parameterElement.getAttributeValue("type");
+						TypeNode parameterTypeNode = ensureTypeNode(parameterType);
+						Parameter parameter = Parameter.create(mode, parameterTypeNode);
+						builder.put(parameterName,parameter);
+					}
+					String returnType = typeElement.getAttributeValue("returntype");
+					TypeNode returnTypeNode = ensureTypeNode(returnType);
+					result = new FunctionSignatureNode(typeElement.getAttributeValue("name"),builder.build(),returnTypeNode);
+				} else {
 					throw new IllegalStateException("The type " + name + " has not been recognized.");
 				}
-				typeByName.put(name, Optional.of(recognized));
-				return recognized;
+				typeByName.put(name, Optional.of(result));
+				return result;
 			} else if (!optionalTypeNode.isPresent()) { // type node is being built, which indicates circularity
 				throw new IllegalStateException("The type " + name + " circularly depends on itself.");
 			} else { // type node is already registered
@@ -252,122 +298,6 @@ public class TypeDependencyGraph {
 			}
 		}
 		
-	}
-	
-	static class Recognizer implements TypeNodeVisitor<TypeNode> {
-
-		private final RecognitionContext rctx;
-		
-		private final String name;
-		
-		private final Element typeElement;
-
-		Recognizer(RecognitionContext rctx, String name, Element typeElement) {
-			this.rctx = rctx;
-			this.name = name;
-			this.typeElement = typeElement;
-		}
-		
-		@Override
-		public RecordNode visitRecordNode(RecordNode node) {
-			RecordNode result = null;
-			if ("record".equals(typeElement.getName())) {
-				ImmutableMap.Builder<String,TypeNode> builder = ImmutableMap.builder();
-				for (Element fieldElement : typeElement.getChildren("field")) {
-					String fieldName = fieldElement.getAttributeValue("name");
-					String fieldType = fieldElement.getAttributeValue("type");
-					TypeNode fieldTypeNode = rctx.ensureTypeNode(fieldType);
-					builder.put(fieldName,fieldTypeNode);
-				}
-				result = new RecordNode(typeElement.getAttributeValue("name"),builder.build());
-			}
-			return result;
-		}
-
-		@Override
-		public VarrayNode visitVarrayNode(VarrayNode node) {
-			VarrayNode result = null;
-			if ("varray".equals(typeElement.getName())) {
-				String elementType = typeElement.getAttributeValue("of");
-				TypeNode elementTypeNode = rctx.ensureTypeNode(elementType);
-				result = new VarrayNode(typeElement.getAttributeValue("name"),elementTypeNode);
-			}
-			return result;
-		}
-
-		@Override
-		public NestedTableNode visitNestedTableNode(NestedTableNode node) {
-			NestedTableNode result = null;
-			if ("nestedtable".equals(typeElement.getName())) {
-				String elementType = typeElement.getAttributeValue("of");
-				TypeNode elementTypeNode = rctx.ensureTypeNode(elementType);
-				result = new NestedTableNode(typeElement.getAttributeValue("name"),elementTypeNode);
-			}
-			return result;
-		}
-
-		@Override
-		public IndexByTableNode visitIndexByTableNode(IndexByTableNode node) {
-			IndexByTableNode result = null;
-			if ("indexbytable".equals(typeElement.getName())) {
-				String elementType = typeElement.getAttributeValue("of");
-				TypeNode elementTypeNode = rctx.ensureTypeNode(elementType);
-				String indexType = typeElement.getAttributeValue("indexby");
-				PrimitiveNode indexTypeNode = (PrimitiveNode)rctx.ensureTypeNode(indexType);
-				result = new IndexByTableNode(typeElement.getAttributeValue("name"),elementTypeNode,indexTypeNode);
-			}
-			return result;
-		}
-
-		@Override
-		public ProcedureSignatureNode visitProcedureSignatureNode(ProcedureSignatureNode node) {
-			ProcedureSignatureNode result = null;
-			if ("procedure".equals(typeElement.getName())) {
-				ImmutableMap.Builder<String,Parameter> builder = ImmutableMap.builder();
-				for (Element parameterElement : typeElement.getChildren()) {
-					String modeName = parameterElement.getName();
-					ParameterMode mode = ParameterMode.valueOf(modeName.toUpperCase());
-					String parameterName = parameterElement.getAttributeValue("name");
-					String parameterType = parameterElement.getAttributeValue("type");
-					TypeNode parameterTypeNode = rctx.ensureTypeNode(parameterType);
-					Parameter parameter = Parameter.create(mode, parameterTypeNode);
-					builder.put(parameterName,parameter);
-				}
-				result = new ProcedureSignatureNode(typeElement.getAttributeValue("name"),builder.build());
-			}
-			return result;
-		}
-
-		@Override
-		public FunctionSignatureNode visitFunctionSignatureNode(FunctionSignatureNode node) {
-			FunctionSignatureNode result = null;
-			if ("function".equals(typeElement.getName())) {
-				ImmutableMap.Builder<String,Parameter> builder = ImmutableMap.builder();
-				for (Element parameterElement : typeElement.getChildren()) {
-					String modeName = parameterElement.getName();
-					ParameterMode mode = ParameterMode.valueOf(modeName.toUpperCase());
-					String parameterName = parameterElement.getAttributeValue("name");
-					String parameterType = parameterElement.getAttributeValue("type");
-					TypeNode parameterTypeNode = rctx.ensureTypeNode(parameterType);
-					Parameter parameter = Parameter.create(mode, parameterTypeNode);
-					builder.put(parameterName,parameter);
-				}
-				String returnType = typeElement.getAttributeValue("returntype");
-				TypeNode returnTypeNode = rctx.ensureTypeNode(returnType);
-				result = new FunctionSignatureNode(typeElement.getAttributeValue("name"),builder.build(),returnTypeNode);
-			}
-			return result;
-		}
-
-		@Override
-		public TypeNode visitPrimitiveNode(PrimitiveNode node) {
-			PrimitiveNode result = null;
-			if (name.matches("integer|pls_integer|boolean|varchar2\\(\\d+\\)")) {
-				result = new PrimitiveNode(name);
-			}
-			return result;
-		}
-
 	}
 	
 	static class GetChildren implements TypeNodeVisitor<List<TypeNode>> {
@@ -705,9 +635,10 @@ Set<String> waiting = Sets.newLinkedHashSet();
 Set<String> closed = Sets.newLinkedHashSet();
 
 
-- doplnit testcase na atp3
+- doplnit testcase na atp3, overit proti excelu
+	- odstranit matouci prototypy
+	- zlepsit lokalizaci mista chyby a indikaci
 - doplnit nevalidni testcasy a dalsi krajni pripady
-- RecCtx nahradit za obycejnou factory, odstranit matouci prototypy
 - TDG stavet pomoci buildru
 
 
