@@ -4,7 +4,6 @@ import static com.google.common.base.Functions.constant;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.FluentIterable.from;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -13,17 +12,12 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.stream.XMLStreamException;
-
 import org.jdom2.Document;
 import org.jdom2.Element;
-import org.jdom2.JDOMException;
 import org.jdom2.filter.Filters;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
-import org.xml.sax.SAXException;
 
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
