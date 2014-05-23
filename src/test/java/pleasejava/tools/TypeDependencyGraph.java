@@ -110,16 +110,6 @@ public class TypeDependencyGraph {
 			return accept(new GetChildren());
 		}
 
-		static final String PROTOTYPE_DUMMY_NAME = "#";
-		
-		static final TypeNode PROTOTYPE_DUMMY_TYPE_NODE = new TypeNode(PROTOTYPE_DUMMY_NAME) {
-			<R> R accept(TypeNodeVisitor<R> visitor) {return null;}
-		};
-
-		static final PrimitiveNode PROTOTYPE_DUMMY_PRIMITIVE_TYPE_NODE = new PrimitiveNode(PROTOTYPE_DUMMY_NAME) {
-			<R> R accept(TypeNodeVisitor<R> visitor) {return null;}
-		};
-
 		abstract <R> R accept(TypeNodeVisitor<R> visitor);
 		
 		public String getName() {
@@ -211,16 +201,6 @@ public class TypeDependencyGraph {
 		private final Element rootElement;
 		
 		private final Map<String,Optional<TypeNode>> typeByName = Maps.newLinkedHashMap();
-
-		private static final Set<TypeNode> PROTOTYPES = ImmutableSet.of(
-				PrimitiveNode.PROTOTYPE,
-				RecordNode.PROTOTYPE,
-				VarrayNode.PROTOTYPE,
-				NestedTableNode.PROTOTYPE,
-				IndexByTableNode.PROTOTYPE,
-				ProcedureSignatureNode.PROTOTYPE,
-				FunctionSignatureNode.PROTOTYPE
-		);
 
 		RecognitionContext(Element rootElement) {
 			this.rootElement = rootElement;
@@ -344,8 +324,6 @@ public class TypeDependencyGraph {
 	
 	static class RecordNode extends TypeNode {
 		
-		private static final RecordNode PROTOTYPE = new RecordNode(PROTOTYPE_DUMMY_NAME,ImmutableMap.<String,TypeNode>of());
-		
 		private final ImmutableMap<String,TypeNode> fields;
 		
 		RecordNode(String name, Map<String,TypeNode> fields) {
@@ -380,8 +358,6 @@ public class TypeDependencyGraph {
 	
 	static class VarrayNode extends TypeNode {
 
-		private static final VarrayNode PROTOTYPE = new VarrayNode(PROTOTYPE_DUMMY_NAME,PROTOTYPE_DUMMY_TYPE_NODE);
-		
 		private final TypeNode elementTypeNode;
 
 		VarrayNode(String name, TypeNode elementTypeNode) {
@@ -415,8 +391,6 @@ public class TypeDependencyGraph {
 	
 	static class NestedTableNode extends TypeNode {
 		
-		private static final NestedTableNode PROTOTYPE = new NestedTableNode(PROTOTYPE_DUMMY_NAME,PROTOTYPE_DUMMY_TYPE_NODE);
-
 		private final TypeNode elementTypeNode;
 
 		NestedTableNode(String name, TypeNode elementTypeNode) {
@@ -450,15 +424,13 @@ public class TypeDependencyGraph {
 	
 	static class IndexByTableNode extends TypeNode {
 		
-		private static final IndexByTableNode PROTOTYPE = new IndexByTableNode(PROTOTYPE_DUMMY_NAME,PROTOTYPE_DUMMY_TYPE_NODE,PROTOTYPE_DUMMY_PRIMITIVE_TYPE_NODE);
-
 		private final TypeNode elementTypeNode;
 
 		private final PrimitiveNode indexTypeNode;
 
 		IndexByTableNode(String name, TypeNode elementTypeNode, PrimitiveNode indexTypeNode) {
 			super(name);
-			Preconditions.checkArgument(elementTypeNode == PROTOTYPE_DUMMY_TYPE_NODE || indexTypeNode != null && indexTypeNode.getName().matches("(?i)binary_integer|pls_integer|varchar2\\(\\d+?\\)|varchar|string|long")); // http://docs.oracle.com/cd/B10500_01/appdev.920/a96624/05_colls.htm#19661
+			Preconditions.checkArgument(indexTypeNode != null && indexTypeNode.getName().matches("(?i)binary_integer|pls_integer|varchar2\\(\\d+?\\)|varchar|string|long")); // http://docs.oracle.com/cd/B10500_01/appdev.920/a96624/05_colls.htm#19661
 			this.indexTypeNode = indexTypeNode;
 			this.elementTypeNode = checkNotNull(elementTypeNode);
 		}
@@ -492,8 +464,6 @@ public class TypeDependencyGraph {
 	
 	static class ProcedureSignatureNode extends TypeNode {
 		
-		private static final ProcedureSignatureNode PROTOTYPE = new ProcedureSignatureNode(PROTOTYPE_DUMMY_NAME,ImmutableMap.<String,Parameter>of());
-
 		private final ImmutableMap<String,Parameter> parameters;
 
 		ProcedureSignatureNode(String name, Map<String,Parameter> parameters) {
@@ -528,8 +498,6 @@ public class TypeDependencyGraph {
 	
 	static class FunctionSignatureNode extends TypeNode {
 		
-		private static final FunctionSignatureNode PROTOTYPE = new FunctionSignatureNode(PROTOTYPE_DUMMY_NAME,ImmutableMap.<String,Parameter>of(),PROTOTYPE_DUMMY_TYPE_NODE);
-
 		private final TypeNode returnTypeNode;
 		
 		private final ImmutableMap<String,Parameter> parameters;
@@ -573,8 +541,6 @@ public class TypeDependencyGraph {
 	
 	static class PrimitiveNode extends TypeNode {
 		
-		private static final PrimitiveNode PROTOTYPE = new PrimitiveNode(PROTOTYPE_DUMMY_NAME);
-
 		PrimitiveNode(String name) {
 			super(name);
 		}
