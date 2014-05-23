@@ -32,7 +32,7 @@ public class TypeDependencyGraphTest {
 	
 	@Test public void simple() {t("a_test_package.var1","integer");}
 	@Test public void dag1() {t("main","a","d","b","c","e","f","g","h","i","varchar2(100)");}
-	/*@Test*/ public void alltypes() {t("echo","a_test_package.ibt1","a_test_package.rec2","a_test_package.var1",
+	@Test public void alltypes() {t("echo","a_test_package.ibt1","a_test_package.rec2","a_test_package.var1",
 			"a_test_package.nst2","a_test_package.var4","a_test_package.nst3","a_test_package.rec1",
 			"a_test_package.nst4","a_test_package.rec3",
 			"boolean",
