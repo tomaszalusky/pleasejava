@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<tdg>
+	<nestedtable name="nst1" of="nst2" />
+	<nestedtable name="nst2" of="nst1" />
+</tdg>

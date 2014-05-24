@@ -7,16 +7,27 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
+import pleasejava.tools.TypeDependencyGraph.InvalidPlsqlConstructException;
+import pleasejava.tools.TypeDependencyGraph.TypeCircularityException;
 import pleasejava.tools.TypeDependencyGraph.TypeNode;
+import pleasejava.tools.TypeDependencyGraph.UndeclaredTypeException;
 
 import com.google.common.collect.ImmutableList;
 
 /**
  * @author Tomas Zalusky
  */
+@RunWith(JUnit4.class)
 public class TypeDependencyGraphTest {
+
+	@Rule
+	public ExpectedException exception = ExpectedException.none();
 
 	private void t(String... expectedNames) {
 		String methodName = Thread.currentThread().getStackTrace()[2].getMethodName();
@@ -74,4 +85,22 @@ public class TypeDependencyGraphTest {
 	 */
 	);}
 
+	@Test public void invalidType() {
+		exception.expect(UndeclaredTypeException.class);
+		exception.expectMessage("'nonexisting'");
+		t();
+	}
+
+	@Test public void invalidPlsqlConstruct() {
+		exception.expect(InvalidPlsqlConstructException.class);
+		exception.expectMessage("'nonexisting'");
+		t();
+	}
+	
+	@Test public void invalidDependencies() {
+		exception.expect(TypeCircularityException.class);
+		exception.expectMessage("'nst1'");
+		t();
+	}
+	
 }

@@ -54,14 +54,14 @@ public class TypeDependencyGraph {
 	public TypeDependencyGraph(InputStream xml) {
 		try {
 			SAXBuilder builder = new SAXBuilder();
-			Document doc =  builder.build(xml);
+			Document doc = builder.build(xml);
 			Element rootElement = doc.getRootElement();
-			RecognitionContext rctx = new RecognitionContext(rootElement);
+			TypeNodeFactory typeNodeFactory = new TypeNodeFactory(rootElement);
 			ImmutableMultimap.Builder<TypeNode,TypeNode> predecessorsBuilder = ImmutableMultimap.builder();
 			ImmutableSet.Builder<TypeNode> allTypeNodesBuilder = ImmutableSet.builder();
 			for (Element typeElement : rootElement.getChildren()) {
 				String name = typeElement.getAttributeValue("name");
-				TypeNode typeNode = rctx.ensureTypeNode(name);
+				TypeNode typeNode = typeNodeFactory.ensureTypeNode(name);
 				List<TypeNode> children = typeNode.getChildren();
 				allTypeNodesBuilder.add(typeNode).addAll(children);
 				predecessorsBuilder.putAll(Maps.toMap(children,constant(typeNode)).asMultimap());
@@ -189,14 +189,59 @@ public class TypeDependencyGraph {
 		}
 
 	}
+
+	static class UndeclaredTypeException extends RuntimeException {
+		
+		private final String undeclaredType;
+
+		public UndeclaredTypeException(String undeclaredType) {
+			this.undeclaredType = undeclaredType;
+		}
+		
+		@Override
+		public String getMessage() {
+			return String.format("Undeclared type '%s'.",undeclaredType);
+		}
+		
+	}
 	
-	static class RecognitionContext {
+	static class InvalidPlsqlConstructException extends RuntimeException {
+		
+		private final String constructName;
+		
+		public InvalidPlsqlConstructException(String constructName) {
+			this.constructName = constructName;
+		}
+		
+		@Override
+		public String getMessage() {
+			return String.format("Invalid PLSQL construct '%s'.",constructName);
+		}
+		
+	}
+	
+	static class TypeCircularityException extends RuntimeException {
+		
+		private final String typeName;
+		
+		public TypeCircularityException(String typeName) {
+			this.typeName = typeName;
+		}
+		
+		@Override
+		public String getMessage() {
+			return String.format("The type '%s' circularly depends on itself.",typeName);
+		}
+		
+	}
+	
+	static class TypeNodeFactory {
 		
 		private final Element rootElement;
 		
 		private final Map<String,Optional<TypeNode>> typeByName = Maps.newLinkedHashMap();
 
-		RecognitionContext(Element rootElement) {
+		TypeNodeFactory(Element rootElement) {
 			this.rootElement = rootElement;
 		}
 		
@@ -210,7 +255,9 @@ public class TypeDependencyGraph {
 				} else {
 					XPathExpression<Element> xpath = XPathFactory.instance().compile("*[@name='" + name + "']", Filters.element());
 					Element typeElement = Iterables.getOnlyElement(xpath.evaluate(rootElement),null);
-					Preconditions.checkNotNull(typeElement,"Undeclared type '%s'.",name);
+					if (typeElement == null) {
+						throw new UndeclaredTypeException(name);
+					}
 					String typeElementName = typeElement.getName();
 					switch (typeElementName) {
 						case "record" : {
@@ -221,24 +268,24 @@ public class TypeDependencyGraph {
 								TypeNode fieldTypeNode = ensureTypeNode(fieldType);
 								builder.put(fieldName,fieldTypeNode);
 							}
-							result = new RecordNode(typeElement.getAttributeValue("name"),builder.build());
+							result = new RecordNode(name,builder.build());
 							break;
 						} case "varray" : {
 							String elementType = typeElement.getAttributeValue("of");
 							TypeNode elementTypeNode = ensureTypeNode(elementType);
-							result = new VarrayNode(typeElement.getAttributeValue("name"),elementTypeNode);
+							result = new VarrayNode(name,elementTypeNode);
 							break;
 						} case "nestedtable" : {
 							String elementType = typeElement.getAttributeValue("of");
 							TypeNode elementTypeNode = ensureTypeNode(elementType);
-							result = new NestedTableNode(typeElement.getAttributeValue("name"),elementTypeNode);
+							result = new NestedTableNode(name,elementTypeNode);
 							break;
 						} case "indexbytable" : {
 							String elementType = typeElement.getAttributeValue("of");
 							TypeNode elementTypeNode = ensureTypeNode(elementType);
 							String indexType = typeElement.getAttributeValue("indexby");
 							PrimitiveNode indexTypeNode = (PrimitiveNode)ensureTypeNode(indexType);
-							result = new IndexByTableNode(typeElement.getAttributeValue("name"),elementTypeNode,indexTypeNode);
+							result = new IndexByTableNode(name,elementTypeNode,indexTypeNode);
 							break;
 						} case "procedure" : {
 							ImmutableMap.Builder<String,Parameter> builder = ImmutableMap.builder();
@@ -251,7 +298,7 @@ public class TypeDependencyGraph {
 								Parameter parameter = Parameter.create(mode, parameterTypeNode);
 								builder.put(parameterName,parameter);
 							}
-							result = new ProcedureSignatureNode(typeElement.getAttributeValue("name"),builder.build());
+							result = new ProcedureSignatureNode(name,builder.build());
 							break;
 						} case "function" : {
 							ImmutableMap.Builder<String,Parameter> builder = ImmutableMap.builder();
@@ -266,17 +313,17 @@ public class TypeDependencyGraph {
 							}
 							String returnType = typeElement.getAttributeValue("returntype");
 							TypeNode returnTypeNode = ensureTypeNode(returnType);
-							result = new FunctionSignatureNode(typeElement.getAttributeValue("name"),builder.build(),returnTypeNode);
+							result = new FunctionSignatureNode(name,builder.build(),returnTypeNode);
 							break;
 						} default : {
-							throw new IllegalStateException("The type " + name + " has not been recognized.");
+							throw new InvalidPlsqlConstructException(typeElementName);
 						}
 					}
 				}
 				typeByName.put(name, Optional.of(result));
 				return result;
 			} else if (!optionalTypeNode.isPresent()) { // type node is being built, which indicates circularity
-				throw new IllegalStateException("The type " + name + " circularly depends on itself.");
+				throw new TypeCircularityException(name);
 			} else { // type node is already registered
 				return optionalTypeNode.get();
 			}
@@ -605,9 +652,12 @@ Set<String> waiting = Sets.newLinkedHashSet();
 Set<String> closed = Sets.newLinkedHashSet();
 
 
-- doplnit testcase na atp3, overit proti excelu
 - doplnit nevalidni testcasy a dalsi krajni pripady
+	- invalid xml format
+- odstranit pojmenovani Node, nechat jen typy
 - TDG stavet pomoci buildru
+- presunout do samostatnych trid
+- javadoc
 
 
 
