@@ -7,13 +7,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
+import org.hamcrest.Description;
+import org.jdom2.input.JDOMParseException;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.internal.matchers.TypeSafeMatcher;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 import pleasejava.tools.TypeDependencyGraph.InvalidPlsqlConstructException;
+import pleasejava.tools.TypeDependencyGraph.InvalidXmlException;
 import pleasejava.tools.TypeDependencyGraph.TypeCircularityException;
 import pleasejava.tools.TypeDependencyGraph.TypeNode;
 import pleasejava.tools.TypeDependencyGraph.UndeclaredTypeException;
@@ -107,8 +111,28 @@ public class TypeDependencyGraphTest {
 		t(TypeCircularityException.class,"'nst1'");
 	}
 	
-//	@Test public void invalidXml() {
-//		t(RuntimeException.class,"'nst1'",s -> s.replaceFirst(""));
-//	}
+	@Test public void invalidXml1() {
+		t(InvalidXmlException.class,"'empty record'");
+	}
+	
+	@Test public void invalidXml2() {
+		t(InvalidXmlException.class,"'missing attribute name'");
+	}
+	
+	@Test public void invalidXml3() {
+		t(InvalidXmlException.class,"'invalid parameter mode foo'");
+	}
+	
+	@Test public void invalidXml4() {
+		exception.expect(RuntimeException.class);
+		exception.expect(new TypeSafeMatcher<Exception>() {
+			public void describeTo(Description description) {}
+			@Override
+			public boolean matchesSafely(Exception item) {
+				return item.getCause() instanceof JDOMParseException;
+			}
+		});
+		t();
+	}
 	
 }

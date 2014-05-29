@@ -19,6 +19,7 @@ import org.jdom2.input.SAXBuilder;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 
+import com.google.common.base.Enums;
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
@@ -235,6 +236,21 @@ public class TypeDependencyGraph {
 		
 	}
 	
+	static class InvalidXmlException extends RuntimeException {
+		
+		private final String detail;
+
+		public InvalidXmlException(String detail) {
+			this.detail = detail;
+		}
+		
+		@Override
+		public String getMessage() {
+			return String.format("Invalid XML type, error: '%s'.",detail);
+		}
+		
+	}
+	
 	static class TypeNodeFactory {
 		
 		private final Element rootElement;
@@ -245,6 +261,23 @@ public class TypeDependencyGraph {
 			this.rootElement = rootElement;
 		}
 		
+		private static String attr(Element element, String name) {
+			String result = element.getAttributeValue(name);
+			if (result == null) {
+				throw new InvalidXmlException("missing attribute " + name);
+			}
+			return result;
+		}
+
+		private static ParameterMode parameterMode(Element parameterElement) {
+			String modeName = parameterElement.getName();
+			Optional<ParameterMode> result = Enums.getIfPresent(ParameterMode.class, modeName.toUpperCase());
+			if (!result.isPresent()) {
+				throw new InvalidXmlException("invalid parameter mode " + modeName);
+			}
+			return result.get();
+		}
+
 		TypeNode ensureTypeNode(String name) {
 			Optional<TypeNode> optionalTypeNode = typeByName.get(name);
 			if (optionalTypeNode == null) { // type node has not been constructed yet
@@ -262,38 +295,41 @@ public class TypeDependencyGraph {
 					switch (typeElementName) {
 						case "record" : {
 							ImmutableMap.Builder<String,TypeNode> builder = ImmutableMap.builder();
-							for (Element fieldElement : typeElement.getChildren("field")) {
-								String fieldName = fieldElement.getAttributeValue("name");
-								String fieldType = fieldElement.getAttributeValue("type");
+							List<Element> children = typeElement.getChildren("field");
+							if (children.isEmpty()) {
+								throw new InvalidXmlException("empty record");
+							}
+							for (Element fieldElement : children) {
+								String fieldName = attr(fieldElement,"name");
+								String fieldType = attr(fieldElement,"type");
 								TypeNode fieldTypeNode = ensureTypeNode(fieldType);
 								builder.put(fieldName,fieldTypeNode);
 							}
 							result = new RecordNode(name,builder.build());
 							break;
 						} case "varray" : {
-							String elementType = typeElement.getAttributeValue("of");
+							String elementType = attr(typeElement,"of");
 							TypeNode elementTypeNode = ensureTypeNode(elementType);
 							result = new VarrayNode(name,elementTypeNode);
 							break;
 						} case "nestedtable" : {
-							String elementType = typeElement.getAttributeValue("of");
+							String elementType = attr(typeElement,"of");
 							TypeNode elementTypeNode = ensureTypeNode(elementType);
 							result = new NestedTableNode(name,elementTypeNode);
 							break;
 						} case "indexbytable" : {
-							String elementType = typeElement.getAttributeValue("of");
+							String elementType = attr(typeElement,"of");
 							TypeNode elementTypeNode = ensureTypeNode(elementType);
-							String indexType = typeElement.getAttributeValue("indexby");
+							String indexType = attr(typeElement,"indexby");
 							PrimitiveNode indexTypeNode = (PrimitiveNode)ensureTypeNode(indexType);
 							result = new IndexByTableNode(name,elementTypeNode,indexTypeNode);
 							break;
 						} case "procedure" : {
 							ImmutableMap.Builder<String,Parameter> builder = ImmutableMap.builder();
 							for (Element parameterElement : typeElement.getChildren()) {
-								String modeName = parameterElement.getName();
-								ParameterMode mode = ParameterMode.valueOf(modeName.toUpperCase());
-								String parameterName = parameterElement.getAttributeValue("name");
-								String parameterType = parameterElement.getAttributeValue("type");
+								ParameterMode mode = parameterMode(parameterElement);
+								String parameterName = attr(parameterElement,"name");
+								String parameterType = attr(parameterElement,"type");
 								TypeNode parameterTypeNode = ensureTypeNode(parameterType);
 								Parameter parameter = Parameter.create(mode, parameterTypeNode);
 								builder.put(parameterName,parameter);
@@ -303,15 +339,14 @@ public class TypeDependencyGraph {
 						} case "function" : {
 							ImmutableMap.Builder<String,Parameter> builder = ImmutableMap.builder();
 							for (Element parameterElement : typeElement.getChildren()) {
-								String modeName = parameterElement.getName();
-								ParameterMode mode = ParameterMode.valueOf(modeName.toUpperCase());
-								String parameterName = parameterElement.getAttributeValue("name");
-								String parameterType = parameterElement.getAttributeValue("type");
+								ParameterMode mode = parameterMode(parameterElement);
+								String parameterName = attr(parameterElement,"name");
+								String parameterType = attr(parameterElement,"type");
 								TypeNode parameterTypeNode = ensureTypeNode(parameterType);
 								Parameter parameter = Parameter.create(mode, parameterTypeNode);
 								builder.put(parameterName,parameter);
 							}
-							String returnType = typeElement.getAttributeValue("returntype");
+							String returnType = attr(typeElement,"returntype");
 							TypeNode returnTypeNode = ensureTypeNode(returnType);
 							result = new FunctionSignatureNode(name,builder.build(),returnTypeNode);
 							break;
@@ -652,8 +687,6 @@ Set<String> waiting = Sets.newLinkedHashSet();
 Set<String> closed = Sets.newLinkedHashSet();
 
 
-- doplnit nevalidni testcasy a dalsi krajni pripady
-	- invalid xml format
 - odstranit pojmenovani Node, nechat jen typy
 - TDG stavet pomoci buildru
 - presunout do samostatnych trid
