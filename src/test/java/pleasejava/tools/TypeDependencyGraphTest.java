@@ -29,8 +29,18 @@ public class TypeDependencyGraphTest {
 	@Rule
 	public ExpectedException exception = ExpectedException.none();
 
+	private void t(Class<? extends Exception> exceptionClass, String expectedMessage) {
+		exception.expect(exceptionClass);
+		exception.expectMessage(expectedMessage);
+		t();
+	}
+	
 	private void t(String... expectedNames) {
-		String methodName = Thread.currentThread().getStackTrace()[2].getMethodName();
+		StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+		String methodName = stackTrace[2].getMethodName();
+		if ("t".equals(methodName)) {
+			methodName = stackTrace[3].getMethodName();
+		}
 		String fileSubpath = String.format("tdg/%s.xml",methodName);
 		try (InputStream is = TypeDependencyGraphTest.class.getResourceAsStream(fileSubpath)) {
 			TypeDependencyGraph graph = new TypeDependencyGraph(is);
@@ -86,21 +96,19 @@ public class TypeDependencyGraphTest {
 	);}
 
 	@Test public void invalidType() {
-		exception.expect(UndeclaredTypeException.class);
-		exception.expectMessage("'nonexisting'");
-		t();
+		t(UndeclaredTypeException.class,"'nonexisting'");
 	}
 
 	@Test public void invalidPlsqlConstruct() {
-		exception.expect(InvalidPlsqlConstructException.class);
-		exception.expectMessage("'nonexisting'");
-		t();
+		t(InvalidPlsqlConstructException.class,"'nonexisting'");
 	}
 	
 	@Test public void invalidDependencies() {
-		exception.expect(TypeCircularityException.class);
-		exception.expectMessage("'nst1'");
-		t();
+		t(TypeCircularityException.class,"'nst1'");
 	}
+	
+//	@Test public void invalidXml() {
+//		t(RuntimeException.class,"'nst1'",s -> s.replaceFirst(""));
+//	}
 	
 }
