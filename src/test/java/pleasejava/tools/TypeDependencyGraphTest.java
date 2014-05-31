@@ -19,7 +19,7 @@ import org.junit.runners.JUnit4;
 import pleasejava.tools.TypeDependencyGraph.InvalidPlsqlConstructException;
 import pleasejava.tools.TypeDependencyGraph.InvalidXmlException;
 import pleasejava.tools.TypeDependencyGraph.TypeCircularityException;
-import pleasejava.tools.TypeDependencyGraph.TypeNode;
+import pleasejava.tools.TypeDependencyGraph.Type;
 import pleasejava.tools.TypeDependencyGraph.UndeclaredTypeException;
 
 import com.google.common.collect.ImmutableList;
@@ -48,8 +48,8 @@ public class TypeDependencyGraphTest {
 		String fileSubpath = String.format("tdg/%s.xml",methodName);
 		try (InputStream is = TypeDependencyGraphTest.class.getResourceAsStream(fileSubpath)) {
 			TypeDependencyGraph graph = new TypeDependencyGraph(is);
-			List<TypeNode> actual = graph.getTopologicalOrdering();
-			List<String> actualNames = from(actual).transform(TypeNode._getName).toList();
+			List<Type> actual = graph.getTopologicalOrdering();
+			List<String> actualNames = from(actual).transform(Type._getName).toList();
 			assertEquals(ImmutableList.copyOf(expectedNames), actualNames);
 		} catch (IOException e) {
 		}

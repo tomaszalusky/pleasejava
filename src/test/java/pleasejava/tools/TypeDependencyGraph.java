@@ -18,7 +18,6 @@ import org.jdom2.filter.Filters;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
-
 import com.google.common.base.Enums;
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
@@ -48,35 +47,35 @@ public class TypeDependencyGraph {
 	 * @throws JDOMException 
 	 * @throws SAXException 
 	 */
-	//final ImmutableListMultimap<TypeNode,TypeNode> dependencies;
+	//final ImmutableListMultimap<Type,Type> dependencies;
 	
-	final List<TypeNode> topologicalOrdering;
+	final List<Type> topologicalOrdering;
 	
 	public TypeDependencyGraph(InputStream xml) {
 		try {
 			SAXBuilder builder = new SAXBuilder();
 			Document doc = builder.build(xml);
 			Element rootElement = doc.getRootElement();
-			TypeNodeFactory typeNodeFactory = new TypeNodeFactory(rootElement);
-			ImmutableMultimap.Builder<TypeNode,TypeNode> predecessorsBuilder = ImmutableMultimap.builder();
-			ImmutableSet.Builder<TypeNode> allTypeNodesBuilder = ImmutableSet.builder();
+			TypeFactory typeFactory = new TypeFactory(rootElement);
+			ImmutableMultimap.Builder<Type,Type> predecessorsBuilder = ImmutableMultimap.builder();
+			ImmutableSet.Builder<Type> allTypesBuilder = ImmutableSet.builder();
 			for (Element typeElement : rootElement.getChildren()) {
 				String name = typeElement.getAttributeValue("name");
-				TypeNode typeNode = typeNodeFactory.ensureTypeNode(name);
-				List<TypeNode> children = typeNode.getChildren();
-				allTypeNodesBuilder.add(typeNode).addAll(children);
-				predecessorsBuilder.putAll(Maps.toMap(children,constant(typeNode)).asMultimap());
+				Type type = typeFactory.ensureType(name);
+				List<Type> children = type.getChildren();
+				allTypesBuilder.add(type).addAll(children);
+				predecessorsBuilder.putAll(Maps.toMap(children,constant(type)).asMultimap());
 			}
-			ImmutableMultimap<TypeNode,TypeNode> predecessors = predecessorsBuilder.build();
-			ImmutableSet<TypeNode> allTypeNodes = allTypeNodesBuilder.build();
+			ImmutableMultimap<Type,Type> predecessors = predecessorsBuilder.build();
+			ImmutableSet<Type> allTypes = allTypesBuilder.build();
 			
-			Multimap<TypeNode,TypeNode> exhaust = LinkedHashMultimap.create(predecessors); // copy of predecessors multimap, its elements are removed during build in order to reveal another nodes
-			ImmutableList.Builder<TypeNode> topologicalOrderingBuilder = ImmutableList.builder();
-			Set<TypeNode> seed = Sets.difference(allTypeNodes,predecessors.keySet()); // initial set of nodes with no incoming edge
-			for (Deque<TypeNode> queue = new ArrayDeque<TypeNode>(seed); !queue.isEmpty(); ) { // queue of nodes with no incoming edge
-				TypeNode top = queue.pollFirst();
+			Multimap<Type,Type> exhaust = LinkedHashMultimap.create(predecessors); // copy of predecessors multimap, its elements are removed during build in order to reveal another nodes
+			ImmutableList.Builder<Type> topologicalOrderingBuilder = ImmutableList.builder();
+			Set<Type> seeds = Sets.difference(allTypes,predecessors.keySet()); // initial set of nodes with no incoming edge
+			for (Deque<Type> queue = new ArrayDeque<Type>(seeds); !queue.isEmpty(); ) { // queue of nodes with no incoming edge
+				Type top = queue.pollFirst();
 				topologicalOrderingBuilder.add(top); // queue invariant: polled node has no incoming edge -> it is safe to push it to output
-				for (TypeNode child : ImmutableSet.copyOf(top.getChildren())) { // set prevents duplicate offer of child in case of duplicate children
+				for (Type child : ImmutableSet.copyOf(top.getChildren())) { // set prevents duplicate offer of child in case of duplicate children
 					exhaust.get(child).remove(top); // removing edges to all children
 					if (exhaust.get(child).isEmpty()) { // if no edge remains, child becomes top 
 						queue.offerLast(child);
@@ -89,30 +88,30 @@ public class TypeDependencyGraph {
 		}
 	}
 	
-	public List<TypeNode> getTopologicalOrdering() {
+	public List<Type> getTopologicalOrdering() {
 		return topologicalOrdering;
 	}
 	
-	abstract static class TypeNode {
+	abstract static class Type {
 		
 		final String name;
 		
-		public TypeNode(String name) {
+		public Type(String name) {
 			this.name = checkNotNull(name);
 		}
 		
-		final List<TypeNode> getChildren() {
+		final List<Type> getChildren() {
 			return accept(new GetChildren());
 		}
 
-		abstract <R> R accept(TypeNodeVisitor<R> visitor);
+		abstract <R> R accept(TypeVisitor<R> visitor);
 		
 		public String getName() {
 			return name;
 		}
 		
-		public static Function<TypeNode,String> _getName = new Function<TypeNode,String>() {
-			public String apply(TypeNode input) {
+		public static Function<Type,String> _getName = new Function<Type,String>() {
+			public String apply(Type input) {
 				return input.getName();
 			}
 		};
@@ -134,44 +133,51 @@ public class TypeDependencyGraph {
 		INOUT;
 	}
 	
+	/**
+	 * Pair of parameter mode and type.
+	 * (Parameter name is intentionally not included,
+	 * it is maintained by procedure or function type,
+	 * this class can be used also for return type of function.)
+	 * @author Tomas Zalusky
+	 */
 	static final class Parameter {
 		
 		private final ParameterMode parameterMode;
 		
-		private final TypeNode typeNode;
+		private final Type type;
 		
-		private Parameter(ParameterMode parameterMode, TypeNode typeNode) {
+		private Parameter(ParameterMode parameterMode, Type type) {
 			this.parameterMode = parameterMode;
-			this.typeNode = typeNode;
+			this.type = type;
 		}
 		
-		public static Parameter create(ParameterMode mode, TypeNode typeNode) {
-			return new Parameter(mode, typeNode);
+		public static Parameter create(ParameterMode mode, Type type) {
+			return new Parameter(mode, type);
 		}
 		
-		public static Parameter in(TypeNode typeNode) {
-			return new Parameter(ParameterMode.IN, typeNode);
+		public static Parameter in(Type type) {
+			return new Parameter(ParameterMode.IN, type);
 		}
 		
-		public static Parameter out(TypeNode typeNode) {
-			return new Parameter(ParameterMode.OUT, typeNode);
+		public static Parameter out(Type type) {
+			return new Parameter(ParameterMode.OUT, type);
 		}
 		
-		public static Parameter inout(TypeNode typeNode) {
-			return new Parameter(ParameterMode.INOUT, typeNode);
+		public static Parameter inout(Type type) {
+			return new Parameter(ParameterMode.INOUT, type);
 		}
 
 		public ParameterMode getParameterMode() {
 			return parameterMode;
 		}
 		
-		public TypeNode getTypeNode() {
-			return typeNode;
+		public Type getType() {
+			return type;
 		}
 		
-		public static final Function<Parameter,TypeNode> _getTypeNode = new Function<Parameter,TypeNode>() {
-			public TypeNode apply(Parameter input) {
-				return input.getTypeNode();
+		public static final Function<Parameter,Type> _getType = new Function<Parameter,Type>() {
+			public Type apply(Parameter input) {
+				return input.getType();
 			}
 		};
 		
@@ -180,13 +186,13 @@ public class TypeDependencyGraph {
 			if (this == obj) return true;
 			if (!(obj instanceof Parameter)) return false;
 			Parameter that = (Parameter)obj;
-			boolean result = Objects.equals(this.parameterMode,that.parameterMode) && Objects.equals(this.typeNode,that.typeNode);
+			boolean result = Objects.equals(this.parameterMode,that.parameterMode) && Objects.equals(this.type,that.type);
 			return result;
 		}
 		
 		@Override
 		public int hashCode() {
-			return Objects.hash(this.parameterMode,this.typeNode);
+			return Objects.hash(this.parameterMode,this.type);
 		}
 
 	}
@@ -251,13 +257,13 @@ public class TypeDependencyGraph {
 		
 	}
 	
-	static class TypeNodeFactory {
+	static class TypeFactory {
 		
 		private final Element rootElement;
 		
-		private final Map<String,Optional<TypeNode>> typeByName = Maps.newLinkedHashMap();
+		private final Map<String,Optional<Type>> typeByName = Maps.newLinkedHashMap();
 
-		TypeNodeFactory(Element rootElement) {
+		TypeFactory(Element rootElement) {
 			this.rootElement = rootElement;
 		}
 		
@@ -278,13 +284,13 @@ public class TypeDependencyGraph {
 			return result.get();
 		}
 
-		TypeNode ensureTypeNode(String name) {
-			Optional<TypeNode> optionalTypeNode = typeByName.get(name);
-			if (optionalTypeNode == null) { // type node has not been constructed yet
-				typeByName.put(name, Optional.<TypeNode>absent()); // marked as being built
-				TypeNode result;
+		Type ensureType(String name) {
+			Optional<Type> optionalType = typeByName.get(name);
+			if (optionalType == null) { // type node has not been constructed yet
+				typeByName.put(name, Optional.<Type>absent()); // marked as being built
+				Type result;
 				if (name.matches("integer|pls_integer|boolean|varchar2\\(\\d+\\)|varchar|string\\(\\d+\\)|string|number\\(\\d+\\)|binary_integer|long|clob")) {
-					result = new PrimitiveNode(name);
+					result = new PrimitiveType(name);
 				} else {
 					XPathExpression<Element> xpath = XPathFactory.instance().compile("*[@name='" + name + "']", Filters.element());
 					Element typeElement = Iterables.getOnlyElement(xpath.evaluate(rootElement),null);
@@ -294,61 +300,61 @@ public class TypeDependencyGraph {
 					String typeElementName = typeElement.getName();
 					switch (typeElementName) {
 						case "record" : {
-							ImmutableMap.Builder<String,TypeNode> builder = ImmutableMap.builder();
+							ImmutableMap.Builder<String,Type> builder = ImmutableMap.builder();
 							List<Element> children = typeElement.getChildren("field");
 							if (children.isEmpty()) {
 								throw new InvalidXmlException("empty record");
 							}
 							for (Element fieldElement : children) {
 								String fieldName = attr(fieldElement,"name");
-								String fieldType = attr(fieldElement,"type");
-								TypeNode fieldTypeNode = ensureTypeNode(fieldType);
-								builder.put(fieldName,fieldTypeNode);
+								String fieldTypeName = attr(fieldElement,"type");
+								Type fieldType = ensureType(fieldTypeName);
+								builder.put(fieldName,fieldType);
 							}
-							result = new RecordNode(name,builder.build());
+							result = new Record(name,builder.build());
 							break;
 						} case "varray" : {
-							String elementType = attr(typeElement,"of");
-							TypeNode elementTypeNode = ensureTypeNode(elementType);
-							result = new VarrayNode(name,elementTypeNode);
+							String elementTypeName = attr(typeElement,"of");
+							Type elementType = ensureType(elementTypeName);
+							result = new Varray(name,elementType);
 							break;
 						} case "nestedtable" : {
-							String elementType = attr(typeElement,"of");
-							TypeNode elementTypeNode = ensureTypeNode(elementType);
-							result = new NestedTableNode(name,elementTypeNode);
+							String elementTypeName = attr(typeElement,"of");
+							Type elementType = ensureType(elementTypeName);
+							result = new NestedTable(name,elementType);
 							break;
 						} case "indexbytable" : {
-							String elementType = attr(typeElement,"of");
-							TypeNode elementTypeNode = ensureTypeNode(elementType);
-							String indexType = attr(typeElement,"indexby");
-							PrimitiveNode indexTypeNode = (PrimitiveNode)ensureTypeNode(indexType);
-							result = new IndexByTableNode(name,elementTypeNode,indexTypeNode);
+							String elementTypeName = attr(typeElement,"of");
+							Type elementType = ensureType(elementTypeName);
+							String indexTypeName = attr(typeElement,"indexby");
+							PrimitiveType indexType = (PrimitiveType)ensureType(indexTypeName);
+							result = new IndexByTable(name,elementType,indexType);
 							break;
 						} case "procedure" : {
 							ImmutableMap.Builder<String,Parameter> builder = ImmutableMap.builder();
 							for (Element parameterElement : typeElement.getChildren()) {
 								ParameterMode mode = parameterMode(parameterElement);
 								String parameterName = attr(parameterElement,"name");
-								String parameterType = attr(parameterElement,"type");
-								TypeNode parameterTypeNode = ensureTypeNode(parameterType);
-								Parameter parameter = Parameter.create(mode, parameterTypeNode);
+								String parameterTypeName = attr(parameterElement,"type");
+								Type parameterType = ensureType(parameterTypeName);
+								Parameter parameter = Parameter.create(mode, parameterType);
 								builder.put(parameterName,parameter);
 							}
-							result = new ProcedureSignatureNode(name,builder.build());
+							result = new ProcedureSignature(name,builder.build());
 							break;
 						} case "function" : {
 							ImmutableMap.Builder<String,Parameter> builder = ImmutableMap.builder();
 							for (Element parameterElement : typeElement.getChildren()) {
 								ParameterMode mode = parameterMode(parameterElement);
 								String parameterName = attr(parameterElement,"name");
-								String parameterType = attr(parameterElement,"type");
-								TypeNode parameterTypeNode = ensureTypeNode(parameterType);
-								Parameter parameter = Parameter.create(mode, parameterTypeNode);
+								String parameterTypeName = attr(parameterElement,"type");
+								Type parameterType = ensureType(parameterTypeName);
+								Parameter parameter = Parameter.create(mode, parameterType);
 								builder.put(parameterName,parameter);
 							}
-							String returnType = attr(typeElement,"returntype");
-							TypeNode returnTypeNode = ensureTypeNode(returnType);
-							result = new FunctionSignatureNode(name,builder.build(),returnTypeNode);
+							String returnTypeName = attr(typeElement,"returntype");
+							Type returnType = ensureType(returnTypeName);
+							result = new FunctionSignature(name,builder.build(),returnType);
 							break;
 						} default : {
 							throw new InvalidPlsqlConstructException(typeElementName);
@@ -357,79 +363,79 @@ public class TypeDependencyGraph {
 				}
 				typeByName.put(name, Optional.of(result));
 				return result;
-			} else if (!optionalTypeNode.isPresent()) { // type node is being built, which indicates circularity
+			} else if (!optionalType.isPresent()) { // type node is being built, which indicates circularity
 				throw new TypeCircularityException(name);
 			} else { // type node is already registered
-				return optionalTypeNode.get();
+				return optionalType.get();
 			}
 		}
 		
 	}
 	
-	static class GetChildren implements TypeNodeVisitor<List<TypeNode>> {
+	static class GetChildren implements TypeVisitor<List<Type>> {
 
 		@Override
-		public List<TypeNode> visitRecordNode(RecordNode node) {
-			return ImmutableList.copyOf(node.getFields().values());
+		public List<Type> visitRecord(Record type) {
+			return ImmutableList.copyOf(type.getFields().values());
 		}
 
 		@Override
-		public List<TypeNode> visitVarrayNode(VarrayNode node) {
-			return ImmutableList.of(node.getElementTypeNode());
+		public List<Type> visitVarray(Varray type) {
+			return ImmutableList.of(type.getElementType());
 		}
 
 		@Override
-		public List<TypeNode> visitNestedTableNode(NestedTableNode node) {
-			return ImmutableList.of(node.getElementTypeNode());
+		public List<Type> visitNestedTable(NestedTable type) {
+			return ImmutableList.of(type.getElementType());
 		}
 
 		@Override
-		public List<TypeNode> visitIndexByTableNode(IndexByTableNode node) {
-			return ImmutableList.of(node.getElementTypeNode());
+		public List<Type> visitIndexByTable(IndexByTable type) {
+			return ImmutableList.of(type.getElementType());
 		}
 
 		@Override
-		public List<TypeNode> visitProcedureSignatureNode(ProcedureSignatureNode node) {
-			return from(node.getParameters().values()).transform(Parameter._getTypeNode).toList();
+		public List<Type> visitProcedureSignature(ProcedureSignature type) {
+			return from(type.getParameters().values()).transform(Parameter._getType).toList();
 		}
 
 		@Override
-		public List<TypeNode> visitFunctionSignatureNode(FunctionSignatureNode node) {
-			ImmutableList.Builder<TypeNode> builder = ImmutableList.builder();
-			builder.add(node.getReturnTypeNode());
-			builder.addAll(from(node.getParameters().values()).transform(Parameter._getTypeNode));
+		public List<Type> visitFunctionSignature(FunctionSignature type) {
+			ImmutableList.Builder<Type> builder = ImmutableList.builder();
+			builder.add(type.getReturnType());
+			builder.addAll(from(type.getParameters().values()).transform(Parameter._getType));
 			return builder.build();
 		}
 
 		@Override
-		public List<TypeNode> visitPrimitiveNode(PrimitiveNode node) {
+		public List<Type> visitPrimitive(PrimitiveType type) {
 			return ImmutableList.of();
 		}
 		
 	}
 	
-	static class RecordNode extends TypeNode {
+	static class Record extends Type {
 		
-		private final ImmutableMap<String,TypeNode> fields;
+		private final ImmutableMap<String,Type> fields;
 		
-		RecordNode(String name, Map<String,TypeNode> fields) {
+		Record(String name, Map<String,Type> fields) {
 			super(name);
 			this.fields = ImmutableMap.copyOf(checkNotNull(fields));
 		}
 
-		<R> R accept(TypeNodeVisitor<R> visitor) {
-			return visitor.visitRecordNode(this);
+		<R> R accept(TypeVisitor<R> visitor) {
+			return visitor.visitRecord(this);
 		}
 		
-		public Map<String,TypeNode> getFields() {
+		public Map<String,Type> getFields() {
 			return fields;
 		}
 		
 		@Override
 		public boolean equals(Object obj) {
 			if (this == obj) return true;
-			if (!(obj instanceof RecordNode)) return false;
-			RecordNode that = (RecordNode)obj;
+			if (!(obj instanceof Record)) return false;
+			Record that = (Record)obj;
 			// cannot just use Objects.equals(this.fields,that.fields) because order matters
 			boolean result = Objects.equals(this.name,that.name) && Iterables.elementsEqual(this.fields.entrySet(),that.fields.entrySet());
 			return result;
@@ -442,123 +448,123 @@ public class TypeDependencyGraph {
 		
 	}
 	
-	static class VarrayNode extends TypeNode {
+	static class Varray extends Type {
 
-		private final TypeNode elementTypeNode;
+		private final Type elementType;
 
-		VarrayNode(String name, TypeNode elementTypeNode) {
+		Varray(String name, Type elementType) {
 			super(name);
-			this.elementTypeNode = checkNotNull(elementTypeNode);
+			this.elementType = checkNotNull(elementType);
 		}
 		
-		<R> R accept(TypeNodeVisitor<R> visitor) {
-			return visitor.visitVarrayNode(this);
+		<R> R accept(TypeVisitor<R> visitor) {
+			return visitor.visitVarray(this);
 		}
 		
-		public TypeNode getElementTypeNode() {
-			return elementTypeNode;
+		public Type getElementType() {
+			return elementType;
 		}
 
 		@Override
 		public boolean equals(Object obj) {
 			if (this == obj) return true;
-			if (!(obj instanceof VarrayNode)) return false;
-			VarrayNode that = (VarrayNode)obj;
-			boolean result = Objects.equals(this.name,that.name) && Objects.equals(this.elementTypeNode,that.elementTypeNode);
+			if (!(obj instanceof Varray)) return false;
+			Varray that = (Varray)obj;
+			boolean result = Objects.equals(this.name,that.name) && Objects.equals(this.elementType,that.elementType);
 			return result;
 		}
 		
 		@Override
 		public int hashCode() {
-			return Objects.hash(this.name,this.elementTypeNode);
+			return Objects.hash(this.name,this.elementType);
 		}
 
 	}
 	
-	static class NestedTableNode extends TypeNode {
+	static class NestedTable extends Type {
 		
-		private final TypeNode elementTypeNode;
+		private final Type elementType;
 
-		NestedTableNode(String name, TypeNode elementTypeNode) {
+		NestedTable(String name, Type elementType) {
 			super(name);
-			this.elementTypeNode = checkNotNull(elementTypeNode);
+			this.elementType = checkNotNull(elementType);
 		}
 		
-		<R> R accept(TypeNodeVisitor<R> visitor) {
-			return visitor.visitNestedTableNode(this);
+		<R> R accept(TypeVisitor<R> visitor) {
+			return visitor.visitNestedTable(this);
 		}
 		
-		public TypeNode getElementTypeNode() {
-			return elementTypeNode;
+		public Type getElementType() {
+			return elementType;
 		}
 
 		@Override
 		public boolean equals(Object obj) {
 			if (this == obj) return true;
-			if (!(obj instanceof NestedTableNode)) return false;
-			NestedTableNode that = (NestedTableNode)obj;
-			boolean result = Objects.equals(this.name,that.name) && Objects.equals(this.elementTypeNode,that.elementTypeNode);
+			if (!(obj instanceof NestedTable)) return false;
+			NestedTable that = (NestedTable)obj;
+			boolean result = Objects.equals(this.name,that.name) && Objects.equals(this.elementType,that.elementType);
 			return result;
 		}
 		
 		@Override
 		public int hashCode() {
-			return Objects.hash(this.name,this.elementTypeNode);
+			return Objects.hash(this.name,this.elementType);
 		}
 
 	}
 	
-	static class IndexByTableNode extends TypeNode {
+	static class IndexByTable extends Type {
 		
-		private final TypeNode elementTypeNode;
+		private final Type elementType;
 
-		private final PrimitiveNode indexTypeNode;
+		private final PrimitiveType indexType;
 
-		IndexByTableNode(String name, TypeNode elementTypeNode, PrimitiveNode indexTypeNode) {
+		IndexByTable(String name, Type elementType, PrimitiveType indexType) {
 			super(name);
-			Preconditions.checkArgument(indexTypeNode != null && indexTypeNode.getName().matches("(?i)binary_integer|pls_integer|varchar2\\(\\d+?\\)|varchar|string|long"), "Illegal index type '%s'.", indexTypeNode == null ? null : indexTypeNode.getName()); // http://docs.oracle.com/cd/B10500_01/appdev.920/a96624/05_colls.htm#19661
-			this.indexTypeNode = indexTypeNode;
-			this.elementTypeNode = checkNotNull(elementTypeNode);
+			Preconditions.checkArgument(indexType != null && indexType.getName().matches("(?i)binary_integer|pls_integer|varchar2\\(\\d+?\\)|varchar|string|long"), "Illegal index type '%s'.", indexType == null ? null : indexType.getName()); // http://docs.oracle.com/cd/B10500_01/appdev.920/a96624/05_colls.htm#19661
+			this.indexType = indexType;
+			this.elementType = checkNotNull(elementType);
 		}
 		
-		<R> R accept(TypeNodeVisitor<R> visitor) {
-			return visitor.visitIndexByTableNode(this);
+		<R> R accept(TypeVisitor<R> visitor) {
+			return visitor.visitIndexByTable(this);
 		}
 		
-		public TypeNode getElementTypeNode() {
-			return elementTypeNode;
+		public Type getElementType() {
+			return elementType;
 		}
 
-		public PrimitiveNode getIndexTypeNode() {
-			return indexTypeNode;
+		public PrimitiveType getIndexType() {
+			return indexType;
 		}
 
 		@Override
 		public boolean equals(Object obj) {
 			if (this == obj) return true;
-			if (!(obj instanceof IndexByTableNode)) return false;
-			IndexByTableNode that = (IndexByTableNode)obj;
-			boolean result = Objects.equals(this.name,that.name) && Objects.equals(this.elementTypeNode,that.elementTypeNode) && Objects.equals(this.indexTypeNode,that.indexTypeNode);
+			if (!(obj instanceof IndexByTable)) return false;
+			IndexByTable that = (IndexByTable)obj;
+			boolean result = Objects.equals(this.name,that.name) && Objects.equals(this.elementType,that.elementType) && Objects.equals(this.indexType,that.indexType);
 			return result;
 		}
 		
 		@Override
 		public int hashCode() {
-			return Objects.hash(this.name,this.elementTypeNode,this.indexTypeNode);
+			return Objects.hash(this.name,this.elementType,this.indexType);
 		}
 	}
 	
-	static class ProcedureSignatureNode extends TypeNode {
+	static class ProcedureSignature extends Type {
 		
 		private final ImmutableMap<String,Parameter> parameters;
 
-		ProcedureSignatureNode(String name, Map<String,Parameter> parameters) {
+		ProcedureSignature(String name, Map<String,Parameter> parameters) {
 			super(name);
 			this.parameters = ImmutableMap.copyOf(checkNotNull(parameters));
 		}
 		
-		<R> R accept(TypeNodeVisitor<R> visitor) {
-			return visitor.visitProcedureSignatureNode(this);
+		<R> R accept(TypeVisitor<R> visitor) {
+			return visitor.visitProcedureSignature(this);
 		}
 		
 		public Map<String,Parameter> getParameters() {
@@ -568,8 +574,8 @@ public class TypeDependencyGraph {
 		@Override
 		public boolean equals(Object obj) {
 			if (this == obj) return true;
-			if (!(obj instanceof ProcedureSignatureNode)) return false;
-			ProcedureSignatureNode that = (ProcedureSignatureNode)obj;
+			if (!(obj instanceof ProcedureSignature)) return false;
+			ProcedureSignature that = (ProcedureSignature)obj;
 			// cannot just use Objects.equals(this.parameters,that.parameters) because order matters
 			boolean result = Objects.equals(this.name,that.name) && Iterables.elementsEqual(this.parameters.entrySet(),that.parameters.entrySet());
 			return result;
@@ -582,24 +588,24 @@ public class TypeDependencyGraph {
 
 	}
 	
-	static class FunctionSignatureNode extends TypeNode {
+	static class FunctionSignature extends Type {
 		
-		private final TypeNode returnTypeNode;
+		private final Type returnType;
 		
 		private final ImmutableMap<String,Parameter> parameters;
 
-		FunctionSignatureNode(String name, Map<String,Parameter> parameters, TypeNode returnTypeNode) {
+		FunctionSignature(String name, Map<String,Parameter> parameters, Type returnType) {
 			super(name);
 			this.parameters = ImmutableMap.copyOf(checkNotNull(parameters));
-			this.returnTypeNode = returnTypeNode;
+			this.returnType = returnType;
 		}
 		
-		<R> R accept(TypeNodeVisitor<R> visitor) {
-			return visitor.visitFunctionSignatureNode(this);
+		<R> R accept(TypeVisitor<R> visitor) {
+			return visitor.visitFunctionSignature(this);
 		}
 
-		public TypeNode getReturnTypeNode() {
-			return returnTypeNode;
+		public Type getReturnType() {
+			return returnType;
 		}
 		
 		public Map<String,Parameter> getParameters() {
@@ -609,37 +615,37 @@ public class TypeDependencyGraph {
 		@Override
 		public boolean equals(Object obj) {
 			if (this == obj) return true;
-			if (!(obj instanceof FunctionSignatureNode)) return false;
-			FunctionSignatureNode that = (FunctionSignatureNode)obj;
+			if (!(obj instanceof FunctionSignature)) return false;
+			FunctionSignature that = (FunctionSignature)obj;
 			// cannot just use Objects.equals(this.parameters,that.parameters) because order matters
 			boolean result = Objects.equals(this.name,that.name)
 					&& Iterables.elementsEqual(this.parameters.entrySet(),that.parameters.entrySet())
-					&& Objects.equals(this.returnTypeNode,that.returnTypeNode);
+					&& Objects.equals(this.returnType,that.returnType);
 			return result;
 		}
 		
 		@Override
 		public int hashCode() {
-			return Objects.hash(ObjectArrays.concat(new Object[] {this.name,this.returnTypeNode}, this.parameters.entrySet().toArray(), Object.class));
+			return Objects.hash(ObjectArrays.concat(new Object[] {this.name,this.returnType}, this.parameters.entrySet().toArray(), Object.class));
 		}
 
 	}
 	
-	static class PrimitiveNode extends TypeNode {
+	static class PrimitiveType extends Type {
 		
-		PrimitiveNode(String name) {
+		PrimitiveType(String name) {
 			super(name);
 		}
 		
-		<R> R accept(TypeNodeVisitor<R> visitor) {
-			return visitor.visitPrimitiveNode(this);
+		<R> R accept(TypeVisitor<R> visitor) {
+			return visitor.visitPrimitive(this);
 		}
 
 		@Override
 		public boolean equals(Object obj) {
 			if (this == obj) return true;
-			if (!(obj instanceof PrimitiveNode)) return false;
-			PrimitiveNode that = (PrimitiveNode)obj;
+			if (!(obj instanceof PrimitiveType)) return false;
+			PrimitiveType that = (PrimitiveType)obj;
 			boolean result = Objects.equals(this.name,that.name);
 			return result;
 		}
@@ -651,14 +657,14 @@ public class TypeDependencyGraph {
 
 	}
 
-	interface TypeNodeVisitor<R> {
-		R visitRecordNode(RecordNode node);
-		R visitVarrayNode(VarrayNode node);
-		R visitNestedTableNode(NestedTableNode node);
-		R visitIndexByTableNode(IndexByTableNode node);
-		R visitProcedureSignatureNode(ProcedureSignatureNode node);
-		R visitFunctionSignatureNode(FunctionSignatureNode node);
-		R visitPrimitiveNode(PrimitiveNode node);
+	interface TypeVisitor<R> {
+		R visitRecord(Record type);
+		R visitVarray(Varray type);
+		R visitNestedTable(NestedTable type);
+		R visitIndexByTable(IndexByTable type);
+		R visitProcedureSignature(ProcedureSignature type);
+		R visitFunctionSignature(FunctionSignature type);
+		R visitPrimitive(PrimitiveType type);
 	}
 	
 	
@@ -687,7 +693,6 @@ Set<String> waiting = Sets.newLinkedHashSet();
 Set<String> closed = Sets.newLinkedHashSet();
 
 
-- odstranit pojmenovani Node, nechat jen typy
 - TDG stavet pomoci buildru
 - presunout do samostatnych trid
 - javadoc
