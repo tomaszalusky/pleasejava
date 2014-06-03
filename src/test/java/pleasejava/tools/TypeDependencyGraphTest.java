@@ -16,15 +16,12 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-import pleasejava.tools.TypeDependencyGraph.InvalidPlsqlConstructException;
-import pleasejava.tools.TypeDependencyGraph.InvalidXmlException;
-import pleasejava.tools.TypeDependencyGraph.TypeCircularityException;
-import pleasejava.tools.TypeDependencyGraph.Type;
-import pleasejava.tools.TypeDependencyGraph.UndeclaredTypeException;
 
 import com.google.common.collect.ImmutableList;
 
 /**
+ * Testing correct structure of type graph.
+ * 
  * @author Tomas Zalusky
  */
 @RunWith(JUnit4.class)
