@@ -24,11 +24,13 @@ import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.LinkedHashMultimap;
+import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.ObjectArrays;
@@ -51,13 +53,19 @@ public class TypeDependencyGraph {
 	
 	private final Set<Type> allTypes;
 	
-	private final Multimap<Type,Type> predecessors;
+	private final ListMultimap<Type,Type> children;
 	
 	private final List<Type> topologicalOrdering;
 	
-	public TypeDependencyGraph(Set<Type> allTypes, Multimap<Type,Type> predecessors) {
+	public TypeDependencyGraph(Set<Type> allTypes, ListMultimap<Type,Type> children) {
 		this.allTypes = ImmutableSet.copyOf(allTypes);
-		this.predecessors = ImmutableMultimap.copyOf(predecessors);
+		this.children = ImmutableListMultimap.copyOf(children);
+		ImmutableMultimap.Builder<Type,Type> predecessorsBuilder = ImmutableMultimap.builder();
+		for (Type type : allTypes) {
+			List<Type> ch = type.getChildren();
+			predecessorsBuilder.putAll(Maps.toMap(ch,constant(type)).asMultimap());
+		}
+		Multimap<Type,Type> predecessors = predecessorsBuilder.build();
 		Multimap<Type,Type> exhaust = LinkedHashMultimap.create(predecessors); // copy of predecessors multimap, its elements are removed during build in order to reveal another nodes
 		ImmutableList.Builder<Type> topologicalOrderingBuilder = ImmutableList.builder();
 		Set<Type> seeds = Sets.difference(allTypes,predecessors.keySet()); // initial set of nodes with no incoming edge
@@ -80,18 +88,18 @@ public class TypeDependencyGraph {
 			Document doc = builder.build(xml);
 			Element rootElement = doc.getRootElement();
 			TypeFactory typeFactory = new TypeFactory(rootElement);
-			ImmutableMultimap.Builder<Type,Type> predecessorsBuilder = ImmutableMultimap.builder();
 			ImmutableSet.Builder<Type> allTypesBuilder = ImmutableSet.builder();
+			ImmutableListMultimap.Builder<Type,Type> childrenBuilder = ImmutableListMultimap.builder();
 			for (Element typeElement : rootElement.getChildren()) {
 				String name = typeElement.getAttributeValue("name");
 				Type type = typeFactory.ensureType(name);
 				List<Type> children = type.getChildren();
 				allTypesBuilder.add(type).addAll(children);
-				predecessorsBuilder.putAll(Maps.toMap(children,constant(type)).asMultimap());
+				childrenBuilder.putAll(type,children);
 			}
-			ImmutableMultimap<Type,Type> predecessors = predecessorsBuilder.build();
+			ImmutableListMultimap<Type,Type> children = childrenBuilder.build();
 			ImmutableSet<Type> allTypes = allTypesBuilder.build();
-			return new TypeDependencyGraph(allTypes, predecessors);
+			return new TypeDependencyGraph(allTypes, children);
 		} catch (Exception e) {
 			throw Throwables.propagate(e);
 		}
