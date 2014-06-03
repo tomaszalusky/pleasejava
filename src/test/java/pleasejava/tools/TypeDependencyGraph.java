@@ -33,6 +33,7 @@ import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
+import com.google.common.collect.Multimaps;
 import com.google.common.collect.ObjectArrays;
 import com.google.common.collect.Sets;
 
@@ -42,30 +43,23 @@ import com.google.common.collect.Sets;
 public class TypeDependencyGraph {
 
 	/**
-	 * Key = graph node, values = all types which key node depends on
-	 * @throws XMLStreamException 
-	 * @throws ParserConfigurationException 
-	 * @throws IOException 
-	 * @throws JDOMException 
-	 * @throws SAXException 
+	 * All nodes used in graph (including primitive types).
 	 */
-	//final ImmutableListMultimap<Type,Type> dependencies;
-	
 	private final Set<Type> allTypes;
 	
+	/**
+	 * Key = graph node, values = all types which key node depends on.
+	 * For example, for record of varchar2s, record is a key, varchar2 is a value.
+	 */
 	private final ListMultimap<Type,Type> children;
 	
 	private final List<Type> topologicalOrdering;
 	
 	public TypeDependencyGraph(Set<Type> allTypes, ListMultimap<Type,Type> children) {
 		this.allTypes = ImmutableSet.copyOf(allTypes);
-		this.children = ImmutableListMultimap.copyOf(children);
-		ImmutableMultimap.Builder<Type,Type> predecessorsBuilder = ImmutableMultimap.builder();
-		for (Type type : allTypes) {
-			List<Type> ch = type.getChildren();
-			predecessorsBuilder.putAll(Maps.toMap(ch,constant(type)).asMultimap());
-		}
-		Multimap<Type,Type> predecessors = predecessorsBuilder.build();
+		ImmutableListMultimap<Type,Type> immChildren = ImmutableListMultimap.copyOf(children);
+		this.children = immChildren;
+		Multimap<Type,Type> predecessors = immChildren.inverse(); // for given key, values express which types is the key used in
 		Multimap<Type,Type> exhaust = LinkedHashMultimap.create(predecessors); // copy of predecessors multimap, its elements are removed during build in order to reveal another nodes
 		ImmutableList.Builder<Type> topologicalOrderingBuilder = ImmutableList.builder();
 		Set<Type> seeds = Sets.difference(allTypes,predecessors.keySet()); // initial set of nodes with no incoming edge
