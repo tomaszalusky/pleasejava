@@ -49,9 +49,32 @@ public class TypeDependencyGraph {
 	 */
 	//final ImmutableListMultimap<Type,Type> dependencies;
 	
-	final List<Type> topologicalOrdering;
+	private final Set<Type> allTypes;
 	
-	public TypeDependencyGraph(InputStream xml) {
+	private final Multimap<Type,Type> predecessors;
+	
+	private final List<Type> topologicalOrdering;
+	
+	public TypeDependencyGraph(Set<Type> allTypes, Multimap<Type,Type> predecessors) {
+		this.allTypes = ImmutableSet.copyOf(allTypes);
+		this.predecessors = ImmutableMultimap.copyOf(predecessors);
+		Multimap<Type,Type> exhaust = LinkedHashMultimap.create(predecessors); // copy of predecessors multimap, its elements are removed during build in order to reveal another nodes
+		ImmutableList.Builder<Type> topologicalOrderingBuilder = ImmutableList.builder();
+		Set<Type> seeds = Sets.difference(allTypes,predecessors.keySet()); // initial set of nodes with no incoming edge
+		for (Deque<Type> queue = new ArrayDeque<Type>(seeds); !queue.isEmpty(); ) { // queue of nodes with no incoming edge
+			Type top = queue.pollFirst();
+			topologicalOrderingBuilder.add(top); // queue invariant: polled node has no incoming edge -> it is safe to push it to output
+			for (Type child : ImmutableSet.copyOf(top.getChildren())) { // set prevents duplicate offer of child in case of duplicate children
+				exhaust.get(child).remove(top); // removing edges to all children
+				if (exhaust.get(child).isEmpty()) { // if no edge remains, child becomes top 
+					queue.offerLast(child);
+				}
+			}
+		}
+		this.topologicalOrdering = topologicalOrderingBuilder.build();
+	}
+	
+	public static TypeDependencyGraph createFrom(InputStream xml) {
 		try {
 			SAXBuilder builder = new SAXBuilder();
 			Document doc = builder.build(xml);
@@ -68,21 +91,7 @@ public class TypeDependencyGraph {
 			}
 			ImmutableMultimap<Type,Type> predecessors = predecessorsBuilder.build();
 			ImmutableSet<Type> allTypes = allTypesBuilder.build();
-			
-			Multimap<Type,Type> exhaust = LinkedHashMultimap.create(predecessors); // copy of predecessors multimap, its elements are removed during build in order to reveal another nodes
-			ImmutableList.Builder<Type> topologicalOrderingBuilder = ImmutableList.builder();
-			Set<Type> seeds = Sets.difference(allTypes,predecessors.keySet()); // initial set of nodes with no incoming edge
-			for (Deque<Type> queue = new ArrayDeque<Type>(seeds); !queue.isEmpty(); ) { // queue of nodes with no incoming edge
-				Type top = queue.pollFirst();
-				topologicalOrderingBuilder.add(top); // queue invariant: polled node has no incoming edge -> it is safe to push it to output
-				for (Type child : ImmutableSet.copyOf(top.getChildren())) { // set prevents duplicate offer of child in case of duplicate children
-					exhaust.get(child).remove(top); // removing edges to all children
-					if (exhaust.get(child).isEmpty()) { // if no edge remains, child becomes top 
-						queue.offerLast(child);
-					}
-				}
-			}
-			this.topologicalOrdering = topologicalOrderingBuilder.build();
+			return new TypeDependencyGraph(allTypes, predecessors);
 		} catch (Exception e) {
 			throw Throwables.propagate(e);
 		}
@@ -693,7 +702,7 @@ Set<String> waiting = Sets.newLinkedHashSet();
 Set<String> closed = Sets.newLinkedHashSet();
 
 
-- TDG stavet pomoci buildru
+- TDG.predecessors -> children
 - presunout do samostatnych trid
 - javadoc
 

@@ -47,7 +47,7 @@ public class TypeDependencyGraphTest {
 		}
 		String fileSubpath = String.format("tdg/%s.xml",methodName);
 		try (InputStream is = TypeDependencyGraphTest.class.getResourceAsStream(fileSubpath)) {
-			TypeDependencyGraph graph = new TypeDependencyGraph(is);
+			TypeDependencyGraph graph = TypeDependencyGraph.createFrom(is);
 			List<Type> actual = graph.getTopologicalOrdering();
 			List<String> actualNames = from(actual).transform(Type._getName).toList();
 			assertEquals(ImmutableList.copyOf(expectedNames), actualNames);
