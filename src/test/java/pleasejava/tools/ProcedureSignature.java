@@ -5,15 +5,24 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.util.Map;
 import java.util.Objects;
 
-
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.ObjectArrays;
 
+/**
+ * Represents fictive type which behaves similarly to record
+ * and describes all parameters of a PLSQL procedure.
+ * 
+ * @author Tomas Zalusky
+ */
 class ProcedureSignature extends Type {
 	
 	private final ImmutableMap<String,Parameter> parameters;
 
+	/**
+	 * @param name
+	 * @param parameters names and types of parameters (ordering of map matters)
+	 */
 	ProcedureSignature(String name, Map<String,Parameter> parameters) {
 		super(name);
 		this.parameters = ImmutableMap.copyOf(checkNotNull(parameters));

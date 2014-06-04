@@ -4,7 +4,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.Objects;
 
-
+/**
+ * Represents varray (varying array) type.
+ * 
+ * @author Tomas Zalusky
+ */
 class Varray extends Type {
 
 	private final Type elementType;

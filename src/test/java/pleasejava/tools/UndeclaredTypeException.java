@@ -1,5 +1,9 @@
 package pleasejava.tools;
 
+/**
+ * Indicates a situation where a (non-primitive) type is referenced but has not been declared anywhere.
+ * @author Tomas Zalusky
+ */
 class UndeclaredTypeException extends RuntimeException {
 	
 	private final String undeclaredType;

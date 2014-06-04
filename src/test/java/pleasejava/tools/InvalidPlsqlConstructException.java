@@ -1,5 +1,10 @@
 package pleasejava.tools;
 
+/**
+ * Indicates situation where illegal XML element was used where XML element denoting PLSQL type was expected.
+ * 
+ * @author Tomas Zalusky
+ */
 class InvalidPlsqlConstructException extends RuntimeException {
 	
 	private final String constructName;

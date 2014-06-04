@@ -2,7 +2,11 @@ package pleasejava.tools;
 
 import java.util.Objects;
 
-
+/**
+ * Represents simple types (scalar and LOB according to http://docs.oracle.com/cd/A97630_01/appdev.920/a96624/03_types.htm ).
+ * 
+ * @author Tomas Zalusky
+ */
 class PrimitiveType extends Type {
 	
 	PrimitiveType(String name) {

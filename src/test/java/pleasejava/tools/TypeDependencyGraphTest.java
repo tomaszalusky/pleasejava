@@ -16,11 +16,11 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-
 import com.google.common.collect.ImmutableList;
 
 /**
  * Testing correct structure of type graph.
+ * Helper methods t() infer their test data from name of caller method.
  * 
  * @author Tomas Zalusky
  */
@@ -30,12 +30,21 @@ public class TypeDependencyGraphTest {
 	@Rule
 	public ExpectedException exception = ExpectedException.none();
 
+	/**
+	 * Helper method, expects exception of given type with message containing given string.
+	 * @param exceptionClass
+	 * @param expectedMessage
+	 */
 	private void t(Class<? extends Exception> exceptionClass, String expectedMessage) {
 		exception.expect(exceptionClass);
 		exception.expectMessage(expectedMessage);
 		t();
 	}
 	
+	/**
+	 * Helper method, expects nodes in given topological ordering specified by their names.
+	 * @param expectedNames
+	 */
 	private void t(String... expectedNames) {
 		StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
 		String methodName = stackTrace[2].getMethodName();

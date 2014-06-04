@@ -4,9 +4,13 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.Objects;
 
-
 import com.google.common.base.Preconditions;
 
+/**
+ * Represents index-by table (aka associative array) type.
+ * 
+ * @author Tomas Zalusky
+ */
 class IndexByTable extends Type {
 	
 	private final Type elementType;

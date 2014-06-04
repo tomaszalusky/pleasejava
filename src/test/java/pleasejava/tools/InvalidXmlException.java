@@ -1,5 +1,10 @@
 package pleasejava.tools;
 
+/**
+ * Indicates all kinds of bad XML format (missing attributes, wrong structure).
+ * 
+ * @author Tomas Zalusky
+ */
 class InvalidXmlException extends RuntimeException {
 	
 	private final String detail;

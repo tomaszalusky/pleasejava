@@ -1,5 +1,9 @@
 package pleasejava.tools;
 
+/**
+ * Indicates circular dependency of type on itself.
+ * @author Tomas Zalusky
+ */
 class TypeCircularityException extends RuntimeException {
 	
 	private final String typeName;

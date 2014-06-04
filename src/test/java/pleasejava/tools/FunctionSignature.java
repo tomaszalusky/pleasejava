@@ -10,12 +10,23 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.ObjectArrays;
 
+/**
+ * Represents fictive type which behaves similarly to record
+ * and describes all parameters and return type of a PLSQL function.
+ * 
+ * @author Tomas Zalusky
+ */
 class FunctionSignature extends Type {
 	
 	private final Type returnType;
 	
 	private final ImmutableMap<String,Parameter> parameters;
 
+	/**
+	 * @param name
+	 * @param parameters names and types of parameters (ordering of map matters)
+	 * @param returnType
+	 */
 	FunctionSignature(String name, Map<String,Parameter> parameters, Type returnType) {
 		super(name);
 		this.parameters = ImmutableMap.copyOf(checkNotNull(parameters));

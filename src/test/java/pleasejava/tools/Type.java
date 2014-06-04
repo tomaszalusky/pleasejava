@@ -21,6 +21,13 @@ abstract class Type {
 		this.name = checkNotNull(name);
 	}
 	
+	/**
+	 * Provides all types which this type depends on.
+	 * For example, all fields' types for record or element type for nested table.
+	 * Returns empty collection for primitive types.
+	 * @see GetChildren
+	 * @return
+	 */
 	final List<Type> getChildren() {
 		return accept(new GetChildren());
 	}
@@ -50,7 +57,7 @@ abstract class Type {
 		return name;
 	}
 
-	static class GetChildren implements TypeVisitor<List<Type>> {
+	private static class GetChildren implements TypeVisitor<List<Type>> {
 
 		@Override
 		public List<Type> visitRecord(Record type) {

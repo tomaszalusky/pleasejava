@@ -1,5 +1,11 @@
 package pleasejava.tools;
 
+/**
+ * Represents method called on particular type instance.
+ * @see Type#accept(TypeVisitor)
+ * 
+ * @author Tomas Zalusky
+ */
 interface TypeVisitor<R> {
 	R visitRecord(Record type);
 	R visitVarray(Varray type);

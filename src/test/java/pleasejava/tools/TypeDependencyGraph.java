@@ -20,7 +20,7 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 
 /**
- * Represents oriented graph whose nodes are all types in given testcase
+ * Represents immutable oriented graph whose nodes are all types in given testcase
  * and edges represent dependency between types.
  * 
  * @author Tomas Zalusky
@@ -40,7 +40,7 @@ public class TypeDependencyGraph {
 	
 	private final List<Type> topologicalOrdering;
 	
-	public TypeDependencyGraph(Set<Type> allTypes, ListMultimap<Type,Type> children) {
+	private TypeDependencyGraph(Set<Type> allTypes, ListMultimap<Type,Type> children) {
 		this.allTypes = ImmutableSet.copyOf(allTypes);
 		ImmutableListMultimap<Type,Type> immChildren = ImmutableListMultimap.copyOf(children);
 		this.children = immChildren;
@@ -64,7 +64,7 @@ public class TypeDependencyGraph {
 	/**
 	 * Facotry method, creates instance from XML.
 	 * @param xml
-	 * @return
+	 * @return new instance
 	 */
 	public static TypeDependencyGraph createFrom(InputStream xml) {
 		try {
@@ -103,6 +103,7 @@ public class TypeDependencyGraph {
 
 /*
 
-- javadoc
+- toString typu
+- toString grafu
 
 */

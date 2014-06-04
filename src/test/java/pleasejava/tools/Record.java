@@ -5,15 +5,23 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.util.Map;
 import java.util.Objects;
 
-
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.ObjectArrays;
 
+/**
+ * Represents record type.
+ * 
+ * @author Tomas Zalusky
+ */
 class Record extends Type {
 	
 	private final ImmutableMap<String,Type> fields;
 	
+	/**
+	 * @param name
+	 * @param fields names and types of fields (ordering of map matters)
+	 */
 	Record(String name, Map<String,Type> fields) {
 		super(name);
 		this.fields = ImmutableMap.copyOf(checkNotNull(fields));

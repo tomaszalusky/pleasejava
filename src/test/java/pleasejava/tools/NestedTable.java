@@ -4,7 +4,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.Objects;
 
-
+/**
+ * Represents nested table type.
+ * 
+ * @author Tomas Zalusky
+ */
 class NestedTable extends Type {
 	
 	private final Type elementType;

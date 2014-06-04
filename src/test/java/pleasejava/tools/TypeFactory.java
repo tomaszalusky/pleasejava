@@ -8,17 +8,27 @@ import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 
-
 import com.google.common.base.Enums;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 
+/**
+ * Recognizes types from XML.
+ * Guards circular dependencies and other mismatches.
+ * @author Tomas Zalusky
+ */
 class TypeFactory {
 	
 	private final Element rootElement;
 	
+	/**
+	 * Map of types identified by their names.
+	 * In the time between first request for given name and finishing the instantiation of respective type,
+	 * the {@link Optional#absent()} serves as map value.
+	 * Encountering {@link Optional#absent()} value during construction indicates circular dependency.
+	 */
 	private final Map<String,Optional<Type>> typeByName = Maps.newLinkedHashMap();
 
 	TypeFactory(Element rootElement) {
@@ -42,6 +52,12 @@ class TypeFactory {
 		return result.get();
 	}
 
+	/**
+	 * Returns instance of type for given name.
+	 * If such an instance does not exist, it is recursively created.
+	 * @param name
+	 * @return
+	 */
 	Type ensureType(String name) {
 		Optional<Type> optionalType = typeByName.get(name);
 		if (optionalType == null) { // type node has not been constructed yet
