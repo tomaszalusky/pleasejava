@@ -62,7 +62,7 @@ public class TypeDependencyGraph {
 	}
 	
 	/**
-	 * Facotry method, creates instance from XML.
+	 * Factory method, creates instance from XML.
 	 * @param xml
 	 * @return new instance
 	 */
@@ -103,7 +103,6 @@ public class TypeDependencyGraph {
 
 /*
 
-- toString typu
 - toString grafu
 
 */

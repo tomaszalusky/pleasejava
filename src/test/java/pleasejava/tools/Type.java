@@ -2,10 +2,16 @@ package pleasejava.tools;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.FluentIterable.from;
+import static pleasejava.Utils.appendf;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import pleasejava.Utils;
 
 import com.google.common.base.Function;
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 
 /**
@@ -54,7 +60,9 @@ abstract class Type {
 	
 	@Override
 	public String toString() {
-		return name;
+		StringBuilder result = new StringBuilder();
+		accept(new ToString(0,result));
+		return result.toString();
 	}
 
 	private static class GetChildren implements TypeVisitor<List<Type>> {
@@ -97,6 +105,89 @@ abstract class Type {
 			return ImmutableList.of();
 		}
 		
+	}
+
+	private static class ToString implements TypeVisitor<Void> {
+
+		private final int level;
+		
+		private final StringBuilder buf;
+		
+		ToString(int level, StringBuilder buf) {
+			this.level = level;
+			this.buf = buf;
+		}
+
+		private static String indent(int level) {
+			return Strings.repeat("\t",level);
+		}
+		
+		@Override
+		public Void visitRecord(Record type) {
+			appendf(buf,"%srecord %s :", indent(level), type.getName());
+			for (Map.Entry<String,Type> entry : type.getFields().entrySet()) {
+				appendf(buf,"%n%s%s :%n", indent(level + 1), entry.getKey());
+				entry.getValue().accept(new ToString(level + 2,buf));
+			}
+			return null;
+		}
+
+		@Override
+		public Void visitVarray(Varray type) {
+			appendf(buf,"%svarray %s :", indent(level), type.getName());
+			appendf(buf,"%n%sof :%n", indent(level + 1));
+			type.getElementType().accept(new ToString(level + 2,buf));
+			return null;
+		}
+
+		@Override
+		public Void visitNestedTable(NestedTable type) {
+			appendf(buf,"%snested table %s :", indent(level), type.getName());
+			appendf(buf,"%n%sof :%n", indent(level + 1));
+			type.getElementType().accept(new ToString(level + 2,buf));
+			return null;
+		}
+
+		@Override
+		public Void visitIndexByTable(IndexByTable type) {
+			appendf(buf,"%sindexby table %s indexed by %s :", indent(level), type.getName(), type.getIndexType().toString());
+			appendf(buf,"%n%sof :%n", indent(level + 1));
+			type.getElementType().accept(new ToString(level + 2,buf));
+			return null;
+		}
+
+		@Override
+		public Void visitProcedureSignature(ProcedureSignature type) {
+			appendf(buf,"%sprocedure %s :", indent(level), type.getName());
+			for (Entry<String,Parameter> entry : type.getParameters().entrySet()) {
+				appendf(buf,"%n%s%s %s :%n", indent(level + 1), entry.getKey(), entry.getValue().getParameterMode().name().toLowerCase());
+				entry.getValue().getType().accept(new ToString(level + 2,buf));
+			}
+			return null;
+		}
+
+		@Override
+		public Void visitFunctionSignature(FunctionSignature type) {
+			appendf(buf,"%sfunction %s :", indent(level), type.getName());
+			appendf(buf,"%n%sreturn :%n", indent(level + 1));
+			type.getReturnType().accept(new ToString(level + 2,buf));
+			for (Entry<String,Parameter> entry : type.getParameters().entrySet()) {
+				appendf(buf,"%n%s%s %s :%n", indent(level + 1), entry.getKey(), entry.getValue().getParameterMode().name().toLowerCase());
+				entry.getValue().getType().accept(new ToString(level + 2,buf));
+			}
+			return null;
+		}
+
+		@Override
+		public Void visitPrimitive(PrimitiveType type) {
+			appendf(buf,"%s%s", indent(level), type.getName());
+			return null;
+		}
+		
+		@Override
+		public String toString() {
+			return buf.toString();
+		}
 	}
 
 }
