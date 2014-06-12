@@ -14,8 +14,10 @@ import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.ListMultimap;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 
@@ -99,10 +101,23 @@ public class TypeDependencyGraph {
 		return topologicalOrdering;
 	}
 	
+	@Override
+	public String toString() {
+		StringBuilder result = new StringBuilder();
+		Set<Type> written = Sets.<Type>newHashSet();
+		for (Set<Type> exhaust = Sets.newLinkedHashSet(getTopologicalOrdering()); !exhaust.isEmpty(); ) {
+			Type first = Iterables.getFirst(exhaust,null);
+			first.accept(new Type.ToString(0,written,result)); // write top-level node and all its children
+			for (Deque<Type> q = Lists.newLinkedList(ImmutableSet.of(first)); !q.isEmpty(); ) { // remove top-level node and transitively all its children from set of waiting nodes
+				Type t = q.pollFirst();
+				exhaust.remove(t);
+				q.addAll(children.get(t));
+			}
+		}
+		return result.toString();
+	}
 }
 
 /*
-
-- toString grafu
 
 */
