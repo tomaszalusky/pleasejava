@@ -16,7 +16,7 @@ import com.google.common.collect.ObjectArrays;
  * 
  * @author Tomas Zalusky
  */
-class FunctionSignature extends Type {
+class FunctionSignature extends AbstractSignature {
 	
 	private final Type returnType;
 	

@@ -14,12 +14,14 @@ import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableTable;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
+import com.google.common.collect.Table;
 
 /**
  * Represents immutable oriented graph whose nodes are all types in given testcase
@@ -34,6 +36,8 @@ public class TypeDependencyGraph {
 	 */
 	private final Set<Type> allTypes;
 	
+	private final Table<Class<? extends Type>,String,Type> allTypesIndex;
+	
 	/**
 	 * Key = graph node, values = all types which key node depends on.
 	 * For example, for record of varchar2s, record is a key, varchar2 is a value.
@@ -44,6 +48,11 @@ public class TypeDependencyGraph {
 	
 	private TypeDependencyGraph(Set<Type> allTypes, ListMultimap<Type,Type> children) {
 		this.allTypes = ImmutableSet.copyOf(allTypes);
+		ImmutableTable.Builder<Class<? extends Type>,String,Type> allTypesIndexBuilder = ImmutableTable.builder();
+		for (Type type : allTypes) {
+			allTypesIndexBuilder.put(type.getClass(), type.getName(), type);
+		}
+		this.allTypesIndex = allTypesIndexBuilder.build();
 		ImmutableListMultimap<Type,Type> immChildren = ImmutableListMultimap.copyOf(children);
 		this.children = immChildren;
 		Multimap<Type,Type> predecessors = immChildren.inverse(); // for given key, values express which types is the key used in
@@ -101,6 +110,11 @@ public class TypeDependencyGraph {
 		return topologicalOrdering;
 	}
 	
+	Type findType(Class<? extends Type> typeClass, String typeName) {
+		Type result = allTypesIndex.get(typeClass,typeName);
+		return result;
+	}
+
 	@Override
 	public String toString() {
 		StringBuilder result = new StringBuilder();
@@ -116,8 +130,14 @@ public class TypeDependencyGraph {
 		}
 		return result.toString();
 	}
+
 }
 
 /*
-
+- toString, zavest vypis jednoducheho uzlu bez zodpovednosti za vypis potomku
+- rozlisit v testech nacteni XML do TDG (je vzdy) a konkretni zpracovani (getTopologicalOrdering, toTypeNode)
+- vyresit prezentaci tabulky: bud aa nebo excel
+- metoda pro urceni identifikatoru
+- zapracovat koncept JDBC-transferrable typu
+- napojit na ukazkove priklady pro TDG, otestovat vystup
 */

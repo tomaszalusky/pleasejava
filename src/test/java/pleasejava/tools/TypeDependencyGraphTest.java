@@ -57,6 +57,8 @@ public class TypeDependencyGraphTest {
 			List<Type> actual = graph.getTopologicalOrdering();
 			List<String> actualNames = from(actual).transform(Type._getName).toList();
 			assertEquals(ImmutableList.copyOf(expectedNames), actualNames);
+			
+			System.out.println(actual.get(0).toTypeNode());
 		} catch (IOException e) {
 		}
 	}

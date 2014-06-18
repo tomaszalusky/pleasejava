@@ -15,7 +15,7 @@ import com.google.common.collect.ObjectArrays;
  * 
  * @author Tomas Zalusky
  */
-class ProcedureSignature extends Type {
+class ProcedureSignature extends AbstractSignature {
 	
 	private final ImmutableMap<String,Parameter> parameters;
 

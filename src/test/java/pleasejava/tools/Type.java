@@ -57,6 +57,16 @@ abstract class Type {
 		}
 	};
 	
+	TypeNode toTypeNode() {
+		List<TypeNode> childNodes = from(this.getChildren()).transform(new Function<Type,TypeNode>() {
+			public TypeNode apply(Type input) {
+				return input.toTypeNode();
+			}
+		}).toList();
+		TypeNode result = new TypeNode(this,childNodes);
+		return result;
+	}
+	
 	@Override
 	public String toString() {
 		StringBuilder result = new StringBuilder();
