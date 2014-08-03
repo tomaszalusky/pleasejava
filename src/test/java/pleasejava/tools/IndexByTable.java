@@ -13,6 +13,10 @@ import com.google.common.base.Preconditions;
  */
 class IndexByTable extends Type {
 	
+	public static final String KEY_LABEL = "(key)";
+	
+	public static final String ELEMENT_LABEL = "(element)";
+	
 	private final Type elementType;
 
 	private final PrimitiveType indexType;

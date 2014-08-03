@@ -135,6 +135,7 @@ public class TypeDependencyGraph {
 
 /*
 - toString, zavest vypis jednoducheho uzlu bez zodpovednosti za vypis potomku
+- konstruovat type tree od korene, umozni to hned urcit level a pozdeji i identifikator
 - rozlisit v testech nacteni XML do TDG (je vzdy) a konkretni zpracovani (getTopologicalOrdering, toTypeNode)
 - vyresit prezentaci tabulky: bud aa nebo excel
 - metoda pro urceni identifikatoru

@@ -11,6 +11,8 @@ import java.util.Objects;
  */
 class Varray extends Type {
 
+	public static final String ELEMENT_LABEL = "(element)";
+	
 	private final Type elementType;
 
 	Varray(String name, Type elementType) {

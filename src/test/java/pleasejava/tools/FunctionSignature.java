@@ -18,6 +18,8 @@ import com.google.common.collect.ObjectArrays;
  */
 class FunctionSignature extends AbstractSignature {
 	
+	public static final String RETURN_LABEL = "(return)";
+	
 	private final Type returnType;
 	
 	private final ImmutableMap<String,Parameter> parameters;

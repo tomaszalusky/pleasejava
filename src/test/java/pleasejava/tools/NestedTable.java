@@ -11,6 +11,8 @@ import java.util.Objects;
  */
 class NestedTable extends Type {
 	
+	public static final String ELEMENT_LABEL = "(element)";
+	
 	private final Type elementType;
 
 	NestedTable(String name, Type elementType) {
