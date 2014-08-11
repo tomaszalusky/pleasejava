@@ -128,6 +128,7 @@ public class TypeDependencyGraph {
 				q.addAll(children.get(t));
 			}
 		}
+		Type.ToString.align(result);
 		return result.toString();
 	}
 
@@ -135,9 +136,10 @@ public class TypeDependencyGraph {
 
 /*
 - toString, zavest vypis jednoducheho uzlu bez zodpovednosti za vypis potomku
+	- sjednotit Type.ToString a TypeNode.ToString, znovupouzit spolecnou funkcionalitu, vyresit rekurzivni vypis, vyresit vypis identifikatoru
+	- vyresit prezentaci tabulky: zda bud aa nebo excel nebo textove bez aa
 - konstruovat type tree od korene, umozni to hned urcit level a pozdeji i identifikator
 - rozlisit v testech nacteni XML do TDG (je vzdy) a konkretni zpracovani (getTopologicalOrdering, toTypeNode)
-- vyresit prezentaci tabulky: bud aa nebo excel
 - metoda pro urceni identifikatoru
 - zapracovat koncept JDBC-transferrable typu
 - napojit na ukazkove priklady pro TDG, otestovat vystup

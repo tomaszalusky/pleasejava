@@ -71,6 +71,7 @@ abstract class Type {
 	public String toString() {
 		StringBuilder result = new StringBuilder();
 		accept(new ToString(0,null,result));
+		Type.ToString.align(result);
 		return result.toString();
 	}
 
@@ -122,6 +123,8 @@ abstract class Type {
 	 */
 	static class ToString implements TypeVisitor<Void> {
 
+		private static final int TAB_SPACES = 2;
+		
 		private final int level;
 		
 		private final Set<Type> written;
@@ -143,7 +146,7 @@ abstract class Type {
 		}
 
 		private static String indent(int level) {
-			return Strings.repeat("\t",level);
+			return Strings.repeat(" ",level * TAB_SPACES);
 		}
 
 		private boolean checkWritten(Type type) {
@@ -161,7 +164,7 @@ abstract class Type {
 
 		@Override
 		public Void visitRecord(Record type) {
-			appendf(buf,"record %s", type.getName());
+			appendf(buf,"record \"%s\"", type.getName());
 			if (!checkWritten(type)) {
 				for (Map.Entry<String,Type> entry : type.getFields().entrySet()) {
 					appendf(buf,"%n%s%s ", indent(level + 1), entry.getKey());
@@ -173,7 +176,7 @@ abstract class Type {
 
 		@Override
 		public Void visitVarray(Varray type) {
-			appendf(buf,"varray %s", type.getName());
+			appendf(buf,"varray \"%s\"", type.getName());
 			if (!checkWritten(type)) {
 				appendf(buf,"%n%s%s ", indent(level + 1), Varray.ELEMENT_LABEL);
 				type.getElementType().accept(new ToString(level + 1,written,buf));
@@ -183,7 +186,7 @@ abstract class Type {
 
 		@Override
 		public Void visitNestedTable(NestedTable type) {
-			appendf(buf,"nestedtable %s", type.getName());
+			appendf(buf,"nestedtable \"%s\"", type.getName());
 			if (!checkWritten(type)) {
 				appendf(buf,"%n%s%s ", indent(level + 1), NestedTable.ELEMENT_LABEL);
 				type.getElementType().accept(new ToString(level + 1,written,buf));
@@ -193,7 +196,7 @@ abstract class Type {
 
 		@Override
 		public Void visitIndexByTable(IndexByTable type) {
-			appendf(buf,"indexbytable %s", type.getName());
+			appendf(buf,"indexbytable \"%s\"", type.getName());
 			if (!checkWritten(type)) {
 				appendf(buf,"%n%s%s %s%n%s%s ", indent(level + 1), IndexByTable.KEY_LABEL,
 						type.getIndexType().toString(),
@@ -205,7 +208,7 @@ abstract class Type {
 
 		@Override
 		public Void visitProcedureSignature(ProcedureSignature type) {
-			appendf(buf,"procedure %s", type.getName());
+			appendf(buf,"procedure \"%s\"", type.getName());
 			if (!checkWritten(type)) {
 				for (Entry<String,Parameter> entry : type.getParameters().entrySet()) {
 					appendf(buf,"%n%s%s %s ", indent(level + 1), entry.getKey(), entry.getValue().getParameterMode().name().toLowerCase());
@@ -217,7 +220,7 @@ abstract class Type {
 
 		@Override
 		public Void visitFunctionSignature(FunctionSignature type) {
-			appendf(buf,"function %s", type.getName());
+			appendf(buf,"function \"%s\"", type.getName());
 			if (!checkWritten(type)) {
 				appendf(buf,"%n%s%s ", indent(level + 1), FunctionSignature.RETURN_LABEL);
 				type.getReturnType().accept(new ToString(level + 1,written,buf));
@@ -231,13 +234,38 @@ abstract class Type {
 
 		@Override
 		public Void visitPrimitive(PrimitiveType type) {
-			appendf(buf,"%s", type.getName()); // always written regardless guard set
+			appendf(buf,"\"%s\"", type.getName()); // always written regardless guard set
 			return null;
 		}
 		
 		@Override
 		public String toString() {
 			return buf.toString();
+		}
+
+		/**
+		 * Aligns type names into same column.
+		 * @param buf
+		 */
+		public static void align(StringBuilder buf) {
+			int lastNewline = -1;
+			boolean wasFirstQuote = false;
+			int maxWidth = -1;
+			for (int i = 0, l = buf.length(); i < l; i++) {
+				char c = buf.charAt(i);
+				if (c == '\n' || c == '\r') {lastNewline = i; wasFirstQuote = false;}
+				if (c == '"' && !wasFirstQuote) {wasFirstQuote = true; maxWidth = Math.max(i - lastNewline - 1,maxWidth);}
+			}
+			StringBuilder result = new StringBuilder();
+			lastNewline = -1;
+			wasFirstQuote = false;
+			for (int i = 0, l = buf.length(); i < l; i++) {
+				char c = buf.charAt(i);
+				if (c == '\n' || c == '\r') {lastNewline = i; wasFirstQuote = false;}
+				if (c == '"' && !wasFirstQuote) {wasFirstQuote = true; result.append(Strings.repeat(" ",maxWidth - (i - lastNewline - 1)));}
+				result.append(c);
+			}
+			buf.delete(0, buf.length()).append(result);
 		}
 		
 	}
