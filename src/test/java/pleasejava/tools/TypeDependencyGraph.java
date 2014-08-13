@@ -2,6 +2,7 @@ package pleasejava.tools;
 
 import java.io.InputStream;
 import java.util.ArrayDeque;
+import java.util.Collection;
 import java.util.Deque;
 import java.util.List;
 import java.util.Set;
@@ -67,7 +68,7 @@ public class TypeDependencyGraph {
 		for (Deque<Type> queue = new ArrayDeque<Type>(seeds); !queue.isEmpty(); ) { // queue of nodes with no incoming edge
 			Type top = queue.pollFirst();
 			topologicalOrderingBuilder.add(top); // queue invariant: polled node has no incoming edge -> it is safe to push it to output
-			for (Type child : from(top.getChildren()).transform(Utils.<Type>_mapEntryValue()).toSet()) { // set prevents duplicate offer of child in case of duplicate children
+			for (Type child : from(top.getChildren().values()).toSet()) { // set prevents duplicate offer of child in case of duplicate children
 				exhaust.get(child).remove(top); // removing edges to all children
 				if (exhaust.get(child).isEmpty()) { // if no edge remains, child becomes top 
 					queue.offerLast(child);
@@ -93,7 +94,7 @@ public class TypeDependencyGraph {
 			for (Element typeElement : rootElement.getChildren()) {
 				String name = typeElement.getAttributeValue("name");
 				Type type = typeFactory.ensureType(name);
-				FluentIterable<Type> children = from(type.getChildren()).transform(Utils.<Type>_mapEntryValue());
+				Collection<Type> children = type.getChildren().values();
 				allTypesBuilder.add(type).addAll(children);
 				childrenBuilder.putAll(type,children);
 			}

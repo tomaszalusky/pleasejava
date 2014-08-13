@@ -33,7 +33,7 @@ abstract class Type {
 	 * @see GetChildren
 	 * @return set of entries, entry key is name identifying child type in parent type (or symbolic name), entry value is child type
 	 */
-	final Set<Map.Entry<String,Type>> getChildren() {
+	final Map<String,Type> getChildren() {
 		return accept(new GetChildren());
 	}
 
@@ -59,7 +59,7 @@ abstract class Type {
 	
 	TypeNode toTypeNode() {
 		ImmutableMap.Builder<String,TypeNode> childNodes = ImmutableMap.builder();
-		for (Map.Entry<String,Type> e : this.getChildren()) {
+		for (Map.Entry<String,Type> e : this.getChildren().entrySet()) {
 			childNodes.put(e.getKey(), e.getValue().toTypeNode());
 		}
 		TypeNode result = new TypeNode(this,childNodes.build());
@@ -74,44 +74,44 @@ abstract class Type {
 		return result.toString();
 	}
 
-	private static class GetChildren implements TypeVisitor<Set<Map.Entry<String,Type>>> {
+	private static class GetChildren implements TypeVisitor<Map<String,Type>> {
 
 		@Override
-		public Set<Map.Entry<String,Type>> visitRecord(Record type) {
-			return ImmutableSet.copyOf(type.getFields().entrySet());
+		public Map<String,Type> visitRecord(Record type) {
+			return ImmutableMap.copyOf(type.getFields());
 		}
 
 		@Override
-		public Set<Map.Entry<String,Type>> visitVarray(Varray type) {
-			return ImmutableSet.of(Maps.immutableEntry(Varray.ELEMENT_LABEL, type.getElementType()));
+		public Map<String,Type> visitVarray(Varray type) {
+			return ImmutableMap.of(Varray.ELEMENT_LABEL, type.getElementType());
 		}
 
 		@Override
-		public Set<Map.Entry<String,Type>> visitNestedTable(NestedTable type) {
-			return ImmutableSet.of(Maps.immutableEntry(NestedTable.ELEMENT_LABEL, type.getElementType()));
+		public Map<String,Type> visitNestedTable(NestedTable type) {
+			return ImmutableMap.of(NestedTable.ELEMENT_LABEL, type.getElementType());
 		}
 
 		@Override
-		public Set<Map.Entry<String,Type>> visitIndexByTable(IndexByTable type) {
-			return ImmutableSet.of(Maps.immutableEntry(IndexByTable.ELEMENT_LABEL, type.getElementType()));
+		public Map<String,Type> visitIndexByTable(IndexByTable type) {
+			return ImmutableMap.of(IndexByTable.ELEMENT_LABEL, type.getElementType());
 		}
 
 		@Override
-		public Set<Map.Entry<String,Type>> visitProcedureSignature(ProcedureSignature type) {
-			return ImmutableSet.copyOf(Maps.transformValues(type.getParameters(),Parameter._getType).entrySet());
+		public Map<String,Type> visitProcedureSignature(ProcedureSignature type) {
+			return ImmutableMap.copyOf(Maps.transformValues(type.getParameters(),Parameter._getType));
 		}
 
 		@Override
-		public Set<Map.Entry<String,Type>> visitFunctionSignature(FunctionSignature type) {
-			ImmutableSet.Builder<Map.Entry<String,Type>> builder = ImmutableSet.builder();
-			builder.add(Maps.immutableEntry(IndexByTable.ELEMENT_LABEL, type.getReturnType()));
-			builder.addAll(Maps.transformValues(type.getParameters(),Parameter._getType).entrySet());
+		public Map<String,Type> visitFunctionSignature(FunctionSignature type) {
+			ImmutableMap.Builder<String,Type> builder = ImmutableMap.builder();
+			builder.put(IndexByTable.ELEMENT_LABEL, type.getReturnType());
+			builder.putAll(Maps.transformValues(type.getParameters(),Parameter._getType));
 			return builder.build();
 		}
 
 		@Override
-		public Set<Map.Entry<String,Type>> visitPrimitive(PrimitiveType type) {
-			return ImmutableSet.of();
+		public Map<String,Type> visitPrimitive(PrimitiveType type) {
+			return ImmutableMap.of();
 		}
 		
 	}
