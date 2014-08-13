@@ -143,9 +143,9 @@ public class TypeDependencyGraph {
 /*
 - toString, zavest vypis jednoducheho uzlu bez zodpovednosti za vypis potomku
 	- sjednotit ToString
-		- nastrelit TypeNode.ToString
-			- rfct TypeNode.getChildren() - uchovat nazev fieldu, je nutny
-		- znovupouzit spolecnou funkcionalitu, zvazit argument visitoru (final veci do visitoru, menici se hodnoty jako argument, visitor nevytvaret porad znova)
+		- zvazit argument visitoru (final veci do visitoru, menici se hodnoty jako argument, visitor nevytvaret porad znova)
+		- znovupouzit spolecnou funkcionalitu
+		- zvazit odstraneni GetChildren
 		- vyresit rekurzivni vypis
 		- vyresit vypis identifikatoru
 	- vyresit prezentaci tabulky: zda bud aa nebo excel nebo textove bez aa

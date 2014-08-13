@@ -2,16 +2,10 @@ package pleasejava.tools;
 
 import static pleasejava.Utils.appendf;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Map.Entry;
-
-import pleasejava.Utils;
-import pleasejava.tools.Type.ToString;
 
 import com.google.common.base.Strings;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
 /**
@@ -62,134 +56,115 @@ class TypeNode {
 		return "" + System.identityHashCode(this);
 	}
 	
-	public String toString(boolean recursive) {
-		StringBuilder buf = new StringBuilder();
-		if (recursive) {
-			appendf(buf, "%s%s", Strings.repeat("  ",level()), toString(false));
-			for (TypeNode child : children.values()) {
-				appendf(buf,"%n%s",child.toString(true));
-			}
-		} else {
-			appendf(buf, "%s %s", type.getClass().getSimpleName(), type.getName());
-		}
-		return buf.toString();
-	}
-	
 	@Override
 	public String toString() {
-//		StringBuilder result = new StringBuilder();
-//		type.accept(new ToString(0,null,result,this));
-//		Type.ToString.align(result);
-//		return result.toString();
-		return toString(true);
+		StringBuilder result = new StringBuilder();
+		type.accept(new ToString(0,result,this));
+		Type.ToString.align(result);
+		return result.toString();
 	}
 	
-//	/**
-//	 * Flexible support for toString method.
-//	 * @author Tomas Zalusky
-//	 */
-//	static class ToString implements TypeVisitor<Void> {
-//
-//		private static final int TAB_SPACES = 2;
-//		
-//		private final int level;
-//		
-//		private final Set<Type> written;
-//		
-//		private final StringBuilder buf;
-//
-//		private final TypeNode typeNode;
-//		
-//		/**
-//		 * @param level amount of indentation
-//		 * @param written guard set of type which have already been written in full format.
-//		 * Ensures only first occurence of each type is listed in full format,
-//		 * remaining occurences are listed only in concise format.
-//		 * Can be <code>null</code> for always using full format (guard disabled).
-//		 * @param buf buffer for result string
-//		 * @param typeNode 
-//		 */
-//		ToString(int level, Set<Type> written, StringBuilder buf, TypeNode typeNode) {
-//			this.level = level;
-//			this.written = written;
-//			this.buf = buf;
-//			this.typeNode = typeNode;
-//		}
-//
-//		private static String indent(int level) {
-//			return Strings.repeat(" ",level * TAB_SPACES);
-//		}
-//
-//		@Override
-//		public Void visitRecord(Record type) {
-//			appendf(buf,"record \"%s\" #%s", type.getName(), typeNode.id());
-//			for (Map.Entry<String,Type> entry : type.getFields().entrySet()) {
-//				appendf(buf,"%n%s%s ", indent(level + 1), entry.getKey());
-//				entry.getValue().accept(new ToString(level + 1,written,buf));
-//			}
-//			return null;
-//		}
-//
-//		@Override
-//		public Void visitVarray(Varray type) {
-//			appendf(buf,"varray \"%s\"", type.getName());
-//			appendf(buf,"%n%s%s ", indent(level + 1), Varray.ELEMENT_LABEL);
-//			type.getElementType().accept(new ToString(level + 1,written,buf));
-//			return null;
-//		}
-//
-//		@Override
-//		public Void visitNestedTable(NestedTable type) {
-//			appendf(buf,"nestedtable \"%s\"", type.getName());
-//			appendf(buf,"%n%s%s ", indent(level + 1), NestedTable.ELEMENT_LABEL);
-//			type.getElementType().accept(new ToString(level + 1,written,buf));
-//			return null;
-//		}
-//
-//		@Override
-//		public Void visitIndexByTable(IndexByTable type) {
-//			appendf(buf,"indexbytable \"%s\"", type.getName());
-//			appendf(buf,"%n%s%s %s%n%s%s ", indent(level + 1), IndexByTable.KEY_LABEL,
-//					type.getIndexType().toString(),
-//					indent(level + 1), IndexByTable.ELEMENT_LABEL);
-//			type.getElementType().accept(new ToString(level + 1,written,buf));
-//			return null;
-//		}
-//
-//		@Override
-//		public Void visitProcedureSignature(ProcedureSignature type) {
-//			appendf(buf,"procedure \"%s\"", type.getName());
-//			for (Entry<String,Parameter> entry : type.getParameters().entrySet()) {
-//				appendf(buf,"%n%s%s %s ", indent(level + 1), entry.getKey(), entry.getValue().getParameterMode().name().toLowerCase());
-//				entry.getValue().getType().accept(new ToString(level + 1,written,buf));
-//			}
-//			return null;
-//		}
-//
-//		@Override
-//		public Void visitFunctionSignature(FunctionSignature type) {
-//			appendf(buf,"function \"%s\"", type.getName());
-//			appendf(buf,"%n%s%s ", indent(level + 1), FunctionSignature.RETURN_LABEL);
-//			type.getReturnType().accept(new ToString(level + 1,written,buf));
-//			for (Entry<String,Parameter> entry : type.getParameters().entrySet()) {
-//				appendf(buf,"%n%s%s %s ", indent(level + 1), entry.getKey(), entry.getValue().getParameterMode().name().toLowerCase());
-//				entry.getValue().getType().accept(new ToString(level + 1,written,buf));
-//			}
-//			return null;
-//		}
-//
-//		@Override
-//		public Void visitPrimitive(PrimitiveType type) {
-//			appendf(buf,"\"%s\"", type.getName()); // always written regardless guard set
-//			return null;
-//		}
-//		
-//		@Override
-//		public String toString() {
-//			return buf.toString();
-//		}
-//
-//	}
+	/**
+	 * Flexible support for toString method.
+	 * @author Tomas Zalusky
+	 */
+	static class ToString implements TypeVisitor<Void> {
+
+		private static final int TAB_SPACES = 2;
+		
+		private final int level;
+		
+		private final StringBuilder buf;
+
+		private final TypeNode typeNode;
+		
+		/**
+		 * @param level amount of indentation
+		 * @param buf buffer for result string
+		 * @param typeNode 
+		 */
+		ToString(int level, StringBuilder buf, TypeNode typeNode) {
+			this.level = level;
+			this.buf = buf;
+			this.typeNode = typeNode;
+		}
+
+		private static String indent(int level) {
+			return Strings.repeat(" ",level * TAB_SPACES);
+		}
+
+		@Override
+		public Void visitRecord(Record type) {
+			appendf(buf,"record \"%s\" #%s", type.getName(), typeNode.id());
+			for (Map.Entry<String,Type> entry : type.getFields().entrySet()) {
+				String key = entry.getKey();
+				appendf(buf,"%n%s%s ", indent(level + 1), key);
+				entry.getValue().accept(new ToString(level + 1,buf,typeNode.getChildren().get(key)));
+			}
+			return null;
+		}
+
+		@Override
+		public Void visitVarray(Varray type) {
+			appendf(buf,"varray \"%s\" #%s", type.getName(), typeNode.id());
+			appendf(buf,"%n%s%s ", indent(level + 1), Varray.ELEMENT_LABEL);
+			type.getElementType().accept(new ToString(level + 1,buf,typeNode.getChildren().get(Varray.ELEMENT_LABEL)));
+			return null;
+		}
+
+		@Override
+		public Void visitNestedTable(NestedTable type) {
+			appendf(buf,"nestedtable \"%s\" #%s", type.getName(), typeNode.id());
+			appendf(buf,"%n%s%s ", indent(level + 1), NestedTable.ELEMENT_LABEL);
+			type.getElementType().accept(new ToString(level + 1,buf,typeNode.getChildren().get(NestedTable.ELEMENT_LABEL)));
+			return null;
+		}
+
+		@Override
+		public Void visitIndexByTable(IndexByTable type) {
+			appendf(buf,"indexbytable \"%s\" #%s", type.getName(), typeNode.id());
+			appendf(buf,"%n%s%s %s", indent(level + 1), IndexByTable.KEY_LABEL, type.getIndexType().toString()); // klic indexby tabulky nema TypeNode
+			appendf(buf,"%n%s%s ", indent(level + 1), IndexByTable.ELEMENT_LABEL);
+			type.getElementType().accept(new ToString(level + 1,buf,typeNode.getChildren().get(IndexByTable.ELEMENT_LABEL)));
+			return null;
+		}
+
+		@Override
+		public Void visitProcedureSignature(ProcedureSignature type) {
+			appendf(buf,"procedure \"%s\" #%s", type.getName(), typeNode.id());
+			for (Map.Entry<String,Parameter> entry : type.getParameters().entrySet()) {
+				String key = entry.getKey();
+				appendf(buf,"%n%s%s %s ", indent(level + 1), key, entry.getValue().getParameterMode().name().toLowerCase());
+				entry.getValue().getType().accept(new ToString(level + 1,buf,typeNode.getChildren().get(key)));
+			}
+			return null;
+		}
+
+		@Override
+		public Void visitFunctionSignature(FunctionSignature type) {
+			appendf(buf,"function \"%s\" #%s", type.getName(), typeNode.id());
+			appendf(buf,"%n%s%s ", indent(level + 1), FunctionSignature.RETURN_LABEL);
+			type.getReturnType().accept(new ToString(level + 1,buf,typeNode.getChildren().get(FunctionSignature.RETURN_LABEL)));
+			for (Map.Entry<String,Parameter> entry : type.getParameters().entrySet()) {
+				String key = entry.getKey();
+				appendf(buf,"%n%s%s %s ", indent(level + 1), key, entry.getValue().getParameterMode().name().toLowerCase());
+				entry.getValue().getType().accept(new ToString(level + 1,buf,typeNode.getChildren().get(key)));
+			}
+			return null;
+		}
+
+		@Override
+		public Void visitPrimitive(PrimitiveType type) {
+			appendf(buf,"\"%s\" #%s", type.getName(), typeNode.id());
+			return null;
+		}
+		
+		@Override
+		public String toString() {
+			return buf.toString();
+		}
+
+	}
 
 }
 
