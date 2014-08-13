@@ -104,7 +104,7 @@ abstract class Type {
 		@Override
 		public Map<String,Type> visitFunctionSignature(FunctionSignature type) {
 			ImmutableMap.Builder<String,Type> builder = ImmutableMap.builder();
-			builder.put(IndexByTable.ELEMENT_LABEL, type.getReturnType());
+			builder.put(FunctionSignature.RETURN_LABEL, type.getReturnType());
 			builder.putAll(Maps.transformValues(type.getParameters(),Parameter._getType));
 			return builder.build();
 		}
