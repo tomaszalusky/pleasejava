@@ -1,17 +1,17 @@
 package pleasejava.tools;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.collect.FluentIterable.from;
-import static pleasejava.Utils.appendf;
-
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
 import com.google.common.base.Function;
 import com.google.common.base.Strings;
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Maps;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+import static pleasejava.Utils.appendf;
 
 /**
  * Ancestor of all PLSQL types.
@@ -31,9 +31,9 @@ abstract class Type {
 	 * For example, all fields' types for record or element type for nested table.
 	 * Returns empty collection for primitive types.
 	 * @see GetChildren
-	 * @return
+	 * @return set of entries, entry key is name identifying child type in parent type (or symbolic name), entry value is child type
 	 */
-	final List<Type> getChildren() {
+	final Set<Map.Entry<String,Type>> getChildren() {
 		return accept(new GetChildren());
 	}
 
@@ -58,12 +58,11 @@ abstract class Type {
 	};
 	
 	TypeNode toTypeNode() {
-		List<TypeNode> childNodes = from(this.getChildren()).transform(new Function<Type,TypeNode>() {
-			public TypeNode apply(Type input) {
-				return input.toTypeNode();
-			}
-		}).toList();
-		TypeNode result = new TypeNode(this,childNodes);
+		ImmutableMap.Builder<String,TypeNode> childNodes = ImmutableMap.builder();
+		for (Map.Entry<String,Type> e : this.getChildren()) {
+			childNodes.put(e.getKey(), e.getValue().toTypeNode());
+		}
+		TypeNode result = new TypeNode(this,childNodes.build());
 		return result;
 	}
 	
@@ -75,44 +74,44 @@ abstract class Type {
 		return result.toString();
 	}
 
-	private static class GetChildren implements TypeVisitor<List<Type>> {
+	private static class GetChildren implements TypeVisitor<Set<Map.Entry<String,Type>>> {
 
 		@Override
-		public List<Type> visitRecord(Record type) {
-			return ImmutableList.copyOf(type.getFields().values());
+		public Set<Map.Entry<String,Type>> visitRecord(Record type) {
+			return ImmutableSet.copyOf(type.getFields().entrySet());
 		}
 
 		@Override
-		public List<Type> visitVarray(Varray type) {
-			return ImmutableList.of(type.getElementType());
+		public Set<Map.Entry<String,Type>> visitVarray(Varray type) {
+			return ImmutableSet.of(Maps.immutableEntry(Varray.ELEMENT_LABEL, type.getElementType()));
 		}
 
 		@Override
-		public List<Type> visitNestedTable(NestedTable type) {
-			return ImmutableList.of(type.getElementType());
+		public Set<Map.Entry<String,Type>> visitNestedTable(NestedTable type) {
+			return ImmutableSet.of(Maps.immutableEntry(NestedTable.ELEMENT_LABEL, type.getElementType()));
 		}
 
 		@Override
-		public List<Type> visitIndexByTable(IndexByTable type) {
-			return ImmutableList.of(type.getElementType());
+		public Set<Map.Entry<String,Type>> visitIndexByTable(IndexByTable type) {
+			return ImmutableSet.of(Maps.immutableEntry(IndexByTable.ELEMENT_LABEL, type.getElementType()));
 		}
 
 		@Override
-		public List<Type> visitProcedureSignature(ProcedureSignature type) {
-			return from(type.getParameters().values()).transform(Parameter._getType).toList();
+		public Set<Map.Entry<String,Type>> visitProcedureSignature(ProcedureSignature type) {
+			return ImmutableSet.copyOf(Maps.transformValues(type.getParameters(),Parameter._getType).entrySet());
 		}
 
 		@Override
-		public List<Type> visitFunctionSignature(FunctionSignature type) {
-			ImmutableList.Builder<Type> builder = ImmutableList.builder();
-			builder.add(type.getReturnType());
-			builder.addAll(from(type.getParameters().values()).transform(Parameter._getType));
+		public Set<Map.Entry<String,Type>> visitFunctionSignature(FunctionSignature type) {
+			ImmutableSet.Builder<Map.Entry<String,Type>> builder = ImmutableSet.builder();
+			builder.add(Maps.immutableEntry(IndexByTable.ELEMENT_LABEL, type.getReturnType()));
+			builder.addAll(Maps.transformValues(type.getParameters(),Parameter._getType).entrySet());
 			return builder.build();
 		}
 
 		@Override
-		public List<Type> visitPrimitive(PrimitiveType type) {
-			return ImmutableList.of();
+		public Set<Map.Entry<String,Type>> visitPrimitive(PrimitiveType type) {
+			return ImmutableSet.of();
 		}
 		
 	}

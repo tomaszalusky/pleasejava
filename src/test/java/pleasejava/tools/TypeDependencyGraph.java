@@ -10,7 +10,10 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.input.SAXBuilder;
 
+import pleasejava.Utils;
+
 import com.google.common.base.Throwables;
+import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ImmutableSet;
@@ -22,6 +25,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Table;
+
+import static com.google.common.collect.FluentIterable.from;
 
 /**
  * Represents immutable oriented graph whose nodes are all types in given testcase
@@ -62,7 +67,7 @@ public class TypeDependencyGraph {
 		for (Deque<Type> queue = new ArrayDeque<Type>(seeds); !queue.isEmpty(); ) { // queue of nodes with no incoming edge
 			Type top = queue.pollFirst();
 			topologicalOrderingBuilder.add(top); // queue invariant: polled node has no incoming edge -> it is safe to push it to output
-			for (Type child : ImmutableSet.copyOf(top.getChildren())) { // set prevents duplicate offer of child in case of duplicate children
+			for (Type child : from(top.getChildren()).transform(Utils.<Type>_mapEntryValue()).toSet()) { // set prevents duplicate offer of child in case of duplicate children
 				exhaust.get(child).remove(top); // removing edges to all children
 				if (exhaust.get(child).isEmpty()) { // if no edge remains, child becomes top 
 					queue.offerLast(child);
@@ -88,7 +93,7 @@ public class TypeDependencyGraph {
 			for (Element typeElement : rootElement.getChildren()) {
 				String name = typeElement.getAttributeValue("name");
 				Type type = typeFactory.ensureType(name);
-				List<Type> children = type.getChildren();
+				FluentIterable<Type> children = from(type.getChildren()).transform(Utils.<Type>_mapEntryValue());
 				allTypesBuilder.add(type).addAll(children);
 				childrenBuilder.putAll(type,children);
 			}
@@ -136,7 +141,12 @@ public class TypeDependencyGraph {
 
 /*
 - toString, zavest vypis jednoducheho uzlu bez zodpovednosti za vypis potomku
-	- sjednotit Type.ToString a TypeNode.ToString, znovupouzit spolecnou funkcionalitu, vyresit rekurzivni vypis, vyresit vypis identifikatoru
+	- sjednotit ToString
+		- nastrelit TypeNode.ToString
+			- rfct TypeNode.getChildren() - uchovat nazev fieldu, je nutny
+		- znovupouzit spolecnou funkcionalitu, zvazit argument visitoru (final veci do visitoru, menici se hodnoty jako argument, visitor nevytvaret porad znova)
+		- vyresit rekurzivni vypis
+		- vyresit vypis identifikatoru
 	- vyresit prezentaci tabulky: zda bud aa nebo excel nebo textove bez aa
 - konstruovat type tree od korene, umozni to hned urcit level a pozdeji i identifikator
 - rozlisit v testech nacteni XML do TDG (je vzdy) a konkretni zpracovani (getTopologicalOrdering, toTypeNode)
