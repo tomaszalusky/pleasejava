@@ -1,5 +1,9 @@
 package pleasejava;
 
+import java.util.Map;
+
+import com.google.common.base.Function;
+
 /**
  * @author Tomas Zalusky
  */
@@ -29,6 +33,14 @@ public class Utils {
 		String s = String.format(format, args);
 		buf.append(s);
 		return buf;
+	}
+
+	public static <V> Function<Map.Entry<?,V>,V> _mapEntryValue() {
+		return new Function<Map.Entry<?,V>,V>() {
+			public V apply(Map.Entry<?,V> input) {
+				return input.getValue();
+			}
+		};
 	}
 
 }
