@@ -32,6 +32,10 @@ class IndexByTable extends Type {
 		return visitor.visitIndexByTable(this);
 	}
 	
+	<A> void accept(TypeVisitorA<A> visitor, A arg) {
+		visitor.visitIndexByTable(this, arg);
+	}
+	
 	public Type getElementType() {
 		return elementType;
 	}

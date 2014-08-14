@@ -7,7 +7,6 @@ import java.util.Set;
 import com.google.common.base.Function;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -47,6 +46,8 @@ abstract class Type {
 	 */
 	abstract <R> R accept(TypeVisitor<R> visitor);
 	
+	abstract <A> void accept(TypeVisitorA<A> visitor, A arg);
+	
 	public String getName() {
 		return name;
 	}
@@ -69,7 +70,7 @@ abstract class Type {
 	@Override
 	public String toString() {
 		StringBuilder result = new StringBuilder();
-		accept(new ToString(0,null,result));
+		accept(new ToString(result,null),0);
 		Type.ToString.align(result);
 		return result.toString();
 	}
@@ -120,28 +121,24 @@ abstract class Type {
 	 * Flexible support for toString method.
 	 * @author Tomas Zalusky
 	 */
-	static class ToString implements TypeVisitor<Void> {
+	static class ToString implements TypeVisitorA<Integer> {
 
 		private static final int TAB_SPACES = 2;
 		
-		private final int level;
+		private final StringBuilder buf;
 		
 		private final Set<Type> written;
 		
-		private final StringBuilder buf;
-		
 		/**
-		 * @param level amount of indentation
+		 * @param buf buffer for result string
 		 * @param written guard set of type which have already been written in full format.
 		 * Ensures only first occurence of each type is listed in full format,
 		 * remaining occurences are listed only in concise format.
 		 * Can be <code>null</code> for always using full format (guard disabled).
-		 * @param buf buffer for result string
 		 */
-		ToString(int level, Set<Type> written, StringBuilder buf) {
-			this.level = level;
-			this.written = written;
+		ToString(StringBuilder buf, Set<Type> written) {
 			this.buf = buf;
+			this.written = written;
 		}
 
 		private static String indent(int level) {
@@ -162,79 +159,72 @@ abstract class Type {
 		}
 
 		@Override
-		public Void visitRecord(Record type) {
+		public void visitRecord(Record type, Integer level) {
 			appendf(buf,"record \"%s\"", type.getName());
 			if (!checkWritten(type)) {
 				for (Map.Entry<String,Type> entry : type.getFields().entrySet()) {
 					appendf(buf,"%n%s%s ", indent(level + 1), entry.getKey());
-					entry.getValue().accept(new ToString(level + 1,written,buf));
+					entry.getValue().accept(this,level + 1);
 				}
 			}
-			return null;
 		}
 
 		@Override
-		public Void visitVarray(Varray type) {
+		public void visitVarray(Varray type, Integer level) {
 			appendf(buf,"varray \"%s\"", type.getName());
 			if (!checkWritten(type)) {
 				appendf(buf,"%n%s%s ", indent(level + 1), Varray.ELEMENT_LABEL);
-				type.getElementType().accept(new ToString(level + 1,written,buf));
+				type.getElementType().accept(this,level + 1);
 			}
-			return null;
 		}
 
 		@Override
-		public Void visitNestedTable(NestedTable type) {
+		public void visitNestedTable(NestedTable type, Integer level) {
 			appendf(buf,"nestedtable \"%s\"", type.getName());
 			if (!checkWritten(type)) {
 				appendf(buf,"%n%s%s ", indent(level + 1), NestedTable.ELEMENT_LABEL);
-				type.getElementType().accept(new ToString(level + 1,written,buf));
+				type.getElementType().accept(this,level + 1);
 			}
-			return null;
 		}
 
 		@Override
-		public Void visitIndexByTable(IndexByTable type) {
+		public void visitIndexByTable(IndexByTable type, Integer level) {
 			appendf(buf,"indexbytable \"%s\"", type.getName());
 			if (!checkWritten(type)) {
 				appendf(buf,"%n%s%s %s%n%s%s ", indent(level + 1), IndexByTable.KEY_LABEL,
 						type.getIndexType().toString(),
 						indent(level + 1), IndexByTable.ELEMENT_LABEL);
-				type.getElementType().accept(new ToString(level + 1,written,buf));
+				type.getElementType().accept(this,level + 1);
 			}
-			return null;
 		}
 
 		@Override
-		public Void visitProcedureSignature(ProcedureSignature type) {
+		public void visitProcedureSignature(ProcedureSignature type, Integer level) {
 			appendf(buf,"procedure \"%s\"", type.getName());
 			if (!checkWritten(type)) {
 				for (Entry<String,Parameter> entry : type.getParameters().entrySet()) {
 					appendf(buf,"%n%s%s %s ", indent(level + 1), entry.getKey(), entry.getValue().getParameterMode().name().toLowerCase());
-					entry.getValue().getType().accept(new ToString(level + 1,written,buf));
+					entry.getValue().getType().accept(this,level + 1);
 				}
 			}
-			return null;
 		}
 
 		@Override
-		public Void visitFunctionSignature(FunctionSignature type) {
+		public void visitFunctionSignature(FunctionSignature type, Integer level) {
 			appendf(buf,"function \"%s\"", type.getName());
 			if (!checkWritten(type)) {
 				appendf(buf,"%n%s%s ", indent(level + 1), FunctionSignature.RETURN_LABEL);
-				type.getReturnType().accept(new ToString(level + 1,written,buf));
+				type.getReturnType().accept(this,level + 1);
 				for (Entry<String,Parameter> entry : type.getParameters().entrySet()) {
 					appendf(buf,"%n%s%s %s ", indent(level + 1), entry.getKey(), entry.getValue().getParameterMode().name().toLowerCase());
-					entry.getValue().getType().accept(new ToString(level + 1,written,buf));
+					entry.getValue().getType().accept(this,level + 1);
 				}
 			}
-			return null;
 		}
 
 		@Override
-		public Void visitPrimitive(PrimitiveType type) {
+		public void visitPrimitive(PrimitiveType type, Integer level) {
 			appendf(buf,"\"%s\"", type.getName()); // always written regardless guard set
-			return null;
 		}
 		
 		@Override

@@ -39,6 +39,10 @@ class FunctionSignature extends AbstractSignature {
 		return visitor.visitFunctionSignature(this);
 	}
 
+	<A> void accept(TypeVisitorA<A> visitor, A arg) {
+		visitor.visitFunctionSignature(this, arg);
+	}
+	
 	public Type getReturnType() {
 		return returnType;
 	}

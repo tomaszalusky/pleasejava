@@ -24,6 +24,10 @@ class Varray extends Type {
 		return visitor.visitVarray(this);
 	}
 	
+	<A> void accept(TypeVisitorA<A> visitor, A arg) {
+		visitor.visitVarray(this, arg);
+	}
+	
 	public Type getElementType() {
 		return elementType;
 	}

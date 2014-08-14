@@ -11,10 +11,7 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.input.SAXBuilder;
 
-import pleasejava.Utils;
-
 import com.google.common.base.Throwables;
-import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ImmutableSet;
@@ -127,7 +124,7 @@ public class TypeDependencyGraph {
 		Set<Type> written = Sets.<Type>newHashSet();
 		for (Set<Type> exhaust = Sets.newLinkedHashSet(getTopologicalOrdering()); !exhaust.isEmpty(); ) {
 			Type first = Iterables.getFirst(exhaust,null);
-			first.accept(new Type.ToString(0,written,result)); // write top-level node and all its children
+			first.accept(new Type.ToString(result,written),0); // write top-level node and all its children
 			for (Deque<Type> q = Lists.newLinkedList(ImmutableSet.of(first)); !q.isEmpty(); ) { // remove top-level node and transitively all its children from set of waiting nodes
 				Type t = q.pollFirst();
 				exhaust.remove(t);
@@ -144,6 +141,8 @@ public class TypeDependencyGraph {
 - toString, zavest vypis jednoducheho uzlu bez zodpovednosti za vypis potomku
 	- sjednotit ToString
 		- zvazit argument visitoru (final veci do visitoru, menici se hodnoty jako argument, visitor nevytvaret porad znova)
+			- TypeVisitorR
+			- TypeVisitorAR
 		- znovupouzit spolecnou funkcionalitu
 		- zvazit odstraneni GetChildren
 		- vyresit rekurzivni vypis

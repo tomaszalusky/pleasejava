@@ -31,6 +31,10 @@ class Record extends Type {
 		return visitor.visitRecord(this);
 	}
 	
+	<A> void accept(TypeVisitorA<A> visitor, A arg) {
+		visitor.visitRecord(this, arg);
+	}
+	
 	public Map<String,Type> getFields() {
 		return fields;
 	}
