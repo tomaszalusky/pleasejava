@@ -27,7 +27,7 @@ class Record extends Type {
 		this.fields = ImmutableMap.copyOf(checkNotNull(fields));
 	}
 
-	<R> R accept(TypeVisitor<R> visitor) {
+	<R> R accept(TypeVisitorR<R> visitor) {
 		return visitor.visitRecord(this);
 	}
 	

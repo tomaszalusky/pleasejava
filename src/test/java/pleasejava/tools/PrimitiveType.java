@@ -13,7 +13,7 @@ class PrimitiveType extends Type {
 		super(name);
 	}
 	
-	<R> R accept(TypeVisitor<R> visitor) {
+	<R> R accept(TypeVisitorR<R> visitor) {
 		return visitor.visitPrimitive(this);
 	}
 

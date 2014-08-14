@@ -28,7 +28,7 @@ class IndexByTable extends Type {
 		this.elementType = checkNotNull(elementType);
 	}
 	
-	<R> R accept(TypeVisitor<R> visitor) {
+	<R> R accept(TypeVisitorR<R> visitor) {
 		return visitor.visitIndexByTable(this);
 	}
 	

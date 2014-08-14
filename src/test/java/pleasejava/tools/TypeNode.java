@@ -68,7 +68,7 @@ class TypeNode {
 	 * Flexible support for toString method.
 	 * @author Tomas Zalusky
 	 */
-	static class ToString implements TypeVisitor<Void> {
+	static class ToString implements TypeVisitorR<Void> {
 
 		private static final int TAB_SPACES = 2;
 		

@@ -35,7 +35,7 @@ class FunctionSignature extends AbstractSignature {
 		this.returnType = returnType;
 	}
 	
-	<R> R accept(TypeVisitor<R> visitor) {
+	<R> R accept(TypeVisitorR<R> visitor) {
 		return visitor.visitFunctionSignature(this);
 	}
 

@@ -28,7 +28,7 @@ class ProcedureSignature extends AbstractSignature {
 		this.parameters = ImmutableMap.copyOf(checkNotNull(parameters));
 	}
 	
-	<R> R accept(TypeVisitor<R> visitor) {
+	<R> R accept(TypeVisitorR<R> visitor) {
 		return visitor.visitProcedureSignature(this);
 	}
 	

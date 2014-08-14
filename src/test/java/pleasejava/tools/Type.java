@@ -44,7 +44,7 @@ abstract class Type {
 	 * @param visitor
 	 * @return
 	 */
-	abstract <R> R accept(TypeVisitor<R> visitor);
+	abstract <R> R accept(TypeVisitorR<R> visitor);
 	
 	abstract <A> void accept(TypeVisitorA<A> visitor, A arg);
 	
@@ -75,7 +75,7 @@ abstract class Type {
 		return result.toString();
 	}
 
-	private static class GetChildren implements TypeVisitor<Map<String,Type>> {
+	private static class GetChildren implements TypeVisitorR<Map<String,Type>> {
 
 		@Override
 		public Map<String,Type> visitRecord(Record type) {
