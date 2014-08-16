@@ -3,6 +3,7 @@ package pleasejava;
 import java.util.Map;
 
 import com.google.common.base.Function;
+import com.google.common.base.Strings;
 
 /**
  * @author Tomas Zalusky
@@ -43,4 +44,31 @@ public class Utils {
 		};
 	}
 
+	/**
+	 * Helper ancestor class for toString method of hierarchical structures.
+	 * Supports indendation and resulting buffer.
+	 * (I consider adding more logic premature as currently there are only 2 ToString implementations.)
+	 * @author Tomas Zalusky
+	 */
+	public static abstract class ToStringSupport {
+		
+		protected static final int TAB_SPACES = 2;
+		
+		protected final StringBuilder buf;
+		
+		public ToStringSupport(StringBuilder buf) {
+			this.buf = buf;
+		}
+
+		protected static String indent(int level) {
+			return Strings.repeat(" ",level * TAB_SPACES);
+		}
+
+		@Override
+		public String toString() {
+			return buf.toString();
+		}
+
+	}
+	
 }

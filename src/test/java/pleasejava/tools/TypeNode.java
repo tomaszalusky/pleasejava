@@ -1,11 +1,12 @@
 package pleasejava.tools;
 
+import static pleasejava.Utils.appendf;
+
 import java.util.Map;
 
-import com.google.common.base.Strings;
-import com.google.common.collect.ImmutableMap;
+import pleasejava.Utils;
 
-import static pleasejava.Utils.appendf;
+import com.google.common.collect.ImmutableMap;
 
 /**
  * Represents one node in parameter type tree.
@@ -67,21 +68,13 @@ class TypeNode {
 	 * Flexible support for toString method.
 	 * @author Tomas Zalusky
 	 */
-	static class ToString implements TypeVisitorAA<Integer,TypeNode> {
-
-		private static final int TAB_SPACES = 2;
-		
-		private final StringBuilder buf;
+	static class ToString extends Utils.ToStringSupport implements TypeVisitorAA<Integer,TypeNode> {
 
 		/**
 		 * @param buf buffer for result string
 		 */
 		ToString(StringBuilder buf) {
-			this.buf = buf;
-		}
-
-		private static String indent(int level) {
-			return Strings.repeat(" ",level * TAB_SPACES);
+			super(buf);
 		}
 
 		@Override
@@ -143,11 +136,6 @@ class TypeNode {
 			appendf(buf,"\"%s\" #%s", type.getName(), typeNode.id());
 		}
 		
-		@Override
-		public String toString() {
-			return buf.toString();
-		}
-
 	}
 
 }

@@ -4,6 +4,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import pleasejava.Utils;
+
 import com.google.common.base.Function;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
@@ -123,12 +125,8 @@ abstract class Type {
 	 * Flexible support for toString method.
 	 * @author Tomas Zalusky
 	 */
-	static class ToString implements TypeVisitorA<Integer> {
+	static class ToString extends Utils.ToStringSupport implements TypeVisitorA<Integer> {
 
-		private static final int TAB_SPACES = 2;
-		
-		private final StringBuilder buf;
-		
 		private final Set<Type> written;
 		
 		/**
@@ -139,12 +137,8 @@ abstract class Type {
 		 * Can be <code>null</code> for always using full format (guard disabled).
 		 */
 		ToString(StringBuilder buf, Set<Type> written) {
-			this.buf = buf;
+			super(buf);
 			this.written = written;
-		}
-
-		private static String indent(int level) {
-			return Strings.repeat(" ",level * TAB_SPACES);
 		}
 
 		private boolean checkWritten(Type type) {
@@ -229,11 +223,6 @@ abstract class Type {
 			appendf(buf,"\"%s\"", type.getName()); // always written regardless guard set
 		}
 		
-		@Override
-		public String toString() {
-			return buf.toString();
-		}
-
 		/**
 		 * Aligns type names into same column.
 		 * @param buf

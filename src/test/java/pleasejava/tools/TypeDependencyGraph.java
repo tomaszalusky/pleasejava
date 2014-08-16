@@ -140,7 +140,6 @@ public class TypeDependencyGraph {
 /*
 - toString, zavest vypis jednoducheho uzlu bez zodpovednosti za vypis potomku
 	- sjednotit ToString
-		- znovupouzit spolecnou funkcionalitu: Utils.ToStringSupport, s dalsim reusem pockat az budou dalsi ToStringy
 		- zvazit odstraneni GetChildren, zkontrolovat spravny vyskyt ELEMENT, INDEX a RETURN typu u PTT
 		- vyresit rekurzivni vypis
 		- vyresit vypis identifikatoru
