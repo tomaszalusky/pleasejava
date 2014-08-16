@@ -101,10 +101,15 @@ class TypeNode {
 			type.getElementType().accept(this,level + 1,typeNode.getChildren().get(NestedTable.ELEMENT_LABEL));
 		}
 
+		/*
+		 * Key type of indexby table doesn't have TypeNode
+		 * since it would complicate creation of subsequent structures.
+		 * Anyway, for clarity it is still written in indented manner.
+		 */
 		@Override
 		public void visitIndexByTable(IndexByTable type, Integer level, TypeNode typeNode) {
 			appendf(buf,"indexbytable \"%s\" #%s", type.getName(), typeNode.id());
-			appendf(buf,"%n%s%s %s", indent(level + 1), IndexByTable.KEY_LABEL, type.getIndexType().toString()); // klic indexby tabulky nema TypeNode
+			appendf(buf,"%n%s%s %s", indent(level + 1), IndexByTable.KEY_LABEL, type.getIndexType().toString());
 			appendf(buf,"%n%s%s ", indent(level + 1), IndexByTable.ELEMENT_LABEL);
 			type.getElementType().accept(this,level + 1,typeNode.getChildren().get(IndexByTable.ELEMENT_LABEL));
 		}
