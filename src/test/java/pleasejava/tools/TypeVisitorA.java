@@ -2,7 +2,7 @@ package pleasejava.tools;
 
 /**
  * Represents method called on particular type instance.
- * @see Type#accept(TypeVisitorA)
+ * @see Type#accept(TypeVisitorA, Object)
  * 
  * @author Tomas Zalusky
  */

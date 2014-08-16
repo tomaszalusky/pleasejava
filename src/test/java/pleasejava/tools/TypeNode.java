@@ -1,12 +1,11 @@
 package pleasejava.tools;
 
-import static pleasejava.Utils.appendf;
-
 import java.util.Map;
-import java.util.Set;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
+
+import static pleasejava.Utils.appendf;
 
 /**
  * Represents one node in parameter type tree.
@@ -59,7 +58,7 @@ class TypeNode {
 	@Override
 	public String toString() {
 		StringBuilder result = new StringBuilder();
-		type.accept(new ToString(0,result,this));
+		type.accept(new ToString(result),0,this);
 		Type.ToString.align(result);
 		return result.toString();
 	}
@@ -68,25 +67,17 @@ class TypeNode {
 	 * Flexible support for toString method.
 	 * @author Tomas Zalusky
 	 */
-	static class ToString implements TypeVisitorR<Void> {
+	static class ToString implements TypeVisitorAA<Integer,TypeNode> {
 
 		private static final int TAB_SPACES = 2;
 		
-		private final int level;
-		
 		private final StringBuilder buf;
 
-		private final TypeNode typeNode;
-		
 		/**
-		 * @param level amount of indentation
 		 * @param buf buffer for result string
-		 * @param typeNode 
 		 */
-		ToString(int level, StringBuilder buf, TypeNode typeNode) {
-			this.level = level;
+		ToString(StringBuilder buf) {
 			this.buf = buf;
-			this.typeNode = typeNode;
 		}
 
 		private static String indent(int level) {
@@ -94,69 +85,62 @@ class TypeNode {
 		}
 
 		@Override
-		public Void visitRecord(Record type) {
+		public void visitRecord(Record type, Integer level, TypeNode typeNode) {
 			appendf(buf,"record \"%s\" #%s", type.getName(), typeNode.id());
 			for (Map.Entry<String,Type> entry : type.getFields().entrySet()) {
 				String key = entry.getKey();
 				appendf(buf,"%n%s%s ", indent(level + 1), key);
-				entry.getValue().accept(new ToString(level + 1,buf,typeNode.getChildren().get(key)));
+				entry.getValue().accept(this,level + 1,typeNode.getChildren().get(key));
 			}
-			return null;
 		}
 
 		@Override
-		public Void visitVarray(Varray type) {
+		public void visitVarray(Varray type, Integer level, TypeNode typeNode) {
 			appendf(buf,"varray \"%s\" #%s", type.getName(), typeNode.id());
 			appendf(buf,"%n%s%s ", indent(level + 1), Varray.ELEMENT_LABEL);
-			type.getElementType().accept(new ToString(level + 1,buf,typeNode.getChildren().get(Varray.ELEMENT_LABEL)));
-			return null;
+			type.getElementType().accept(this,level + 1,typeNode.getChildren().get(Varray.ELEMENT_LABEL));
 		}
 
 		@Override
-		public Void visitNestedTable(NestedTable type) {
+		public void visitNestedTable(NestedTable type, Integer level, TypeNode typeNode) {
 			appendf(buf,"nestedtable \"%s\" #%s", type.getName(), typeNode.id());
 			appendf(buf,"%n%s%s ", indent(level + 1), NestedTable.ELEMENT_LABEL);
-			type.getElementType().accept(new ToString(level + 1,buf,typeNode.getChildren().get(NestedTable.ELEMENT_LABEL)));
-			return null;
+			type.getElementType().accept(this,level + 1,typeNode.getChildren().get(NestedTable.ELEMENT_LABEL));
 		}
 
 		@Override
-		public Void visitIndexByTable(IndexByTable type) {
+		public void visitIndexByTable(IndexByTable type, Integer level, TypeNode typeNode) {
 			appendf(buf,"indexbytable \"%s\" #%s", type.getName(), typeNode.id());
 			appendf(buf,"%n%s%s %s", indent(level + 1), IndexByTable.KEY_LABEL, type.getIndexType().toString()); // klic indexby tabulky nema TypeNode
 			appendf(buf,"%n%s%s ", indent(level + 1), IndexByTable.ELEMENT_LABEL);
-			type.getElementType().accept(new ToString(level + 1,buf,typeNode.getChildren().get(IndexByTable.ELEMENT_LABEL)));
-			return null;
+			type.getElementType().accept(this,level + 1,typeNode.getChildren().get(IndexByTable.ELEMENT_LABEL));
 		}
 
 		@Override
-		public Void visitProcedureSignature(ProcedureSignature type) {
+		public void visitProcedureSignature(ProcedureSignature type, Integer level, TypeNode typeNode) {
 			appendf(buf,"procedure \"%s\" #%s", type.getName(), typeNode.id());
 			for (Map.Entry<String,Parameter> entry : type.getParameters().entrySet()) {
 				String key = entry.getKey();
 				appendf(buf,"%n%s%s %s ", indent(level + 1), key, entry.getValue().getParameterMode().name().toLowerCase());
-				entry.getValue().getType().accept(new ToString(level + 1,buf,typeNode.getChildren().get(key)));
+				entry.getValue().getType().accept(this,level + 1,typeNode.getChildren().get(key));
 			}
-			return null;
 		}
 
 		@Override
-		public Void visitFunctionSignature(FunctionSignature type) {
+		public void visitFunctionSignature(FunctionSignature type, Integer level, TypeNode typeNode) {
 			appendf(buf,"function \"%s\" #%s", type.getName(), typeNode.id());
 			appendf(buf,"%n%s%s ", indent(level + 1), FunctionSignature.RETURN_LABEL);
-			type.getReturnType().accept(new ToString(level + 1,buf,typeNode.getChildren().get(FunctionSignature.RETURN_LABEL)));
+			type.getReturnType().accept(this,level + 1,typeNode.getChildren().get(FunctionSignature.RETURN_LABEL));
 			for (Map.Entry<String,Parameter> entry : type.getParameters().entrySet()) {
 				String key = entry.getKey();
 				appendf(buf,"%n%s%s %s ", indent(level + 1), key, entry.getValue().getParameterMode().name().toLowerCase());
-				entry.getValue().getType().accept(new ToString(level + 1,buf,typeNode.getChildren().get(key)));
+				entry.getValue().getType().accept(this,level + 1,typeNode.getChildren().get(key));
 			}
-			return null;
 		}
 
 		@Override
-		public Void visitPrimitive(PrimitiveType type) {
+		public void visitPrimitive(PrimitiveType type, Integer level, TypeNode typeNode) {
 			appendf(buf,"\"%s\" #%s", type.getName(), typeNode.id());
-			return null;
 		}
 		
 		@Override

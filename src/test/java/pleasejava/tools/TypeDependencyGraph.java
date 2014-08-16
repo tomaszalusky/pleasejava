@@ -140,17 +140,15 @@ public class TypeDependencyGraph {
 /*
 - toString, zavest vypis jednoducheho uzlu bez zodpovednosti za vypis potomku
 	- sjednotit ToString
-		- zvazit argument visitoru (final veci do visitoru, menici se hodnoty jako argument, visitor nevytvaret porad znova)
-			- TypeVisitorR
-			- TypeVisitorAR
-		- znovupouzit spolecnou funkcionalitu
-		- zvazit odstraneni GetChildren
+		- znovupouzit spolecnou funkcionalitu: Utils.ToStringSupport, s dalsim reusem pockat az budou dalsi ToStringy
+		- zvazit odstraneni GetChildren, zkontrolovat spravny vyskyt ELEMENT, INDEX a RETURN typu u PTT
 		- vyresit rekurzivni vypis
 		- vyresit vypis identifikatoru
 	- vyresit prezentaci tabulky: zda bud aa nebo excel nebo textove bez aa
 - konstruovat type tree od korene, umozni to hned urcit level a pozdeji i identifikator
 - rozlisit v testech nacteni XML do TDG (je vzdy) a konkretni zpracovani (getTopologicalOrdering, toTypeNode)
 - metoda pro urceni identifikatoru
-- zapracovat koncept JDBC-transferrable typu
+- zapracovat koncept JDBC-transferrable typu, a la ifc JdbcTransfer { convertForth(); convertBack(); }
 - napojit na ukazkove priklady pro TDG, otestovat vystup
+- dokumentaci typenode tree
 */

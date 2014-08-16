@@ -21,6 +21,10 @@ class PrimitiveType extends Type {
 		visitor.visitPrimitive(this, arg);
 	}
 	
+	<A1,A2> void accept(TypeVisitorAA<A1,A2> visitor, A1 arg1, A2 arg2) {
+		visitor.visitPrimitive(this, arg1, arg2);
+	}
+	
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) return true;

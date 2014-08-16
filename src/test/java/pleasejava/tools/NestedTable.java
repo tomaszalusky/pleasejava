@@ -28,6 +28,10 @@ class NestedTable extends Type {
 		visitor.visitNestedTable(this, arg);
 	}
 	
+	<A1,A2> void accept(TypeVisitorAA<A1,A2> visitor, A1 arg1, A2 arg2) {
+		visitor.visitNestedTable(this, arg1, arg2);
+	}
+	
 	public Type getElementType() {
 		return elementType;
 	}

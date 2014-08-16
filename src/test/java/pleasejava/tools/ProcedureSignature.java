@@ -35,6 +35,10 @@ class ProcedureSignature extends AbstractSignature {
 	<A> void accept(TypeVisitorA<A> visitor, A arg) {
 		visitor.visitProcedureSignature(this, arg);
 	}
+
+	<A1,A2> void accept(TypeVisitorAA<A1,A2> visitor, A1 arg1, A2 arg2) {
+		visitor.visitProcedureSignature(this, arg1, arg2);
+	}
 	
 	public Map<String,Parameter> getParameters() {
 		return parameters;
