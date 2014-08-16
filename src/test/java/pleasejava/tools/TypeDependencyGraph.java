@@ -131,18 +131,13 @@ public class TypeDependencyGraph {
 				q.addAll(children.get(t));
 			}
 		}
-		Type.ToString.align(result);
+		Type.ToString.align(result,false);
 		return result.toString();
 	}
 
 }
 
 /*
-- toString, zavest vypis jednoducheho uzlu bez zodpovednosti za vypis potomku
-	- sjednotit ToString
-		- vyresit rekurzivni vypis
-		- vyresit vypis identifikatoru
-	- vyresit prezentaci tabulky: zda bud aa nebo excel nebo textove bez aa
 - konstruovat type tree od korene, umozni to hned urcit level a pozdeji i identifikator
 - rozlisit v testech nacteni XML do TDG (je vzdy) a konkretni zpracovani (getTopologicalOrdering, toTypeNode)
 - metoda pro urceni identifikatoru

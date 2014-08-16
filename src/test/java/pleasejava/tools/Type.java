@@ -75,7 +75,7 @@ abstract class Type {
 	public String toString() {
 		StringBuilder result = new StringBuilder();
 		accept(new ToString(result,null),0);
-		Type.ToString.align(result);
+		Type.ToString.align(result,false);
 		return result.toString();
 	}
 
@@ -226,24 +226,34 @@ abstract class Type {
 		/**
 		 * Aligns type names into same column.
 		 * @param buf
+		 * @param thirdColumn if true, three columns are formatted, else only two columns are formatted
 		 */
-		public static void align(StringBuilder buf) {
+		public static void align(StringBuilder buf, boolean thirdColumn) {
 			int lastNewline = -1;
+			int firstQuote = -1;
 			boolean wasFirstQuote = false;
-			int maxWidth = -1;
+			int maxWidth1 = -1, maxWidth2 = -1;
 			for (int i = 0, l = buf.length(); i < l; i++) {
 				char c = buf.charAt(i);
 				if (c == '\n' || c == '\r') {lastNewline = i; wasFirstQuote = false;}
-				if (c == '"' && !wasFirstQuote) {wasFirstQuote = true; maxWidth = Math.max(i - lastNewline - 1,maxWidth);}
+				if (c == '"') {
+					if (wasFirstQuote) {maxWidth2 = Math.max(i - firstQuote - 1,maxWidth2);}
+					else {wasFirstQuote = true; firstQuote = i; maxWidth1 = Math.max(i - lastNewline - 1,maxWidth1);}
+				}
 			}
 			StringBuilder result = new StringBuilder();
 			lastNewline = -1;
+			firstQuote = -1;
 			wasFirstQuote = false;
 			for (int i = 0, l = buf.length(); i < l; i++) {
 				char c = buf.charAt(i);
 				if (c == '\n' || c == '\r') {lastNewline = i; wasFirstQuote = false;}
-				if (c == '"' && !wasFirstQuote) {wasFirstQuote = true; result.append(Strings.repeat(" ",maxWidth - (i - lastNewline - 1)));}
-				result.append(c);
+				if (c == '"') {
+					if (wasFirstQuote) {result.append(c).append(Strings.repeat(" ",maxWidth2 - (i - firstQuote - 1)));}
+					else {wasFirstQuote = true; firstQuote = i; result.append(Strings.repeat(" ",maxWidth1 - (i - lastNewline - 1))).append(c);}
+				} else {
+					result.append(c);
+				}
 			}
 			buf.delete(0, buf.length()).append(result);
 		}

@@ -60,7 +60,7 @@ class TypeNode {
 	public String toString() {
 		StringBuilder result = new StringBuilder();
 		type.accept(new ToString(result),0,this);
-		Type.ToString.align(result);
+		Type.ToString.align(result,true);
 		return result.toString();
 	}
 	
