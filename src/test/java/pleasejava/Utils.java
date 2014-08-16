@@ -52,7 +52,7 @@ public class Utils {
 	 */
 	public static abstract class ToStringSupport {
 		
-		protected static final int TAB_SPACES = 2;
+		protected static final int TAB_SPACES = 4;
 		
 		protected final StringBuilder buf;
 		
