@@ -138,7 +138,6 @@ public class TypeDependencyGraph {
 }
 
 /*
-- konstruovat type tree od korene, umozni to hned urcit level a pozdeji i identifikator
 - rozlisit v testech nacteni XML do TDG (je vzdy) a konkretni zpracovani (getTopologicalOrdering, toTypeNode)
 - metoda pro urceni identifikatoru
 - zapracovat koncept JDBC-transferrable typu, a la ifc JdbcTransfer { convertForth(); convertBack(); }

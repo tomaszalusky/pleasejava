@@ -24,36 +24,40 @@ class TypeNode {
 	 * The root of tree represents signature of procedure or function (holds condition
 	 * <code>parent == null && (type instanceof {@link ProcedureSignature} || type instanceof {@link FunctionSignature})</code>).
 	 */
-	private TypeNode parent;
+	private final TypeNode parent;
 	
-	private final Map<String,TypeNode> children;
+	private /*not final, assigned only once*/ Map<String,TypeNode> children;
+	
+	private final int depth;
 
-	TypeNode(Type type, Map<String,TypeNode> children) {
+	TypeNode(Type type, TypeNode parent) {
 		this.type = type;
-		this.children = ImmutableMap.copyOf(children);
-		for (TypeNode child : children.values()) {
-			child.setParent(this);
-		}
+		this.parent = parent;
+		this.depth = parent == null ? 0 : parent.depth + 1;
 	}
-	
-	public Type getType() {
+
+	Type getType() {
 		return type;
 	}
-	
-	private void setParent(TypeNode parent) {
-		this.parent = parent;
+
+	TypeNode getParent() {
+		return parent;
 	}
 	
 	Map<String,TypeNode> getChildren() {
 		return children;
 	}
+
+	void setChildren(Map<String,TypeNode> children) {
+		this.children = ImmutableMap.copyOf(children);
+	}
 	
-	int level() {
-		return parent == null ? 0 : parent.level() + 1;
+	int depth() {
+		return depth;
 	}
 	
 	String id() {
-		return "" + System.identityHashCode(this);
+		return String.format("id=%s",System.identityHashCode(this));
 	}
 	
 	@Override

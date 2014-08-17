@@ -59,7 +59,7 @@ public class TypeDependencyGraphTest {
 			assertEquals(ImmutableList.copyOf(expectedNames), actualNames);
 			
 			//System.out.println(graph);
-			System.out.println(actual.get(0).toTypeNode());
+			System.out.println(actual.get(0).toTypeNode(null));
 		} catch (IOException e) {
 		}
 	}
