@@ -6,12 +6,7 @@ import static org.junit.Assert.assertEquals;
 import java.io.IOException;
 import java.util.List;
 
-import org.hamcrest.Description;
-import org.hamcrest.TypeSafeMatcher;
-import org.jdom2.input.JDOMParseException;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
@@ -26,21 +21,6 @@ import com.google.common.collect.ImmutableList;
 @RunWith(JUnit4.class)
 public class TypeDependencyGraphTest extends AbstractTypeGraphTest {
 
-	@Rule
-	public ExpectedException exception = ExpectedException.none();
-
-	/**
-	 * Helper method, expects exception of given type with message containing given string.
-	 * @param exceptionClass
-	 * @param expectedMessage
-	 * @throws IOException 
-	 */
-	private void t(Class<? extends Exception> exceptionClass, String expectedMessage) throws IOException {
-		exception.expect(exceptionClass);
-		exception.expectMessage(expectedMessage);
-		t();
-	}
-	
 	/**
 	 * Helper method, expects nodes in given topological ordering specified by their names.
 	 * @param expectedNames
@@ -105,40 +85,4 @@ public class TypeDependencyGraphTest extends AbstractTypeGraphTest {
 	 */
 	);}
 
-	@Test public void invalidType() throws IOException {
-		t(UndeclaredTypeException.class,"'nonexisting'");
-	}
-
-	@Test public void invalidPlsqlConstruct() throws IOException {
-		t(InvalidPlsqlConstructException.class,"'nonexisting'");
-	}
-	
-	@Test public void invalidDependencies() throws IOException {
-		t(TypeCircularityException.class,"'nst1'");
-	}
-	
-	@Test public void invalidXml1() throws IOException {
-		t(InvalidXmlException.class,"'empty record'");
-	}
-	
-	@Test public void invalidXml2() throws IOException {
-		t(InvalidXmlException.class,"'missing attribute name'");
-	}
-	
-	@Test public void invalidXml3() throws IOException {
-		t(InvalidXmlException.class,"'invalid parameter mode foo'");
-	}
-	
-	@Test public void invalidXml4() throws IOException {
-		exception.expect(RuntimeException.class);
-		exception.expect(new TypeSafeMatcher<Exception>() {
-			public void describeTo(Description description) {}
-			@Override
-			public boolean matchesSafely(Exception item) {
-				return item.getCause() instanceof JDOMParseException;
-			}
-		});
-		t();
-	}
-	
 }
