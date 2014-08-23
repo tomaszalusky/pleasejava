@@ -8,10 +8,10 @@ import java.io.InputStream;
 import java.util.List;
 
 import org.hamcrest.Description;
+import org.hamcrest.TypeSafeMatcher;
 import org.jdom2.input.JDOMParseException;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.internal.matchers.TypeSafeMatcher;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
