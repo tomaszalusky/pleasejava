@@ -4,7 +4,6 @@ import static com.google.common.collect.FluentIterable.from;
 import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 
 import org.hamcrest.Description;
@@ -25,7 +24,7 @@ import com.google.common.collect.ImmutableList;
  * @author Tomas Zalusky
  */
 @RunWith(JUnit4.class)
-public class TypeDependencyGraphTest {
+public class TypeDependencyGraphTest extends AbstractTypeGraphTest {
 
 	@Rule
 	public ExpectedException exception = ExpectedException.none();
@@ -34,8 +33,9 @@ public class TypeDependencyGraphTest {
 	 * Helper method, expects exception of given type with message containing given string.
 	 * @param exceptionClass
 	 * @param expectedMessage
+	 * @throws IOException 
 	 */
-	private void t(Class<? extends Exception> exceptionClass, String expectedMessage) {
+	private void t(Class<? extends Exception> exceptionClass, String expectedMessage) throws IOException {
 		exception.expect(exceptionClass);
 		exception.expectMessage(expectedMessage);
 		t();
@@ -44,31 +44,28 @@ public class TypeDependencyGraphTest {
 	/**
 	 * Helper method, expects nodes in given topological ordering specified by their names.
 	 * @param expectedNames
+	 * @throws IOException 
 	 */
-	private void t(String... expectedNames) {
+	private void t(String... expectedNames) throws IOException {
 		StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
 		String methodName = stackTrace[2].getMethodName();
 		if ("t".equals(methodName)) {
 			methodName = stackTrace[3].getMethodName();
 		}
-		String fileSubpath = String.format("tdg/%s.xml",methodName);
-		try (InputStream is = TypeDependencyGraphTest.class.getResourceAsStream(fileSubpath)) {
-			TypeDependencyGraph graph = TypeDependencyGraph.createFrom(is);
-			List<Type> actual = graph.getTopologicalOrdering();
-			List<String> actualNames = from(actual).transform(Type._getName).toList();
-			assertEquals(ImmutableList.copyOf(expectedNames), actualNames);
-			
-			//System.out.println(graph);
-			System.out.println(actual.get(0).toTypeNode(null));
-		} catch (IOException e) {
-		}
+		TypeDependencyGraph graph = loadGraph(methodName);
+		List<Type> actual = graph.getTopologicalOrdering();
+		List<String> actualNames = from(actual).transform(Type._getName).toList();
+		assertEquals(ImmutableList.copyOf(expectedNames), actualNames);
+		
+		//System.out.println(graph);
+		System.out.println(actual.get(0).toTypeNode(null));
 	}
+
+	@Test public void simple() throws IOException {t("a_test_package.var1","integer");}
 	
-	@Test public void simple() {t("a_test_package.var1","integer");}
+	@Test public void dag1() throws IOException {t("main","a","d","b","c","e","f","g","h","i","varchar2(100)");}
 	
-	@Test public void dag1() {t("main","a","d","b","c","e","f","g","h","i","varchar2(100)");}
-	
-	@Test public void alltypes() {t(
+	@Test public void alltypes() throws IOException {t(
 			"echo",
 			"a_test_package.ibt1",
 			"a_test_package.var1",
@@ -108,31 +105,31 @@ public class TypeDependencyGraphTest {
 	 */
 	);}
 
-	@Test public void invalidType() {
+	@Test public void invalidType() throws IOException {
 		t(UndeclaredTypeException.class,"'nonexisting'");
 	}
 
-	@Test public void invalidPlsqlConstruct() {
+	@Test public void invalidPlsqlConstruct() throws IOException {
 		t(InvalidPlsqlConstructException.class,"'nonexisting'");
 	}
 	
-	@Test public void invalidDependencies() {
+	@Test public void invalidDependencies() throws IOException {
 		t(TypeCircularityException.class,"'nst1'");
 	}
 	
-	@Test public void invalidXml1() {
+	@Test public void invalidXml1() throws IOException {
 		t(InvalidXmlException.class,"'empty record'");
 	}
 	
-	@Test public void invalidXml2() {
+	@Test public void invalidXml2() throws IOException {
 		t(InvalidXmlException.class,"'missing attribute name'");
 	}
 	
-	@Test public void invalidXml3() {
+	@Test public void invalidXml3() throws IOException {
 		t(InvalidXmlException.class,"'invalid parameter mode foo'");
 	}
 	
-	@Test public void invalidXml4() {
+	@Test public void invalidXml4() throws IOException {
 		exception.expect(RuntimeException.class);
 		exception.expect(new TypeSafeMatcher<Exception>() {
 			public void describeTo(Description description) {}
