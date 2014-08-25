@@ -2,6 +2,9 @@ package pleasejava;
 
 import java.util.Map;
 
+import org.junit.Assert;
+import org.junit.ComparisonFailure;
+
 import com.google.common.base.Function;
 import com.google.common.base.Strings;
 
@@ -42,6 +45,42 @@ public class Utils {
 				return input.getValue();
 			}
 		};
+	}
+
+	/**
+	 * Like {@link Assert#assertEquals(Object, Object)},
+	 * except throwing {@link ComparisonFailure} also for non-String objects.
+	 * This lets Eclipse to visualize differences when clicking on error in JUnit view.
+	 * @param expected
+	 * @param actual
+	 */
+	public static void assertEquals(Object expected, Object actual) {
+		try {
+			Assert.assertEquals(expected, actual);
+		} catch (AssertionError e) {
+			throw new ComparisonFailure(e.getMessage(),
+					String.valueOf(expected),
+					String.valueOf(actual)
+			);
+		}
+	}
+	
+	/**
+	 * Like {@link Assert#assertEquals(String, Object, Object)},
+	 * except throwing {@link ComparisonFailure} also for non-String objects.
+	 * This lets Eclipse to visualize differences when clicking on error in JUnit view.
+	 * @param expected
+	 * @param actual
+	 */
+	public static void assertEquals(String message, Object expected, Object actual) {
+		try {
+			Assert.assertEquals(message, expected, actual);
+		} catch (AssertionError e) {
+			throw new ComparisonFailure(e.getMessage(),
+					String.valueOf(expected),
+					String.valueOf(actual)
+			);
+		}
 	}
 
 	/**
