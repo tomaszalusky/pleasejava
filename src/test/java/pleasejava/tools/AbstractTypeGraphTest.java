@@ -12,7 +12,7 @@ public abstract class AbstractTypeGraphTest {
 	protected TypeDependencyGraph loadGraph(String graphName) throws IOException {
 		String fileSubpath = String.format("tdg/%s.xml",graphName);
 		TypeDependencyGraph result;
-		try (InputStream is = TypeDependencyGraphTest.class.getResourceAsStream(fileSubpath)) {
+		try (InputStream is = TypeGraphTopologicalOrderingTest.class.getResourceAsStream(fileSubpath)) {
 			result = TypeDependencyGraph.createFrom(is);
 		}
 		return result;
