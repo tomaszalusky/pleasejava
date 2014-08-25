@@ -83,7 +83,7 @@ public class TypeGraphTopologicalOrderingTest extends AbstractTypeGraphTest {
 		List<Type> actual = graph.getTopologicalOrdering();
 		List<String> actualNames = from(actual).transform(Type._getName).toList();
 		assertEquals(expectedNames, actualNames);
-		//System.out.println(actual.get(0).toTypeNode(null));
+		System.out.println(actual.get(0).toTypeNode(null));
 	}
 
 }
