@@ -1,0 +1,78 @@
+procedure                               "main"          #id=ID
+    pa in record                        "a"             #id=ID
+        fb nestedtable                  "b"             #id=ID
+            (element) record            "f"             #id=ID
+                fg record               "g"             #id=ID
+                    fi indexbytable     "i"             #id=ID
+                        (key)           "pls_integer"  
+                        (element)       "varchar2(100)" #id=ID
+                    fh record           "h"             #id=ID
+                        fi indexbytable "i"             #id=ID
+                            (key)       "pls_integer"  
+                            (element)   "varchar2(100)" #id=ID
+                        fj              "varchar2(100)" #id=ID
+                fi indexbytable         "i"             #id=ID
+                    (key)               "pls_integer"  
+                    (element)           "varchar2(100)" #id=ID
+        fc record                       "c"             #id=ID
+            ff record                   "f"             #id=ID
+                fg record               "g"             #id=ID
+                    fi indexbytable     "i"             #id=ID
+                        (key)           "pls_integer"  
+                        (element)       "varchar2(100)" #id=ID
+                    fh record           "h"             #id=ID
+                        fi indexbytable "i"             #id=ID
+                            (key)       "pls_integer"  
+                            (element)   "varchar2(100)" #id=ID
+                        fj              "varchar2(100)" #id=ID
+                fi indexbytable         "i"             #id=ID
+                    (key)               "pls_integer"  
+                    (element)           "varchar2(100)" #id=ID
+            fg record                   "g"             #id=ID
+                fi indexbytable         "i"             #id=ID
+                    (key)               "pls_integer"  
+                    (element)           "varchar2(100)" #id=ID
+                fh record               "h"             #id=ID
+                    fi indexbytable     "i"             #id=ID
+                        (key)           "pls_integer"  
+                        (element)       "varchar2(100)" #id=ID
+                    fj                  "varchar2(100)" #id=ID
+    pd in record                        "d"             #id=ID
+        fc record                       "c"             #id=ID
+            ff record                   "f"             #id=ID
+                fg record               "g"             #id=ID
+                    fi indexbytable     "i"             #id=ID
+                        (key)           "pls_integer"  
+                        (element)       "varchar2(100)" #id=ID
+                    fh record           "h"             #id=ID
+                        fi indexbytable "i"             #id=ID
+                            (key)       "pls_integer"  
+                            (element)   "varchar2(100)" #id=ID
+                        fj              "varchar2(100)" #id=ID
+                fi indexbytable         "i"             #id=ID
+                    (key)               "pls_integer"  
+                    (element)           "varchar2(100)" #id=ID
+            fg record                   "g"             #id=ID
+                fi indexbytable         "i"             #id=ID
+                    (key)               "pls_integer"  
+                    (element)           "varchar2(100)" #id=ID
+                fh record               "h"             #id=ID
+                    fi indexbytable     "i"             #id=ID
+                        (key)           "pls_integer"  
+                        (element)       "varchar2(100)" #id=ID
+                    fj                  "varchar2(100)" #id=ID
+        fe record                       "e"             #id=ID
+            fg record                   "g"             #id=ID
+                fi indexbytable         "i"             #id=ID
+                    (key)               "pls_integer"  
+                    (element)           "varchar2(100)" #id=ID
+                fh record               "h"             #id=ID
+                    fi indexbytable     "i"             #id=ID
+                        (key)           "pls_integer"  
+                        (element)       "varchar2(100)" #id=ID
+                    fj                  "varchar2(100)" #id=ID
+            fh record                   "h"             #id=ID
+                fi indexbytable         "i"             #id=ID
+                    (key)               "pls_integer"  
+                    (element)           "varchar2(100)" #id=ID
+                fj                      "varchar2(100)" #id=ID

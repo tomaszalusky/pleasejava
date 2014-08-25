@@ -13,7 +13,8 @@ import org.junit.runners.Suite.SuiteClasses;
 @RunWith(Suite.class)
 @SuiteClasses({
 		TypeGraphLoadTest.class,
-		TypeGraphTopologicalOrderingTest.class
+		TypeGraphTopologicalOrderingTest.class,
+		TypeNodeTreeTest.class
 })
 public class AllTests {
 

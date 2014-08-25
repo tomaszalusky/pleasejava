@@ -57,7 +57,7 @@ class TypeNode {
 	}
 	
 	String id() {
-		return String.format("id=%s",System.identityHashCode(this));
+		return String.format("id=%s","ID");
 	}
 	
 	@Override

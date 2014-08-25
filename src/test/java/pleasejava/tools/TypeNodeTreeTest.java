@@ -1,12 +1,6 @@
 package pleasejava.tools;
 
-import static com.google.common.base.Throwables.propagate;
-import static com.google.common.collect.FluentIterable.from;
-import static org.junit.Assert.*;
-
-import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -16,10 +10,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import pleasejava.Utils;
-
-import com.google.common.base.Charsets;
-import com.google.common.io.Files;
-import com.google.common.io.Resources;
 
 /**
  * @author Tomas Zalusky
@@ -42,6 +32,8 @@ public class TypeNodeTreeTest extends AbstractTypeGraphTest {
 	public static Collection<Object[]> data() {
 		return Arrays.asList(new Object[][] {
 				{"simple"},
+				{"dag1"},
+				{"alltypes"},
 		});
 	}
 

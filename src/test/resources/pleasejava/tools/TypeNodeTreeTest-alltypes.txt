@@ -1,0 +1,130 @@
+function                       "echo"                #id=ID
+    (return)                   "integer"             #id=ID
+    pi_ibt1 in indexbytable    "a_test_package.ibt1" #id=ID
+        (key)                  "pls_integer"        
+        (element) record       "a_test_package.rec2" #id=ID
+            f_var5 varray      "a_test_package.var5" #id=ID
+                (element)      "varchar2(100)"       #id=ID
+            f1_rec3 record     "a_test_package.rec3" #id=ID
+                f_boolean      "boolean"             #id=ID
+                f_integer      "integer"             #id=ID
+            f_pls_integer      "pls_integer"         #id=ID
+            f2_rec3 record     "a_test_package.rec3" #id=ID
+                f_boolean      "boolean"             #id=ID
+                f_integer      "integer"             #id=ID
+    pi_var1 in varray          "a_test_package.var1" #id=ID
+        (element) varray       "a_test_package.var4" #id=ID
+            (element) record   "a_test_package.rec3" #id=ID
+                f_boolean      "boolean"             #id=ID
+                f_integer      "integer"             #id=ID
+    pi_nst2 in nestedtable     "a_test_package.nst2" #id=ID
+        (element) varray       "a_test_package.var4" #id=ID
+            (element) record   "a_test_package.rec3" #id=ID
+                f_boolean      "boolean"             #id=ID
+                f_integer      "integer"             #id=ID
+    pi_nst3 in nestedtable     "a_test_package.nst3" #id=ID
+        (element) nestedtable  "a_test_package.nst4" #id=ID
+            (element) record   "a_test_package.rec3" #id=ID
+                f_boolean      "boolean"             #id=ID
+                f_integer      "integer"             #id=ID
+    pi_rec1 in record          "a_test_package.rec1" #id=ID
+        f_nst4 nestedtable     "a_test_package.nst4" #id=ID
+            (element) record   "a_test_package.rec3" #id=ID
+                f_boolean      "boolean"             #id=ID
+                f_integer      "integer"             #id=ID
+        f_ibt4 indexbytable    "a_test_package.ibt4" #id=ID
+            (key)              "varchar2(10)"       
+            (element)          "number(30)"          #id=ID
+        f_binary_integer       "binary_integer"      #id=ID
+        f_ibt5 indexbytable    "a_test_package.ibt5" #id=ID
+            (key)              "string"             
+            (element) varray   "a_test_package.var5" #id=ID
+                (element)      "varchar2(100)"       #id=ID
+    pi_var3 in varray          "a_test_package.var3" #id=ID
+        (element) indexbytable "a_test_package.ibt5" #id=ID
+            (key)              "string"             
+            (element) varray   "a_test_package.var5" #id=ID
+                (element)      "varchar2(100)"       #id=ID
+    pi_ibt2 in indexbytable    "a_test_package.ibt2" #id=ID
+        (key)                  "binary_integer"     
+        (element) indexbytable "a_test_package.ibt5" #id=ID
+            (key)              "string"             
+            (element) varray   "a_test_package.var5" #id=ID
+                (element)      "varchar2(100)"       #id=ID
+    pi_nst1 in nestedtable     "a_test_package.nst1" #id=ID
+        (element) indexbytable "a_test_package.ibt5" #id=ID
+            (key)              "string"             
+            (element) varray   "a_test_package.var5" #id=ID
+                (element)      "varchar2(100)"       #id=ID
+    pi_ibt3 in indexbytable    "a_test_package.ibt3" #id=ID
+        (key)                  "long"               
+        (element) nestedtable  "a_test_package.nst5" #id=ID
+            (element)          "varchar2(200)"       #id=ID
+    pi_var2 in varray          "a_test_package.var2" #id=ID
+        (element) nestedtable  "a_test_package.nst5" #id=ID
+            (element)          "varchar2(200)"       #id=ID
+    pi_clob in                 "clob"                #id=ID
+    po_ibt1 out indexbytable   "a_test_package.ibt1" #id=ID
+        (key)                  "pls_integer"        
+        (element) record       "a_test_package.rec2" #id=ID
+            f_var5 varray      "a_test_package.var5" #id=ID
+                (element)      "varchar2(100)"       #id=ID
+            f1_rec3 record     "a_test_package.rec3" #id=ID
+                f_boolean      "boolean"             #id=ID
+                f_integer      "integer"             #id=ID
+            f_pls_integer      "pls_integer"         #id=ID
+            f2_rec3 record     "a_test_package.rec3" #id=ID
+                f_boolean      "boolean"             #id=ID
+                f_integer      "integer"             #id=ID
+    po_var1 out varray         "a_test_package.var1" #id=ID
+        (element) varray       "a_test_package.var4" #id=ID
+            (element) record   "a_test_package.rec3" #id=ID
+                f_boolean      "boolean"             #id=ID
+                f_integer      "integer"             #id=ID
+    po_nst2 out nestedtable    "a_test_package.nst2" #id=ID
+        (element) varray       "a_test_package.var4" #id=ID
+            (element) record   "a_test_package.rec3" #id=ID
+                f_boolean      "boolean"             #id=ID
+                f_integer      "integer"             #id=ID
+    po_nst3 out nestedtable    "a_test_package.nst3" #id=ID
+        (element) nestedtable  "a_test_package.nst4" #id=ID
+            (element) record   "a_test_package.rec3" #id=ID
+                f_boolean      "boolean"             #id=ID
+                f_integer      "integer"             #id=ID
+    po_rec1 out record         "a_test_package.rec1" #id=ID
+        f_nst4 nestedtable     "a_test_package.nst4" #id=ID
+            (element) record   "a_test_package.rec3" #id=ID
+                f_boolean      "boolean"             #id=ID
+                f_integer      "integer"             #id=ID
+        f_ibt4 indexbytable    "a_test_package.ibt4" #id=ID
+            (key)              "varchar2(10)"       
+            (element)          "number(30)"          #id=ID
+        f_binary_integer       "binary_integer"      #id=ID
+        f_ibt5 indexbytable    "a_test_package.ibt5" #id=ID
+            (key)              "string"             
+            (element) varray   "a_test_package.var5" #id=ID
+                (element)      "varchar2(100)"       #id=ID
+    po_var3 out varray         "a_test_package.var3" #id=ID
+        (element) indexbytable "a_test_package.ibt5" #id=ID
+            (key)              "string"             
+            (element) varray   "a_test_package.var5" #id=ID
+                (element)      "varchar2(100)"       #id=ID
+    po_ibt2 out indexbytable   "a_test_package.ibt2" #id=ID
+        (key)                  "binary_integer"     
+        (element) indexbytable "a_test_package.ibt5" #id=ID
+            (key)              "string"             
+            (element) varray   "a_test_package.var5" #id=ID
+                (element)      "varchar2(100)"       #id=ID
+    po_nst1 out nestedtable    "a_test_package.nst1" #id=ID
+        (element) indexbytable "a_test_package.ibt5" #id=ID
+            (key)              "string"             
+            (element) varray   "a_test_package.var5" #id=ID
+                (element)      "varchar2(100)"       #id=ID
+    po_ibt3 out indexbytable   "a_test_package.ibt3" #id=ID
+        (key)                  "long"               
+        (element) nestedtable  "a_test_package.nst5" #id=ID
+            (element)          "varchar2(200)"       #id=ID
+    po_var2 out varray         "a_test_package.var2" #id=ID
+        (element) nestedtable  "a_test_package.nst5" #id=ID
+            (element)          "varchar2(200)"       #id=ID
+    po_clob out                "clob"                #id=ID

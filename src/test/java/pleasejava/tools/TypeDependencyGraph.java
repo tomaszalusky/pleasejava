@@ -138,7 +138,7 @@ public class TypeDependencyGraph {
 }
 
 /*
-- rozlisit v testech nacteni XML do TDG (je vzdy) a konkretni zpracovani (getTopologicalOrdering, toTypeNode)
+- TypeDependencyGraph -> TypeGraph
 - metoda pro urceni identifikatoru
 - zapracovat koncept JDBC-transferrable typu, a la ifc JdbcTransfer { convertForth(); convertBack(); }
 - napojit na ukazkove priklady pro TDG, otestovat vystup
