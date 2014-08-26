@@ -32,7 +32,7 @@ import static com.google.common.collect.FluentIterable.from;
  * 
  * @author Tomas Zalusky
  */
-public class TypeDependencyGraph {
+public class TypeGraph {
 
 	/**
 	 * All nodes used in graph (including primitive types).
@@ -49,7 +49,7 @@ public class TypeDependencyGraph {
 	
 	private final List<Type> topologicalOrdering;
 	
-	private TypeDependencyGraph(Set<Type> allTypes, ListMultimap<Type,Type> children) {
+	private TypeGraph(Set<Type> allTypes, ListMultimap<Type,Type> children) {
 		this.allTypes = ImmutableSet.copyOf(allTypes);
 		ImmutableTable.Builder<Class<? extends Type>,String,Type> allTypesIndexBuilder = ImmutableTable.builder();
 		for (Type type : allTypes) {
@@ -80,7 +80,7 @@ public class TypeDependencyGraph {
 	 * @param xml
 	 * @return new instance
 	 */
-	public static TypeDependencyGraph createFrom(InputStream xml) {
+	public static TypeGraph createFrom(InputStream xml) {
 		try {
 			SAXBuilder builder = new SAXBuilder();
 			Document doc = builder.build(xml);
@@ -97,7 +97,7 @@ public class TypeDependencyGraph {
 			}
 			ImmutableListMultimap<Type,Type> children = childrenBuilder.build();
 			ImmutableSet<Type> allTypes = allTypesBuilder.build();
-			return new TypeDependencyGraph(allTypes, children);
+			return new TypeGraph(allTypes, children);
 		} catch (Exception e) {
 			throw Throwables.propagate(e);
 		}
@@ -138,7 +138,6 @@ public class TypeDependencyGraph {
 }
 
 /*
-- TypeDependencyGraph -> TypeGraph
 - metoda pro urceni identifikatoru
 - zapracovat koncept JDBC-transferrable typu, a la ifc JdbcTransfer { convertForth(); convertBack(); }
 - napojit na ukazkove priklady pro TDG, otestovat vystup

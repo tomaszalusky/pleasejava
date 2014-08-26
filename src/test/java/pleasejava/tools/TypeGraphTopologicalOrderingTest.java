@@ -79,7 +79,7 @@ public class TypeGraphTopologicalOrderingTest extends AbstractTypeGraphTest {
 
 	@Test
 	public void test() throws IOException {
-		TypeDependencyGraph graph = loadGraph(name);
+		TypeGraph graph = loadGraph(name);
 		List<Type> actual = graph.getTopologicalOrdering();
 		List<String> actualNames = from(actual).transform(Type._getName).toList();
 		assertEquals(expectedNames, actualNames);

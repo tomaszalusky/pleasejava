@@ -20,11 +20,11 @@ import com.google.common.io.Resources;
  */
 public abstract class AbstractTypeGraphTest {
 
-	protected static TypeDependencyGraph loadGraph(String graphName) throws IOException {
+	protected static TypeGraph loadGraph(String graphName) throws IOException {
 		String fileSubpath = String.format("tdg/%s.xml",graphName);
-		TypeDependencyGraph result;
+		TypeGraph result;
 		try (InputStream is = TypeGraphTopologicalOrderingTest.class.getResourceAsStream(fileSubpath)) {
-			result = TypeDependencyGraph.createFrom(is);
+			result = TypeGraph.createFrom(is);
 		}
 		return result;
 	}

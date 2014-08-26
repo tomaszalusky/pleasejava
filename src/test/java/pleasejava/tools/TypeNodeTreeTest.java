@@ -39,7 +39,7 @@ public class TypeNodeTreeTest extends AbstractTypeGraphTest {
 
 	@Test
 	public void test() throws IOException {
-		TypeDependencyGraph graph = loadGraph(name);
+		TypeGraph graph = loadGraph(name);
 		List<Type> topologicalOrdering = graph.getTopologicalOrdering();
 		TypeNode rootNode = topologicalOrdering.get(0).toTypeNode(null);
 		String actual = rootNode.toString();
