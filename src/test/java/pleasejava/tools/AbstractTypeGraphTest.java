@@ -21,7 +21,7 @@ import com.google.common.io.Resources;
 public abstract class AbstractTypeGraphTest {
 
 	protected static TypeGraph loadGraph(String graphName) throws IOException {
-		String fileSubpath = String.format("tdg/%s.xml",graphName);
+		String fileSubpath = String.format("typegraph/%s.xml",graphName);
 		TypeGraph result;
 		try (InputStream is = TypeGraphTopologicalOrderingTest.class.getResourceAsStream(fileSubpath)) {
 			result = TypeGraph.createFrom(is);
