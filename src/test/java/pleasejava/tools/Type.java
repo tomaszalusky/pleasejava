@@ -62,11 +62,12 @@ abstract class Type {
 		}
 	};
 	
-	TypeNode toTypeNode(TypeNode parent) {
-		TypeNode result = new TypeNode(this,parent);
+	TypeNode toTypeNode(TypeNode parent, int orderInParent) {
+		TypeNode result = new TypeNode(this,parent,orderInParent);
 		ImmutableMap.Builder<String,TypeNode> children = ImmutableMap.builder();
+		int o = 0;
 		for (Map.Entry<String,Type> e : this.getChildren().entrySet()) {
-			children.put(e.getKey(), e.getValue().toTypeNode(result));
+			children.put(e.getKey(), e.getValue().toTypeNode(result, o++));
 		}
 		result.setChildren(children.build());
 		return result;

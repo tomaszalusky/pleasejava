@@ -29,11 +29,66 @@ class TypeNode {
 	private /*not final, assigned only once*/ Map<String,TypeNode> children;
 	
 	private final int depth;
+	
+	private final String id;
 
-	TypeNode(Type type, TypeNode parent) {
+	/**
+	 * Constructs new type node for type {@code type} under given {@code parent}
+	 * with additional argument denoting 0-based order of this node within parent.
+	 * @param type
+	 * @param parent
+	 * @param orderInParent
+	 */
+	TypeNode(Type type, TypeNode parent, int orderInParent) {
 		this.type = type;
 		this.parent = parent;
 		this.depth = parent == null ? 0 : parent.depth + 1;
+		this.id = computeId(parent,orderInParent);
+	}
+
+	/**
+	 * Computes identifier of node. The identifier describes position of node in type tree
+	 * and is utilized as a base for names of PLSQL variables in generated code.
+	 * <p>Algorithm:</p>
+	 * <ul>
+	 * <li>id of root node is <code>""</code></li>
+	 * <li>id of node which represents
+	 *   <ul>
+	 *     <li>i-th field of record</li>
+	 *     <li>or i-th parameter of procedure</li>
+	 *     <li>or i-th parameter of function</li>
+	 *     <li>or return type of function (in which case i is treated to be 0, otherwise i is 1-based)</li>
+	 *   </ul>
+	 * is
+	 *   <ul>
+	 *     <li><code>parent.id() + i</code> for id &lt; 10</li>
+	 *     <li><code>parent.id() + "_" + i + "_"</code> for id &ge; 10</li>
+	 *   </ul>
+	 * (rationale for such a convention:
+	 * not to waste underscores when number of children is expected to be small in major cases
+	 * and also avoid ambiguity for reconstructing path from id)
+	 * </li>
+	 * <li>id of node which is element of collection type, is <code>parent.id() + "e"</code></li>
+	 * </ul>
+	 * <p>For example, the meaning of <code>2e_11_e</code> is: second parameter of procedure is a collection
+	 * whose element is record whose 11th field is collection whose element is described type node.
+	 * </p>
+	 * @param parent
+	 * @param orderInParent
+	 * @return
+	 */
+	private static String computeId(TypeNode parent, final int orderInParent) {
+		String result = parent == null ? "" : parent.id() + parent.getType().accept(new TypeVisitorR<String>() {
+			private String escapize(int value) {return value < 10 ? "" + value : "_" + value + "_";}
+			@Override public String visitRecord(Record type) {return escapize(orderInParent + 1);}
+			@Override public String visitVarray(Varray type) {return "e";}
+			@Override public String visitNestedTable(NestedTable type) {return "e";}
+			@Override public String visitIndexByTable(IndexByTable type) {return "e";}
+			@Override public String visitProcedureSignature(ProcedureSignature type) {return escapize(orderInParent + 1);}
+			@Override public String visitFunctionSignature(FunctionSignature type) {return escapize(orderInParent);}
+			@Override public String visitPrimitive(PrimitiveType type) {throw new IllegalStateException("primitive type is not expected to be parent of any type");}
+		});
+		return result;
 	}
 
 	Type getType() {
@@ -57,7 +112,7 @@ class TypeNode {
 	}
 	
 	String id() {
-		return String.format("id=%s","ID");
+		return id;
 	}
 	
 	@Override
@@ -181,20 +236,5 @@ Pravidla:
 	- potomka typu, který odpovídá typu hodnoty
 - uzel typu varray má jednoho potomka:
 	- potomka typu, který odpovídá typu PLSQL elementu
-
-
-Algoritmus stanovení identifikátoru uzlu PTT:
----------------------------------------------
-- všechny parametry metody tvoøí fiktivní record, jehož id = ""
-- je-li uzel i-tým fieldem recordu (i je 1-based, 0 je vyhrazena pouze pro návratový typ funkcí), je
-  - pro id<10 id = id_rodièe + i
-  - pro id>=10 id = id_rodièe + "_" + i + "_" 
-  (smyslem je neplýtvat na oddìlovaèích délkou pro malé recordy a zároveò zachovat jednoznaènost)
-- je-li uzel prvkem kolekce, je id = id_rodièe + "e"
-Pøíklad:
-2e_11_e = druhým parametrem metody je kolekce, jejíž prvkem je record,
-jehož 11. fieldem je kolekce, jejíž prvek je popisovaný uzel PTT
-
-
 
 */

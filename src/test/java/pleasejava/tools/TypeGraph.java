@@ -138,7 +138,6 @@ public class TypeGraph {
 }
 
 /*
-- metoda pro urceni identifikatoru
 - zapracovat koncept JDBC-transferrable typu, a la ifc JdbcTransfer { convertForth(); convertBack(); }
 - napojit na ukazkove priklady pro TDG, otestovat vystup
 - dokumentaci typenode tree
