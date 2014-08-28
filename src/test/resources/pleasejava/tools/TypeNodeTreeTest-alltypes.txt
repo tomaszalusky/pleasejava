@@ -37,23 +37,23 @@ function                       "echo"                #
             (element)          "number(30)"          #52e
         f_binary_integer       "binary_integer"      #53
         f_ibt5 indexbytable    "a_test_package.ibt5" #54
-            (key)              "string"             
+            (key)              "string(20)"         
             (element) varray   "a_test_package.var5" #54e
                 (element)      "varchar2(100)"       #54ee
     pi_var3 in varray          "a_test_package.var3" #6
         (element) indexbytable "a_test_package.ibt5" #6e
-            (key)              "string"             
+            (key)              "string(20)"         
             (element) varray   "a_test_package.var5" #6ee
                 (element)      "varchar2(100)"       #6eee
     pi_ibt2 in indexbytable    "a_test_package.ibt2" #7
         (key)                  "binary_integer"     
         (element) indexbytable "a_test_package.ibt5" #7e
-            (key)              "string"             
+            (key)              "string(20)"         
             (element) varray   "a_test_package.var5" #7ee
                 (element)      "varchar2(100)"       #7eee
     pi_nst1 in nestedtable     "a_test_package.nst1" #8
         (element) indexbytable "a_test_package.ibt5" #8e
-            (key)              "string"             
+            (key)              "string(20)"         
             (element) varray   "a_test_package.var5" #8ee
                 (element)      "varchar2(100)"       #8eee
     pi_ibt3 in indexbytable    "a_test_package.ibt3" #9
@@ -101,23 +101,23 @@ function                       "echo"                #
             (element)          "number(30)"          #_16_2e
         f_binary_integer       "binary_integer"      #_16_3
         f_ibt5 indexbytable    "a_test_package.ibt5" #_16_4
-            (key)              "string"             
+            (key)              "string(20)"         
             (element) varray   "a_test_package.var5" #_16_4e
                 (element)      "varchar2(100)"       #_16_4ee
     po_var3 out varray         "a_test_package.var3" #_17_
         (element) indexbytable "a_test_package.ibt5" #_17_e
-            (key)              "string"             
+            (key)              "string(20)"         
             (element) varray   "a_test_package.var5" #_17_ee
                 (element)      "varchar2(100)"       #_17_eee
     po_ibt2 out indexbytable   "a_test_package.ibt2" #_18_
         (key)                  "binary_integer"     
         (element) indexbytable "a_test_package.ibt5" #_18_e
-            (key)              "string"             
+            (key)              "string(20)"         
             (element) varray   "a_test_package.var5" #_18_ee
                 (element)      "varchar2(100)"       #_18_eee
     po_nst1 out nestedtable    "a_test_package.nst1" #_19_
         (element) indexbytable "a_test_package.ibt5" #_19_e
-            (key)              "string"             
+            (key)              "string(20)"         
             (element) varray   "a_test_package.var5" #_19_ee
                 (element)      "varchar2(100)"       #_19_eee
     po_ibt3 out indexbytable   "a_test_package.ibt3" #_20_
