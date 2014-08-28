@@ -2,6 +2,8 @@ package pleasejava.tools;
 
 import static pleasejava.Utils.appendf;
 
+import java.sql.Array;
+import java.sql.Struct;
 import java.util.Map;
 
 import pleasejava.Utils;
@@ -9,9 +11,59 @@ import pleasejava.Utils;
 import com.google.common.collect.ImmutableMap;
 
 /**
- * Represents one node in parameter type tree.
- * Unlike {@link Type}, {@link TypeNode} represents occurence of type
- * at concrete point in signature of procedure or function.
+ * Represents one node in type tree.
+ * <p>
+ * Type tree is a tree which describes parameters of PLSQL procedure or function and their dependencies on another types.
+ * For example, given <code>tableofnum</code> is declared as <code>table of number</code>,
+ * <code>procedure foo(a1 tableofnum, a2 varchar2(20))</code> is described by tree:
+ * </p>
+ * <pre>
+ * foo
+ * |
+ * |------- tableofnum
+ * |        |
+ * |         ---------- number
+ * |
+ *  ------- varchar2(20)
+ * </pre> 
+ * <p>
+ * Following rules hold for type tree:
+ * </p>
+ * <ul>
+ * <li>node for {@link ProcedureSignature} or {@link FunctionSignature} type is root of tree.
+ * These types are artificial ({@link AbstractSignature more info}) and only those can occur as a root.
+ * Each child represents parameter of PLSQL procedure or function in order of declaration.
+ * In the case of PLSQL function, extra child represents return type and occurs as the very first child.
+ * </li>
+ * <li>node for {@link PrimitiveType} is leaf of tree, which corresponds with intuitive fact that
+ * every complex type finally breaks down into primitive types.
+ * (Note that type tree represents decomposition of all complex types, even those that are top-level
+ * and can be sent via JDBC {@link Array} or {@link Struct}.
+ * The ability of being transferred by JDBC is under responsibility of different classes and doesn't influence type tree.)
+ * </li>
+ * <li>node for {@link NestedTable} has one child which represents nested table element type.
+ * </li>
+ * <li>node for {@link Varray} has one child which represents varray element type.
+ * </li>
+ * <li>node for {@link IndexByTable} has one child which represents index-by table element type.
+ * Note that key type doesn't have {@link TypeNode} since it would complicate creation of subsequent structures.
+ * (For convenience it is still written in indented manner in
+ * {@link ToString#visitIndexByTable(IndexByTable, Integer, TypeNode) toString} anyway).
+ * </li>
+ * <li>node for {@link Record} has at least one child, 
+ * each child represents field of PLSQL record in order of declaration.
+ * </li>
+ * </ul>
+ * <p>
+ * Every node has multipurpose string identifier, see {@link #computeId(TypeNode, int)}.
+ * </p>
+ * <p>
+ * Note that unlike {@link Type}, {@link TypeNode} represents occurence of type
+ * at concrete point in procedure or function signature and cannot be shared.
+ * For example, a procedure <code>foo(a1 tableofrecord, a2 tableofrecord)</code>
+ * has two children of type {@link NestedTable},
+ * where <em>each of them</em> has its own child of type {@link Record}.
+ * </p>
  * @author Tomas Zalusky
  */
 class TypeNode {
@@ -21,8 +73,7 @@ class TypeNode {
 	/**
 	 * Points to type node representing type which depends on this type.
 	 * Transitively leads to procedure or function whose signature is described by type tree with this node.
-	 * The root of tree represents signature of procedure or function (holds condition
-	 * <code>parent == null && (type instanceof {@link ProcedureSignature} || type instanceof {@link FunctionSignature})</code>).
+	 * For root of tree, the parent node is {@code null}.
 	 */
 	private final TypeNode parent;
 	
@@ -73,6 +124,13 @@ class TypeNode {
 	 * <p>For example, the meaning of <code>2e_11_e</code> is: second parameter of procedure is a collection
 	 * whose element is record whose 11th field is collection whose element is described type node.
 	 * </p>
+	 * <p>The aim of identifier design is
+	 * </p>
+	 * <ul>
+	 * <li>to provide clue of node position comprehensible for both human and computer</li>
+	 * <li>to make possible unambiguous reconstruction of node position</li>
+	 * <li>and to avoid exceeding Oracle identifier name limit of 30 characters in practical cases</li>
+	 * </ul>
 	 * @param parent
 	 * @param orderInParent
 	 * @return
@@ -160,11 +218,6 @@ class TypeNode {
 			type.getElementType().accept(this,level + 1,typeNode.getChildren().get(NestedTable.ELEMENT_LABEL));
 		}
 
-		/*
-		 * Key type of indexby table doesn't have TypeNode
-		 * since it would complicate creation of subsequent structures.
-		 * Anyway, for clarity it is still written in indented manner.
-		 */
 		@Override
 		public void visitIndexByTable(IndexByTable type, Integer level, TypeNode typeNode) {
 			appendf(buf,"indexbytable \"%s\" #%s", type.getName(), typeNode.id());
@@ -203,38 +256,3 @@ class TypeNode {
 	}
 
 }
-
-/*
-PTT - Parameter Type Tree
-=========================
-
-je strom vyjadøující vnoøení PLSQL typù pro jednotlivé parametry PLSQL
-procedury.
-
-Pravidla:
-- koøen je uzel reprezentující typ parametru PLSQL procedury
-- uzel typu JDBC-transferrable typ nemá žádné potomky. Jinak:
-- uzel typu nested table, index-by table a varray má jednoho potomka,
-  který odpovídá typu prvku kolekce
-- uzel typu record má tolik potomkù, kolik má record fieldù, 
-  každý potomek odpovídá typu pøíslušného fieldu
-
-Každý uzel PTT má øetìzcový identifikátor. 
-Tento identifikátor se použije jako souèást PLSQL identifikátorù v generovaných PLSQL skriptech.
-Smyslem je dosáhnout toho, aby i generovaný kód byl pøimìøenì intuitivnì èitelný
-a zároveò v bìžných pøíkladech nepøekroèit omezení Oraclu na délku identifikátoru 30 znakù.
-
-dosavadní návod: (zøejmì zastaralé)
-Pravidla:
-- koøen je uzel reprezentující typ parametru PLSQL procedury
-- uzel typu JDBC-transferrable typ nemá žádné potomky. Jinak:
-- uzel typu nested table má dva potomky:
-	- potomka typu trojstavový boolean, který charakterizuje nastavení null u prvkù (true/false), a pøíznak smazání prvku (null) POZN. ZREVIDOVAT, NEZDA SE MI, ZE BY V JEDNOM MISTE BYLA INFORMACE O CELE TABULCE I O JEJICH PRVCICH, A ZE NEMA TOTEZ VARRAY
-	- potomka typu, který odpovídá typu PLSQL elementu
-- uzel typu index-by table má dva potomky:
-	- potomka typu, který odpovídá typu indexu
-	- potomka typu, který odpovídá typu hodnoty
-- uzel typu varray má jednoho potomka:
-	- potomka typu, který odpovídá typu PLSQL elementu
-
-*/
