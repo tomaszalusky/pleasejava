@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<tdg>
+<typegraph>
 	<function name="echo" returntype="integer">
 		<in name="pi_ibt1" type="a_test_package.ibt1" />
 		<in name="pi_var1" type="a_test_package.var1" />
@@ -48,7 +48,7 @@
 		<field name="f_ibt5" type="a_test_package.ibt5" />
 	</record>
 	<varray name="a_test_package.var3" of="a_test_package.ibt5" />
-	<indexbytable name="a_test_package.ibt5" of="a_test_package.var5" indexby="string" />
+	<indexbytable name="a_test_package.ibt5" of="a_test_package.var5" indexby="string(20)" />
 	<indexbytable name="a_test_package.ibt4" of="number(30)" indexby="varchar2(10)" />
 	<indexbytable name="a_test_package.ibt2" of="a_test_package.ibt5" indexby="binary_integer" />
 	<nestedtable name="a_test_package.nst1" of="a_test_package.ibt5" />
@@ -56,4 +56,4 @@
 	<varray name="a_test_package.var2" of="a_test_package.nst5" />
 	<nestedtable name="a_test_package.nst5" of="varchar2(200)" />
 
-</tdg>
+</typegraph>

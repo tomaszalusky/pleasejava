@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<tdg>
+<typegraph>
 	<record name="rec">
 		<field name="f" type="nonexisting" />
 	</record>
-</tdg>
+</typegraph>

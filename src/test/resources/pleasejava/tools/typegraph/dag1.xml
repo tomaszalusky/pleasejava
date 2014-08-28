@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<tdg>
+<typegraph>
 	<procedure name="main">
 		<in name="pa" type="a" />
 		<in name="pd" type="d" />
@@ -34,4 +34,4 @@
 		<field name="fi" type="i" />
 		<field name="fj" type="varchar2(100)" />
 	</record>
-</tdg>
+</typegraph>

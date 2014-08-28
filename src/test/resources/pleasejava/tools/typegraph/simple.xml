@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<tdg>
+<typegraph>
 	<varray name="a_test_package.var1" of="integer" />
-</tdg>
+</typegraph>
