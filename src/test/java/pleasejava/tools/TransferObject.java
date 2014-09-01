@@ -47,11 +47,11 @@ ITO objekty tvoøí také strom.
 Algoritmus tvorby ITO a asociace s PTT:
 ---------------------------------------
 - nech N je uzel PTT
-- je-li N list, je typu JDBCT a je souèástí kolekce
+- je-li N typu JDBCT a je souèástí kolekce  (nemusi byt list)
   - pøidej ITO {JDBCT}
   - id = id(N)
   - break
-- je-li N list, je typu JDBCT a není souèástí kolekce
+- je-li N typu JDBCT a není souèástí kolekce   (nemusi byt list)
   - pøidej ITO JDBCT
   - id = id(N)
   - break

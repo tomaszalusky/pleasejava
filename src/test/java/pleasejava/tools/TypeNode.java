@@ -173,6 +173,10 @@ class TypeNode {
 		return id;
 	}
 	
+	TransferObject toTransferObject() {
+		return null;
+	}
+	
 	@Override
 	public String toString() {
 		StringBuilder result = new StringBuilder();
