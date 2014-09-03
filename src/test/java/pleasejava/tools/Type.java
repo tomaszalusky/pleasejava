@@ -52,6 +52,8 @@ abstract class Type {
 	
 	abstract <A1,A2> void accept(TypeVisitorAA<A1,A2> visitor, A1 arg1, A2 arg2);
 	
+	abstract <A1,A2,A3> void accept(TypeVisitorAAA<A1,A2,A3> visitor, A1 arg1, A2 arg2, A3 arg3);
+	
 	public String getName() {
 		return name;
 	}

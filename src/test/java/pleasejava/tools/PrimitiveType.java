@@ -33,7 +33,11 @@ class PrimitiveType extends Type {
 		boolean result = Objects.equals(this.name,that.name);
 		return result;
 	}
-	
+
+	<A1,A2,A3> void accept(TypeVisitorAAA<A1,A2,A3> visitor, A1 arg1, A2 arg2, A3 arg3) {
+		visitor.visitPrimitive(this, arg1, arg2, arg3);
+	}
+
 	@Override
 	public int hashCode() {
 		return Objects.hash(this.name);

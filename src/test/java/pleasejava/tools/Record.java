@@ -39,6 +39,10 @@ class Record extends Type {
 		visitor.visitRecord(this, arg1, arg2);
 	}
 	
+	<A1,A2,A3> void accept(TypeVisitorAAA<A1,A2,A3> visitor, A1 arg1, A2 arg2, A3 arg3) {
+		visitor.visitRecord(this, arg1, arg2, arg3);
+	}
+
 	public Map<String,Type> getFields() {
 		return fields;
 	}
