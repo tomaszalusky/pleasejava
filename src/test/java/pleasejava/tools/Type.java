@@ -86,6 +86,19 @@ abstract class Type {
 	private static class GetChildren implements TypeVisitorR<Map<String,Type>> {
 
 		@Override
+		public Map<String,Type> visitProcedureSignature(ProcedureSignature type) {
+			return ImmutableMap.copyOf(Maps.transformValues(type.getParameters(),Parameter._getType));
+		}
+
+		@Override
+		public Map<String,Type> visitFunctionSignature(FunctionSignature type) {
+			ImmutableMap.Builder<String,Type> builder = ImmutableMap.builder();
+			builder.put(FunctionSignature.RETURN_LABEL, type.getReturnType());
+			builder.putAll(Maps.transformValues(type.getParameters(),Parameter._getType));
+			return builder.build();
+		}
+
+		@Override
 		public Map<String,Type> visitRecord(Record type) {
 			return ImmutableMap.copyOf(type.getFields());
 		}
@@ -103,19 +116,6 @@ abstract class Type {
 		@Override
 		public Map<String,Type> visitIndexByTable(IndexByTable type) {
 			return ImmutableMap.of(IndexByTable.ELEMENT_LABEL, type.getElementType());
-		}
-
-		@Override
-		public Map<String,Type> visitProcedureSignature(ProcedureSignature type) {
-			return ImmutableMap.copyOf(Maps.transformValues(type.getParameters(),Parameter._getType));
-		}
-
-		@Override
-		public Map<String,Type> visitFunctionSignature(FunctionSignature type) {
-			ImmutableMap.Builder<String,Type> builder = ImmutableMap.builder();
-			builder.put(FunctionSignature.RETURN_LABEL, type.getReturnType());
-			builder.putAll(Maps.transformValues(type.getParameters(),Parameter._getType));
-			return builder.build();
 		}
 
 		@Override
@@ -159,6 +159,30 @@ abstract class Type {
 		}
 
 		@Override
+		public void visitProcedureSignature(ProcedureSignature type, Integer level) {
+			appendf(buf,"procedure \"%s\"", type.getName());
+			if (!checkWritten(type)) {
+				for (Entry<String,Parameter> entry : type.getParameters().entrySet()) {
+					appendf(buf,"%n%s%s %s ", indent(level + 1), entry.getKey(), entry.getValue().getParameterMode().name().toLowerCase());
+					entry.getValue().getType().accept(this,level + 1);
+				}
+			}
+		}
+
+		@Override
+		public void visitFunctionSignature(FunctionSignature type, Integer level) {
+			appendf(buf,"function \"%s\"", type.getName());
+			if (!checkWritten(type)) {
+				appendf(buf,"%n%s%s ", indent(level + 1), FunctionSignature.RETURN_LABEL);
+				type.getReturnType().accept(this,level + 1);
+				for (Entry<String,Parameter> entry : type.getParameters().entrySet()) {
+					appendf(buf,"%n%s%s %s ", indent(level + 1), entry.getKey(), entry.getValue().getParameterMode().name().toLowerCase());
+					entry.getValue().getType().accept(this,level + 1);
+				}
+			}
+		}
+
+		@Override
 		public void visitRecord(Record type, Integer level) {
 			appendf(buf,"record \"%s\"", type.getName());
 			if (!checkWritten(type)) {
@@ -195,30 +219,6 @@ abstract class Type {
 						type.getIndexType().toString(),
 						indent(level + 1), IndexByTable.ELEMENT_LABEL);
 				type.getElementType().accept(this,level + 1);
-			}
-		}
-
-		@Override
-		public void visitProcedureSignature(ProcedureSignature type, Integer level) {
-			appendf(buf,"procedure \"%s\"", type.getName());
-			if (!checkWritten(type)) {
-				for (Entry<String,Parameter> entry : type.getParameters().entrySet()) {
-					appendf(buf,"%n%s%s %s ", indent(level + 1), entry.getKey(), entry.getValue().getParameterMode().name().toLowerCase());
-					entry.getValue().getType().accept(this,level + 1);
-				}
-			}
-		}
-
-		@Override
-		public void visitFunctionSignature(FunctionSignature type, Integer level) {
-			appendf(buf,"function \"%s\"", type.getName());
-			if (!checkWritten(type)) {
-				appendf(buf,"%n%s%s ", indent(level + 1), FunctionSignature.RETURN_LABEL);
-				type.getReturnType().accept(this,level + 1);
-				for (Entry<String,Parameter> entry : type.getParameters().entrySet()) {
-					appendf(buf,"%n%s%s %s ", indent(level + 1), entry.getKey(), entry.getValue().getParameterMode().name().toLowerCase());
-					entry.getValue().getType().accept(this,level + 1);
-				}
 			}
 		}
 

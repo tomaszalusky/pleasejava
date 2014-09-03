@@ -138,12 +138,12 @@ class TypeNode {
 	private static String computeId(TypeNode parent, final int orderInParent) {
 		String result = parent == null ? "" : parent.id() + parent.getType().accept(new TypeVisitorR<String>() {
 			private String escapize(int value) {return value < 10 ? "" + value : "_" + value + "_";}
+			@Override public String visitProcedureSignature(ProcedureSignature type) {return escapize(orderInParent + 1);}
+			@Override public String visitFunctionSignature(FunctionSignature type) {return escapize(orderInParent);}
 			@Override public String visitRecord(Record type) {return escapize(orderInParent + 1);}
 			@Override public String visitVarray(Varray type) {return "e";}
 			@Override public String visitNestedTable(NestedTable type) {return "e";}
 			@Override public String visitIndexByTable(IndexByTable type) {return "e";}
-			@Override public String visitProcedureSignature(ProcedureSignature type) {return escapize(orderInParent + 1);}
-			@Override public String visitFunctionSignature(FunctionSignature type) {return escapize(orderInParent);}
 			@Override public String visitPrimitive(PrimitiveType type) {throw new IllegalStateException("primitive type is not expected to be parent of any type");}
 		});
 		return result;
@@ -190,6 +190,16 @@ class TypeNode {
 	static class AddToTransferObject implements TypeVisitorAAA<TypeNode,TransferObject,Boolean> {
 
 		@Override
+		public void visitProcedureSignature(ProcedureSignature type, TypeNode typeNode, TransferObject parent, Boolean inCollection) {
+			
+		}
+
+		@Override
+		public void visitFunctionSignature(FunctionSignature type, TypeNode typeNode, TransferObject parent, Boolean inCollection) {
+			
+		}
+
+		@Override
 		public void visitRecord(Record type, TypeNode typeNode, TransferObject parent, Boolean inCollection) {
 			
 		}
@@ -206,16 +216,6 @@ class TypeNode {
 
 		@Override
 		public void visitIndexByTable(IndexByTable type, TypeNode typeNode, TransferObject parent, Boolean inCollection) {
-			
-		}
-
-		@Override
-		public void visitProcedureSignature(ProcedureSignature type, TypeNode typeNode, TransferObject parent, Boolean inCollection) {
-			
-		}
-
-		@Override
-		public void visitFunctionSignature(FunctionSignature type, TypeNode typeNode, TransferObject parent, Boolean inCollection) {
 			
 		}
 
@@ -237,6 +237,28 @@ class TypeNode {
 		 */
 		ToString(StringBuilder buf) {
 			super(buf);
+		}
+
+		@Override
+		public void visitProcedureSignature(ProcedureSignature type, Integer level, TypeNode typeNode) {
+			appendf(buf,"procedure \"%s\" #%s", type.getName(), typeNode.id());
+			for (Map.Entry<String,Parameter> entry : type.getParameters().entrySet()) {
+				String key = entry.getKey();
+				appendf(buf,"%n%s%s %s ", indent(level + 1), key, entry.getValue().getParameterMode().name().toLowerCase());
+				entry.getValue().getType().accept(this,level + 1,typeNode.getChildren().get(key));
+			}
+		}
+
+		@Override
+		public void visitFunctionSignature(FunctionSignature type, Integer level, TypeNode typeNode) {
+			appendf(buf,"function \"%s\" #%s", type.getName(), typeNode.id());
+			appendf(buf,"%n%s%s ", indent(level + 1), FunctionSignature.RETURN_LABEL);
+			type.getReturnType().accept(this,level + 1,typeNode.getChildren().get(FunctionSignature.RETURN_LABEL));
+			for (Map.Entry<String,Parameter> entry : type.getParameters().entrySet()) {
+				String key = entry.getKey();
+				appendf(buf,"%n%s%s %s ", indent(level + 1), key, entry.getValue().getParameterMode().name().toLowerCase());
+				entry.getValue().getType().accept(this,level + 1,typeNode.getChildren().get(key));
+			}
 		}
 
 		@Override
@@ -269,28 +291,6 @@ class TypeNode {
 			appendf(buf,"%n%s%s %s", indent(level + 1), IndexByTable.KEY_LABEL, type.getIndexType().toString());
 			appendf(buf,"%n%s%s ", indent(level + 1), IndexByTable.ELEMENT_LABEL);
 			type.getElementType().accept(this,level + 1,typeNode.getChildren().get(IndexByTable.ELEMENT_LABEL));
-		}
-
-		@Override
-		public void visitProcedureSignature(ProcedureSignature type, Integer level, TypeNode typeNode) {
-			appendf(buf,"procedure \"%s\" #%s", type.getName(), typeNode.id());
-			for (Map.Entry<String,Parameter> entry : type.getParameters().entrySet()) {
-				String key = entry.getKey();
-				appendf(buf,"%n%s%s %s ", indent(level + 1), key, entry.getValue().getParameterMode().name().toLowerCase());
-				entry.getValue().getType().accept(this,level + 1,typeNode.getChildren().get(key));
-			}
-		}
-
-		@Override
-		public void visitFunctionSignature(FunctionSignature type, Integer level, TypeNode typeNode) {
-			appendf(buf,"function \"%s\" #%s", type.getName(), typeNode.id());
-			appendf(buf,"%n%s%s ", indent(level + 1), FunctionSignature.RETURN_LABEL);
-			type.getReturnType().accept(this,level + 1,typeNode.getChildren().get(FunctionSignature.RETURN_LABEL));
-			for (Map.Entry<String,Parameter> entry : type.getParameters().entrySet()) {
-				String key = entry.getKey();
-				appendf(buf,"%n%s%s %s ", indent(level + 1), key, entry.getValue().getParameterMode().name().toLowerCase());
-				entry.getValue().getType().accept(this,level + 1,typeNode.getChildren().get(key));
-			}
 		}
 
 		@Override

@@ -8,6 +8,10 @@ package pleasejava.tools;
  */
 interface TypeVisitorA<A> {
 
+	void visitProcedureSignature(ProcedureSignature type, A arg);
+	
+	void visitFunctionSignature(FunctionSignature type, A arg);
+	
 	void visitRecord(Record type, A arg);
 
 	void visitVarray(Varray type, A arg);
@@ -15,10 +19,6 @@ interface TypeVisitorA<A> {
 	void visitNestedTable(NestedTable type, A arg);
 	
 	void visitIndexByTable(IndexByTable type, A arg);
-	
-	void visitProcedureSignature(ProcedureSignature type, A arg);
-	
-	void visitFunctionSignature(FunctionSignature type, A arg);
 	
 	void visitPrimitive(PrimitiveType type, A arg);
 
