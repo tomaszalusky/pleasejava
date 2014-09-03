@@ -1,15 +1,22 @@
 package pleasejava.tools;
 
-import java.util.Map;
+import java.util.List;
 
 /**
  * @author Tomas Zalusky
  */
 public class TransferObject {
 
-//	private final TransferObject parent;
-//	
-//	private /*not final, assigned only once*/ Map<String,TransferObject> children;
+	private String desc; // TODO some string characteristics, only temporary, will be replaced by subclass of TO and another data 
+	
+	private final TransferObject parent;
+	
+	private /*not final, assigned only once*/ List<TransferObject> children;
+
+	public TransferObject(String desc, TransferObject parent) {
+		this.desc = desc;
+		this.parent = parent;
+	}
 
 }
 

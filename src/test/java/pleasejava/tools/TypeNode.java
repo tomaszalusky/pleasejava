@@ -174,7 +174,9 @@ class TypeNode {
 	}
 	
 	TransferObject toTransferObject() {
-		return null;
+		TransferObject result = new TransferObject("root",null);
+		type.accept(new AddToTransferObject(),this,result,false);
+		return result;
 	}
 	
 	@Override
@@ -183,6 +185,45 @@ class TypeNode {
 		type.accept(new ToString(result),0,this);
 		Type.ToString.align(result,true);
 		return result.toString();
+	}
+
+	static class AddToTransferObject implements TypeVisitorAAA<TypeNode,TransferObject,Boolean> {
+
+		@Override
+		public void visitRecord(Record type, TypeNode typeNode, TransferObject parent, Boolean inCollection) {
+			
+		}
+
+		@Override
+		public void visitVarray(Varray type, TypeNode typeNode, TransferObject parent, Boolean inCollection) {
+			
+		}
+
+		@Override
+		public void visitNestedTable(NestedTable type, TypeNode typeNode, TransferObject parent, Boolean inCollection) {
+			
+		}
+
+		@Override
+		public void visitIndexByTable(IndexByTable type, TypeNode typeNode, TransferObject parent, Boolean inCollection) {
+			
+		}
+
+		@Override
+		public void visitProcedureSignature(ProcedureSignature type, TypeNode typeNode, TransferObject parent, Boolean inCollection) {
+			
+		}
+
+		@Override
+		public void visitFunctionSignature(FunctionSignature type, TypeNode typeNode, TransferObject parent, Boolean inCollection) {
+			
+		}
+
+		@Override
+		public void visitPrimitive(PrimitiveType type, TypeNode typeNode, TransferObject parent, Boolean inCollection) {
+			
+		}
+		
 	}
 	
 	/**
