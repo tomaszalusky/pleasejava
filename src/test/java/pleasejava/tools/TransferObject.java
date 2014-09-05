@@ -2,6 +2,11 @@ package pleasejava.tools;
 
 import java.util.List;
 
+import pleasejava.Utils;
+
+import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
+
 /**
  * @author Tomas Zalusky
  */
@@ -11,11 +16,32 @@ public class TransferObject {
 	
 	private final TransferObject parent;
 	
-	private /*not final, assigned only once*/ List<TransferObject> children;
+	private final List<TransferObject> children = Lists.newArrayList(); // mutable
+	
+	private final int depth;
 
 	public TransferObject(String desc, TransferObject parent) {
 		this.desc = desc;
 		this.parent = parent;
+		this.depth = parent == null ? 0 : parent.depth + 1;
+	}
+
+	public void addChild(TransferObject child) {
+		children.add(child);
+	}
+	
+	@Override
+	public String toString() {
+		StringBuilder buf = new StringBuilder();
+		toStringBuilder(buf);
+		return buf.toString();
+	}
+
+	private void toStringBuilder(StringBuilder buf) {
+		Utils.appendf(buf,"%s%s%n",Strings.repeat(" ",4*depth),desc);
+		for (TransferObject child : children) {
+			child.toStringBuilder(buf);
+		}
 	}
 
 }

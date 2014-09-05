@@ -27,6 +27,10 @@ abstract class Type {
 		this.name = checkNotNull(name);
 	}
 	
+	boolean isJdbcTransferrable() { // TODO temporary implementation - package types are not transferrable while toplevel and primitive type are
+		return !name.contains(".");
+	}
+	
 	/**
 	 * Provides all types which this type depends on.
 	 * For example, all fields' types for record or element type for nested table.

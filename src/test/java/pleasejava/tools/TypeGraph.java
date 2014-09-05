@@ -139,8 +139,16 @@ public class TypeGraph {
 
 /*
 
-later:
+- AddToTO
+- vyresit globalni PLSQLConfig
+- nacist ibt a derave nst pres JDBC
 - zapracovat koncept JDBC-transferrable typu, a la ifc JdbcTransfer { convertForth(); convertBack(); } - to bude az u TO, mozna i dale
+- asociaci TN<->TO, id u TO
+- vypis TN spolu s TO
+- overit funkcnost pro dosavadni testcasy
+- overit funkcnost pro nove jdbct typy
+
+later:
 - komentar patri az k TO: potomka typu trojstavový boolean, který charakterizuje nastavení null u prvkù (true/false), a pøíznak smazání prvku (null) POZN. ZREVIDOVAT, NEZDA SE MI, ZE BY V JEDNOM MISTE BYLA INFORMACE O CELE TABULCE I O JEJICH PRVCICH, A ZE NEMA TOTEZ VARRAY
 
 */
