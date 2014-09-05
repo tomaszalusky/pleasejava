@@ -1,12 +1,16 @@
 package pleasejava;
 
+import java.util.List;
 import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.ComparisonFailure;
 
+import com.google.common.base.CharMatcher;
 import com.google.common.base.Function;
+import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 
 /**
  * @author Tomas Zalusky
@@ -108,6 +112,36 @@ public class Utils {
 			return buf.toString();
 		}
 
+	}
+	
+	private void align(StringBuilder buf) {
+		Function<String,String[]> lineSplitter = new Function<String,String[]>() {
+			public String[] apply(String input) {
+				String[] result = new String[3];
+				int f = 0;
+				int q1 = input.indexOf('"',f);
+				if (q1 == -1) {
+					result[0] = result[1] = "";
+				} else {
+					result[0] = CharMatcher.WHITESPACE.trimTrailingFrom(input.substring(0,q1));
+					int q2 = input.indexOf('"',q1 + 1);
+					result[1] = CharMatcher.WHITESPACE.trimTrailingFrom(input.substring(q1,q2 + 1));
+					f = q2 + 1;
+				}
+				int h1 = input.indexOf('#',f);
+				if (h1 == -1) {
+					result[0] = "";
+				} else {
+					result[1] = CharMatcher.WHITESPACE.trimTrailingFrom(input.substring(h1));
+				}
+				return result;
+			}
+		};
+		int[] maximums = new int[3];
+		for (String line : Splitter.onPattern("\\r?\\n").split(buf)) {
+			String[] parts = lineSplitter.apply(line);
+			for (int i = 0; i < 3; i++) maximums[i] = Math.max(maximums[i], parts[i].length());
+		}
 	}
 	
 }
