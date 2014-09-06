@@ -11,6 +11,8 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.input.SAXBuilder;
 
+import pleasejava.Utils;
+
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableListMultimap;
@@ -131,7 +133,7 @@ public class TypeGraph {
 				q.addAll(children.get(t));
 			}
 		}
-		Type.ToString.align(result,false);
+		Utils.align(result);
 		return result.toString();
 	}
 

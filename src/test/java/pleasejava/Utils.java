@@ -137,6 +137,9 @@ public class Utils {
 				} else {
 					result[0] = CharMatcher.WHITESPACE.trimTrailingFrom(input.substring(0,q1));
 					int q2 = input.indexOf('"',q1 + 1);
+					if (input.regionMatches(q2, "\" ...", 0, 5)) { // ellipsis is treated as part of name
+						q2 += 4;
+					}
 					result[1] = CharMatcher.WHITESPACE.trimTrailingFrom(input.substring(q1,q2 + 1));
 					f = q2 + 1;
 				}
