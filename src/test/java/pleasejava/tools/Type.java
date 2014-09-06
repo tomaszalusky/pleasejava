@@ -1,5 +1,8 @@
 package pleasejava.tools;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+import static pleasejava.Utils.appendf;
+
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -7,12 +10,8 @@ import java.util.Set;
 import pleasejava.Utils;
 
 import com.google.common.base.Function;
-import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
-
-import static com.google.common.base.Preconditions.checkNotNull;
-import static pleasejava.Utils.appendf;
 
 /**
  * Ancestor of all PLSQL types.
@@ -83,7 +82,7 @@ abstract class Type {
 	public String toString() {
 		StringBuilder result = new StringBuilder();
 		accept(new ToString(result,null),0);
-		Type.ToString.align(result,false);
+		Utils.align(result);
 		return result.toString();
 	}
 
@@ -229,41 +228,6 @@ abstract class Type {
 		@Override
 		public void visitPrimitive(PrimitiveType type, Integer level) {
 			appendf(buf,"\"%s\"", type.getName()); // always written regardless guard set
-		}
-		
-		/**
-		 * Aligns type names into same column.
-		 * @param buf
-		 * @param thirdColumn if true, three columns are formatted, else only two columns are formatted
-		 */
-		public static void align(StringBuilder buf, boolean thirdColumn) {
-			int lastNewline = -1;
-			int firstQuote = -1;
-			boolean wasFirstQuote = false;
-			int maxWidth1 = -1, maxWidth2 = -1;
-			for (int i = 0, l = buf.length(); i < l; i++) {
-				char c = buf.charAt(i);
-				if (c == '\n' || c == '\r') {lastNewline = i; wasFirstQuote = false;}
-				if (c == '"') {
-					if (wasFirstQuote) {maxWidth2 = Math.max(i - firstQuote - 1,maxWidth2);}
-					else {wasFirstQuote = true; firstQuote = i; maxWidth1 = Math.max(i - lastNewline - 1,maxWidth1);}
-				}
-			}
-			StringBuilder result = new StringBuilder();
-			lastNewline = -1;
-			firstQuote = -1;
-			wasFirstQuote = false;
-			for (int i = 0, l = buf.length(); i < l; i++) {
-				char c = buf.charAt(i);
-				if (c == '\n' || c == '\r') {lastNewline = i; wasFirstQuote = false;}
-				if (c == '"') {
-					if (wasFirstQuote) {result.append(c).append(Strings.repeat(" ",maxWidth2 - (i - firstQuote - 1)));}
-					else {wasFirstQuote = true; firstQuote = i; result.append(Strings.repeat(" ",maxWidth1 - (i - lastNewline - 1))).append(c);}
-				} else {
-					result.append(c);
-				}
-			}
-			buf.delete(0, buf.length()).append(result);
 		}
 		
 	}
