@@ -1,6 +1,7 @@
 package pleasejava;
 
-import java.util.List;
+import static com.google.common.collect.FluentIterable.from;
+
 import java.util.Map;
 
 import org.junit.Assert;
@@ -8,14 +9,16 @@ import org.junit.ComparisonFailure;
 
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Function;
+import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
 
 /**
  * @author Tomas Zalusky
  */
 public class Utils {
+
+	private static final String LS = String.format("%n");
 
 	public static void main(String[] args) {
 		System.out.println("Hello world");
@@ -114,10 +117,19 @@ public class Utils {
 
 	}
 	
-	private void align(StringBuilder buf) {
-		Function<String,String[]> lineSplitter = new Function<String,String[]>() {
+	/**
+	 * Formats content of given buffer to table columns
+	 * based on occurence of certain characters in text:
+	 * <pre>
+	 * first column "second column in quotes" #third column after hash
+	 * </pre>
+	 * @param buf
+	 */
+	public static void align(StringBuilder buf) {
+		final int COLS = 3;
+		final Function<String,String[]> lineSplitter = new Function<String,String[]>() {
 			public String[] apply(String input) {
-				String[] result = new String[3];
+				String[] result = new String[COLS];
 				int f = 0;
 				int q1 = input.indexOf('"',f);
 				if (q1 == -1) {
@@ -130,18 +142,29 @@ public class Utils {
 				}
 				int h1 = input.indexOf('#',f);
 				if (h1 == -1) {
-					result[0] = "";
+					result[2] = "";
 				} else {
-					result[1] = CharMatcher.WHITESPACE.trimTrailingFrom(input.substring(h1));
+					result[2] = CharMatcher.WHITESPACE.trimTrailingFrom(input.substring(h1));
 				}
 				return result;
 			}
 		};
-		int[] maximums = new int[3];
-		for (String line : Splitter.onPattern("\\r?\\n").split(buf)) {
+		final int[] maximums = new int[COLS];
+		Iterable<String> lines = Splitter.onPattern("\\r?\\n").split(buf);
+		for (String line : lines) {
 			String[] parts = lineSplitter.apply(line);
-			for (int i = 0; i < 3; i++) maximums[i] = Math.max(maximums[i], parts[i].length());
+			for (int i = 0; i < COLS; i++) maximums[i] = Math.max(maximums[i], parts[i].length());
 		}
+		StringBuilder result = Joiner.on(LS).appendTo(new StringBuilder(), from(lines).transform(new Function<String,String>() {
+			public String apply(String line) {
+				StringBuilder result = new StringBuilder();
+				String[] parts = lineSplitter.apply(line);
+				for (int i = 0; i < COLS; i++) appendf(result,"%s%s ",parts[i], Strings.repeat(" ",maximums[i] - parts[i].length()));
+				return CharMatcher.WHITESPACE.trimTrailingFrom(result).toString();
+			}
+		}));
+		buf.setLength(0);
+		buf.append(result);
 	}
 	
 }
