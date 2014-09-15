@@ -141,12 +141,12 @@ public class TypeGraph {
 
 /*
 
+- asociaci TN<->TO, id u TO
+- vypis TN spolu s TO
 - AddToTO
 - vyresit globalni PLSQLConfig
 - nacist ibt a derave nst pres JDBC
 - zapracovat koncept JDBC-transferrable typu, a la ifc JdbcTransfer { convertForth(); convertBack(); } - to bude az u TO, mozna i dale
-- asociaci TN<->TO, id u TO
-- vypis TN spolu s TO
 - overit funkcnost pro dosavadni testcasy
 - overit funkcnost pro nove jdbct typy
 
