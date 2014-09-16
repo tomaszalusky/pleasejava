@@ -173,6 +173,10 @@ class TypeNode {
 		return id;
 	}
 	
+	TransferObjectTree toTransferObjectTree() {
+		return null; // TODO
+	}
+	
 	TransferObject toTransferObject() {
 		TransferObject result = new TransferObject("/",null);
 		type.accept(new AddToTransferObject(),this,result,false);
