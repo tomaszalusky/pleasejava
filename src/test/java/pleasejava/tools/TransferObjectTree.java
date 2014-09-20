@@ -21,7 +21,7 @@ public class TransferObjectTree {
 
 	@Override
 	public String toString() {
-		return super.toString();
+		return root.toString();
 	}
 
 }

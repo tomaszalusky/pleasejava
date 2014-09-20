@@ -8,6 +8,8 @@ import java.util.Map;
 
 import pleasejava.Utils;
 
+import com.google.common.collect.ImmutableListMultimap;
+import com.google.common.collect.ImmutableListMultimap.Builder;
 import com.google.common.collect.ImmutableMap;
 
 /**
@@ -174,12 +176,11 @@ class TypeNode {
 	}
 	
 	TransferObjectTree toTransferObjectTree() {
-		return null; // TODO
-	}
-	
-	TransferObject toTransferObject() {
-		TransferObject result = new TransferObject("/",null);
-		type.accept(new AddToTransferObject(),this,result,false);
+		ImmutableListMultimap.Builder<TypeNode,TransferObject> associationsBuilder = ImmutableListMultimap.builder();
+		TransferObject root = new TransferObject("/",null,this);
+		associationsBuilder.put(this,root);
+		type.accept(new AddToTransferObject(associationsBuilder),this,root,false);
+		TransferObjectTree result = new TransferObjectTree(this, root, associationsBuilder.build());
 		return result;
 	}
 	
@@ -192,6 +193,12 @@ class TypeNode {
 	}
 
 	static class AddToTransferObject implements TypeVisitorAAA<TypeNode,TransferObject,Boolean> {
+
+		private final ImmutableListMultimap.Builder<TypeNode,TransferObject> associationsBuilder;
+
+		public AddToTransferObject(ImmutableListMultimap.Builder<TypeNode,TransferObject> associationsBuilder) {
+			this.associationsBuilder = associationsBuilder;
+		}
 
 		/**
 		 * Since procedure and function (just like root transfer object) are artificial constructs,
@@ -231,7 +238,8 @@ class TypeNode {
 					childTypeNode.getType().accept(this,childTypeNode,parent,inCollection);
 				}
 			} else {
-				TransferObject child = new TransferObject(type.getName(),parent);
+				TransferObject child = new TransferObject(type.getName(),parent,typeNode);
+				associationsBuilder.put(typeNode,child);
 				parent.addChild(child);
 			}
 		}
@@ -256,16 +264,21 @@ class TypeNode {
 		public void visitVarray(Varray type, TypeNode typeNode, TransferObject parent, Boolean inCollection) {
 			if (type.isJdbcTransferrable()) {
 				if (inCollection) {
-					TransferObject child = new TransferObject("{p}",parent);
+					TransferObject child = new TransferObject("{p}",parent,typeNode);
+					associationsBuilder.put(typeNode, child);
 					parent.addChild(child);
-					TransferObject grandchild = new TransferObject(type.getName(),child);
+					TypeNode childTypeNode = typeNode.getChildren().get(Varray.ELEMENT_LABEL);
+					TransferObject grandchild = new TransferObject(type.getName(),child,childTypeNode);
+					associationsBuilder.put(childTypeNode, grandchild);
 					child.addChild(grandchild);
 				} else {
-					TransferObject child = new TransferObject(type.getName(),parent);
+					TransferObject child = new TransferObject(type.getName(),parent,typeNode);
+					associationsBuilder.put(typeNode, child);
 					parent.addChild(child);
 				}
 			} else {
-				TransferObject pointers = new TransferObject("{p}",parent);
+				TransferObject pointers = new TransferObject("{p}",parent,typeNode);
+				associationsBuilder.put(typeNode, pointers);
 				parent.addChild(pointers);
 				TypeNode childTypeNode = typeNode.getChildren().get(Varray.ELEMENT_LABEL);
 				childTypeNode.getType().accept(this,childTypeNode,pointers,true);
@@ -276,18 +289,24 @@ class TypeNode {
 		public void visitNestedTable(NestedTable type, TypeNode typeNode, TransferObject parent, Boolean inCollection) {
 			if (type.isJdbcTransferrable()) {
 				if (inCollection) { // TODO deletion
-					TransferObject child = new TransferObject("{p}",parent);
+					TransferObject child = new TransferObject("{p}",parent,typeNode);
+					associationsBuilder.put(typeNode, child);
 					parent.addChild(child);
-					TransferObject grandchild = new TransferObject(type.getName(),child);
+					TypeNode childTypeNode = typeNode.getChildren().get(NestedTable.ELEMENT_LABEL);
+					TransferObject grandchild = new TransferObject(type.getName(),child,childTypeNode);
+					associationsBuilder.put(childTypeNode, grandchild);
 					child.addChild(grandchild);
 				} else {
-					TransferObject child = new TransferObject(type.getName(),parent);
+					TransferObject child = new TransferObject(type.getName(),parent,typeNode);
+					associationsBuilder.put(typeNode, child);
 					parent.addChild(child);
 				}
 			} else {
-				TransferObject pointers = new TransferObject("{p}",parent);
+				TransferObject pointers = new TransferObject("{p}",parent,typeNode);
+				associationsBuilder.put(typeNode, pointers);
 				parent.addChild(pointers);
-				TransferObject deletions = new TransferObject("{d}",parent);
+				TransferObject deletions = new TransferObject("{d}",pointers,typeNode);
+				associationsBuilder.put(typeNode, deletions);
 				pointers.addChild(deletions);
 				TypeNode childTypeNode = typeNode.getChildren().get(NestedTable.ELEMENT_LABEL);
 				childTypeNode.getType().accept(this,childTypeNode,pointers,true);
@@ -298,18 +317,24 @@ class TypeNode {
 		public void visitIndexByTable(IndexByTable type, TypeNode typeNode, TransferObject parent, Boolean inCollection) {
 			if (type.isJdbcTransferrable()) {
 				if (inCollection) { // TODO indexes
-					TransferObject child = new TransferObject("{p}",parent);
+					TransferObject child = new TransferObject("{p}",parent,typeNode);
+					associationsBuilder.put(typeNode, child);
 					parent.addChild(child);
-					TransferObject grandchild = new TransferObject(type.getName(),child);
+					TypeNode childTypeNode = typeNode.getChildren().get(IndexByTable.ELEMENT_LABEL);
+					TransferObject grandchild = new TransferObject(type.getName(),child,childTypeNode);
+					associationsBuilder.put(childTypeNode, grandchild);
 					child.addChild(grandchild);
 				} else {
-					TransferObject child = new TransferObject(type.getName(),parent);
+					TransferObject child = new TransferObject(type.getName(),parent,typeNode);
+					associationsBuilder.put(typeNode, child);
 					parent.addChild(child);
 				}
 			} else {
-				TransferObject pointers = new TransferObject("{p}",parent);
+				TransferObject pointers = new TransferObject("{p}",parent,typeNode);
+				associationsBuilder.put(typeNode, pointers);
 				parent.addChild(pointers);
-				TransferObject indexes = new TransferObject("{i:" + type.getIndexType().name + "}",parent);
+				TransferObject indexes = new TransferObject("{i:" + type.getIndexType().name + "}",pointers,typeNode);
+				associationsBuilder.put(typeNode, indexes);
 				pointers.addChild(indexes);
 				TypeNode childTypeNode = typeNode.getChildren().get(IndexByTable.ELEMENT_LABEL);
 				childTypeNode.getType().accept(this,childTypeNode,pointers,true);
@@ -320,10 +345,11 @@ class TypeNode {
 		public void visitPrimitive(PrimitiveType type, TypeNode typeNode, TransferObject parent, Boolean inCollection) {
 			TransferObject child;
 			if (inCollection) {
-				child = new TransferObject("{" + type.getName() + "}",parent);
+				child = new TransferObject("{" + type.getName() + "}",parent,typeNode);
 			} else {
-				child = new TransferObject(type.getName(),parent);
+				child = new TransferObject(type.getName(),parent,typeNode);
 			}
+			associationsBuilder.put(typeNode, child);
 			parent.addChild(child);
 		}
 		

@@ -20,9 +20,12 @@ public class TransferObject {
 	
 	private final int depth;
 
-	public TransferObject(String desc, TransferObject parent) {
+	private final TypeNode typeNode;
+	
+	public TransferObject(String desc, TransferObject parent, TypeNode typeNode) {
 		this.desc = desc;
 		this.parent = parent;
+		this.typeNode = typeNode;
 		this.depth = parent == null ? 0 : parent.depth + 1;
 	}
 
