@@ -19,6 +19,10 @@ public class TransferObjectTree {
 		this.associations = associations;
 	}
 
+	public ListMultimap<TypeNode,TransferObject> getAssociations() {
+		return associations;
+	}
+	
 	@Override
 	public String toString() {
 		return root.toString();

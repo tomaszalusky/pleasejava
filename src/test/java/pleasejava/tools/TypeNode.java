@@ -1,5 +1,6 @@
 package pleasejava.tools;
 
+import static com.google.common.collect.Iterables.getOnlyElement;
 import static pleasejava.Utils.appendf;
 
 import java.sql.Array;
@@ -11,6 +12,7 @@ import pleasejava.Utils;
 import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ImmutableListMultimap.Builder;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Iterables;
 
 /**
  * Represents one node in type tree.
@@ -187,7 +189,14 @@ class TypeNode {
 	@Override
 	public String toString() {
 		StringBuilder result = new StringBuilder();
-		type.accept(new ToString(result),0,this);
+		type.accept(new ToString(result,null),0,this);
+		Utils.align(result);
+		return result.toString();
+	}
+
+	public String toString(TransferObjectTree transferObjectTree) {
+		StringBuilder result = new StringBuilder();
+		type.accept(new ToString(result,transferObjectTree),0,this);
 		Utils.align(result);
 		return result.toString();
 	}
@@ -361,16 +370,24 @@ class TypeNode {
 	 */
 	static class ToString extends Utils.ToStringSupport implements TypeVisitorAA<Integer,TypeNode> {
 
+		private final TransferObjectTree transferObjectTree;
+
 		/**
 		 * @param buf buffer for result string
+		 * @param transferObjectTree 
 		 */
-		ToString(StringBuilder buf) {
+		ToString(StringBuilder buf, TransferObjectTree transferObjectTree) {
 			super(buf);
+			this.transferObjectTree = transferObjectTree;
 		}
 
 		@Override
 		public void visitProcedureSignature(ProcedureSignature type, Integer level, TypeNode typeNode) {
 			appendf(buf,"procedure \"%s\" #%s", type.getName(), typeNode.id());
+			if (transferObjectTree != null) {
+				TransferObject to = getOnlyElement(transferObjectTree.getAssociations().get(typeNode));
+				appendf(buf," | %s%s #%s",indent(to.getDepth()),to.getDesc(),to.getId());
+			}
 			for (Map.Entry<String,Parameter> entry : type.getParameters().entrySet()) {
 				String key = entry.getKey();
 				appendf(buf,"%n%s%s %s ", indent(level + 1), key, entry.getValue().getParameterMode().name().toLowerCase());

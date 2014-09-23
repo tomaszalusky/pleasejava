@@ -43,7 +43,8 @@ public class TypeNodeTreeTest extends AbstractTypeGraphTest {
 		List<Type> topologicalOrdering = graph.getTopologicalOrdering();
 		TypeNode rootNode = topologicalOrdering.get(0).toTypeNode(null,0);
 		String actual = rootNode.toString();
-		System.out.println(rootNode.toTransferObjectTree().toString());
+		TransferObjectTree tot = rootNode.toTransferObjectTree();
+		System.out.println(rootNode.toString(tot));
 		if (record) {
 			writeExpectedOutput(getClass(),name,actual);
 		} else {

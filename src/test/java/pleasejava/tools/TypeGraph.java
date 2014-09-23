@@ -141,8 +141,8 @@ public class TypeGraph {
 
 /*
 
-- id u TO
 - vypis TN spolu s TO
+- id u TO
 - AddToTO
 - vyresit globalni PLSQLConfig
 - nacist ibt a derave nst pres JDBC

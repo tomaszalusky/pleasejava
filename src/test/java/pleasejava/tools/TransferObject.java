@@ -29,6 +29,16 @@ public class TransferObject {
 		this.depth = parent == null ? 0 : parent.depth + 1;
 	}
 
+	
+	
+	public String getDesc() {
+		return desc;
+	}
+
+	public int getDepth() {
+		return depth;
+	}
+	
 	public void addChild(TransferObject child) {
 		children.add(child);
 	}
@@ -45,6 +55,10 @@ public class TransferObject {
 		for (TransferObject child : children) {
 			child.toStringBuilder(buf);
 		}
+	}
+
+	public String getId() {
+		return "id";
 	}
 
 }
