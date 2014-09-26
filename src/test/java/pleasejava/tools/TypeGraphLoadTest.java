@@ -14,6 +14,8 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
+import pleasejava.Utils;
+
 /**
  * Tests correct loading of type graph.
  * @author Tomas Zalusky
@@ -21,8 +23,12 @@ import org.junit.runners.Parameterized;
 @RunWith(Parameterized.class)
 public class TypeGraphLoadTest extends AbstractTypeGraphTest {
 
+	private static boolean record = false;
+
 	private final String name;
 	
+	private final String expected;
+
 	private final Class<? extends Exception> exceptionClass;
 	
 	private final Object expectedMessageOrMatcher;
@@ -30,8 +36,9 @@ public class TypeGraphLoadTest extends AbstractTypeGraphTest {
 	@Rule
 	public ExpectedException exception = ExpectedException.none();
 	
-	public TypeGraphLoadTest(String name, Class<? extends Exception> exceptionClass, Object expectedMessageOrMatcher) {
+	public TypeGraphLoadTest(String name, Class<? extends Exception> exceptionClass, Object expectedMessageOrMatcher) throws IOException {
 		this.name = name;
+		this.expected = record ? null : (exceptionClass == null ? readExpectedOutput(getClass(),name) : null);
 		this.exceptionClass = exceptionClass;
 		this.expectedMessageOrMatcher = expectedMessageOrMatcher;
 	}
@@ -67,8 +74,16 @@ public class TypeGraphLoadTest extends AbstractTypeGraphTest {
 			} else {
 				exception.expect((Matcher<?>)expectedMessageOrMatcher);
 			}
+			loadGraph(name);
+		} else {
+			TypeGraph typeGraph = loadGraph(name);
+			String actual = typeGraph.toString();
+			if (record) {
+				writeExpectedOutput(getClass(),name,actual);
+			} else {
+				Utils.assertEquals(expected,actual);
+			}
 		}
-		loadGraph(name);
 	}
 	
 }

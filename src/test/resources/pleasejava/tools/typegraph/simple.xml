@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <typegraph>
+	<procedure name="main">
+		<in name="a" type="a_test_package.var1" />
+	</procedure>
 	<varray name="a_test_package.var1" of="integer" />
 </typegraph>

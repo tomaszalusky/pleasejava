@@ -142,6 +142,11 @@ public class TypeGraph {
 /*
 
 - vypis TN spolu s TO
+	- rfct ToStringSupport
+	- migrace Type.ToString na tabulku
+	- migrace TypeNode.ToString na tabulku
+	- - Utils.align
+	- pridat konverzi na TO pro jednotlive typy
 - id u TO
 - AddToTO
 - vyresit globalni PLSQLConfig
