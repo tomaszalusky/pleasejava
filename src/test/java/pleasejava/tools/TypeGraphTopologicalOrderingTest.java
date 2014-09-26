@@ -33,7 +33,7 @@ public class TypeGraphTopologicalOrderingTest extends AbstractTypeGraphTest {
 	@Parameterized.Parameters(name = "{index}: {0}")
 	public static Collection<Object[]> data() {
 		return Arrays.asList(new Object[][] {
-				{"simple"  , ImmutableList.of("a_test_package.var1","integer")},
+				{"simple"  , ImmutableList.of("main","a_test_package.var1","integer")},
 				{"dag1"    , ImmutableList.of("main","a","d","b","c","e","f","g","h","i","varchar2(100)")},
 				{"alltypes", ImmutableList.of(
 						"echo",

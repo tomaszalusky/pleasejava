@@ -1,2 +1,3 @@
-varray        "a_test_package.var1" #
-    (element) "integer"             #e
+procedure         "main"                #
+    a in varray   "a_test_package.var1" #1
+        (element) "integer"             #1e
