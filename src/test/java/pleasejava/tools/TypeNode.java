@@ -202,9 +202,10 @@ class TypeNode {
 
 	public String toString(TransferObjectTree transferObjectTree) {
 		StringBuilder result = new StringBuilder();
-		type.accept(new ToString(result,transferObjectTree),0,this);
-		Utils.align(result);
-		return result.toString();
+		ToString visitor = new ToString(result,transferObjectTree);
+		type.accept(visitor,0,this);
+		//Utils.align(result);
+		return visitor.toString();
 	}
 
 	static class AddToTransferObject implements TypeVisitorAAA<TypeNode,TransferObject,Boolean> {
@@ -392,7 +393,7 @@ class TypeNode {
 			appendToLastCell("procedure").append("\"" + type.getName() + "\"").append("#" + typeNode.id());
 			if (transferObjectTree != null) {
 				TransferObject to = getOnlyElement(transferObjectTree.getAssociations().get(typeNode));
-				appendf(buf," | %s%s #%s",indent(to.getDepth()),to.getDesc(),to.getId());
+				append("| " + indent(to.getDepth()) + to.getDesc()).append("#" + to.getId());
 			}
 			for (Map.Entry<String,Parameter> entry : type.getParameters().entrySet()) {
 				String key = entry.getKey();
@@ -406,7 +407,7 @@ class TypeNode {
 			appendToLastCell("function").append("\"" + type.getName() + "\"").append("#" + typeNode.id());
 			if (transferObjectTree != null) {
 				TransferObject to = getOnlyElement(transferObjectTree.getAssociations().get(typeNode));
-				appendf(buf," | %s%s #%s",indent(to.getDepth()),to.getDesc(),to.getId());
+				append("| " + indent(to.getDepth()) + to.getDesc()).append("#" + to.getId());
 			}
 			newLine().append(indent(level + 1) + FunctionSignature.RETURN_LABEL + " ");
 			type.getReturnType().accept(this,level + 1,typeNode.getChildren().get(FunctionSignature.RETURN_LABEL));
@@ -421,7 +422,7 @@ class TypeNode {
 		public void visitRecord(Record type, Integer level, TypeNode typeNode) {
 			appendToLastCell("record").append("\"" + type.getName() + "\"").append("#" + typeNode.id());
 			if (transferObjectTree != null) { // record nodes never have associated TO
-				appendf(buf," |");
+				append("|");
 			}
 			for (Map.Entry<String,Type> entry : type.getFields().entrySet()) {
 				String key = entry.getKey();
@@ -435,7 +436,7 @@ class TypeNode {
 			appendToLastCell("varray").append("\"" + type.getName() + "\"").append("#" + typeNode.id());
 			if (transferObjectTree != null) {
 				TransferObject to = getOnlyElement(transferObjectTree.getAssociations().get(typeNode));
-				appendf(buf," | %s%s #%s",indent(to.getDepth()),to.getDesc(),to.getId());
+				append("| " + indent(to.getDepth()) + to.getDesc()).append("#" + to.getId());
 			}
 			newLine().append(indent(level + 1) + Varray.ELEMENT_LABEL + " ");
 			type.getElementType().accept(this,level + 1,typeNode.getChildren().get(Varray.ELEMENT_LABEL));
@@ -474,10 +475,10 @@ class TypeNode {
 			if (transferObjectTree != null) {
 				List<TransferObject> tos = transferObjectTree.getAssociations().get(typeNode);
 				if (tos.isEmpty()) { // part of more complex transferrable type
-					appendf(buf," |");
+					append("|");
 				} else { // decomposition reaches primitive node in which case it must have exactly one TO
 					TransferObject to = getOnlyElement(tos);
-					appendf(buf," | %s%s #%s",indent(to.getDepth()),to.getDesc(),to.getId());
+					append("| " + indent(to.getDepth()) + to.getDesc()).append("#" + to.getId());
 				}
 			}
 		}

@@ -29,8 +29,6 @@ public class TransferObject {
 		this.depth = parent == null ? 0 : parent.depth + 1;
 	}
 
-	
-	
 	public String getDesc() {
 		return desc;
 	}
