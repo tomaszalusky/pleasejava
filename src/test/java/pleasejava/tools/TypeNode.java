@@ -9,6 +9,7 @@ import java.util.Map;
 
 import pleasejava.Utils;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ImmutableMap;
 
@@ -427,8 +428,13 @@ class TypeNode {
 		public void visitVarray(Varray type, Integer level, TypeNode typeNode) {
 			appendToLastCell("varray").append("\"" + type.getName() + "\"").append("#" + typeNode.id());
 			if (transferObjectTree != null) {
-				TransferObject to = getOnlyElement(transferObjectTree.getAssociations().get(typeNode));
-				append("| " + indent(to.getDepth()) + to.getDesc()).append("#" + to.getId());
+				List<TransferObject> tos = transferObjectTree.getAssociations().get(typeNode);
+				if (tos.isEmpty()) { // part of more complex transferrable type
+					append("|");
+				} else {
+					TransferObject to = getOnlyElement(tos);
+					append("| " + indent(to.getDepth()) + to.getDesc()).append("#" + to.getId());
+				}
 			}
 			newLine().append(indent(level + 1) + Varray.ELEMENT_LABEL + " ");
 			type.getElementType().accept(this,level + 1,typeNode.getChildren().get(Varray.ELEMENT_LABEL));
@@ -437,18 +443,19 @@ class TypeNode {
 		@Override
 		public void visitNestedTable(NestedTable type, Integer level, TypeNode typeNode) {
 			appendToLastCell("nestedtable").append("\"" + type.getName() + "\"").append("#" + typeNode.id());
-//			if (transferObjectTree != null) {
-//				List<TransferObject> tos = transferObjectTree.getAssociations().get(typeNode);
-//				if (tos.isEmpty()) { // part of more complex transferrable type
-//					appendf(buf," |");
-//				} else {
-//					Preconditions.checkState(tos.size() == 2,"wrong number of associations: %s",tos.size());
-//					TransferObject toPointers = tos.get(0);
-//					TransferObject toDeletions = tos.get(1);
-//					appendf(buf," | %s%s #%s%n| %s%s #%s",indent(toPointers.getDepth()),toPointers.getDesc(),toPointers.getId(),
-//							indent(toDeletions.getDepth()),toDeletions.getDesc(),toDeletions.getId());
-//				}
-//			}
+			if (transferObjectTree != null) {
+				List<TransferObject> tos = transferObjectTree.getAssociations().get(typeNode);
+				if (tos.isEmpty()) { // part of more complex transferrable type
+					append("|");
+				} else {
+					Preconditions.checkState(tos.size() == 2,"wrong number of associations: %s",tos.size());
+					TransferObject toPointers = tos.get(0);
+					TransferObject toDeletions = tos.get(1);
+					append("| " + indent(toPointers.getDepth()) + toPointers.getDesc()).append("#" + toPointers.getId())
+					.newLine().append("").append("").append("")
+					.append("| " + indent(toDeletions.getDepth()) + toDeletions.getDesc()).append("#" + toDeletions.getId());
+				}
+			}
 			newLine().append(indent(level + 1) + NestedTable.ELEMENT_LABEL + " ");
 			type.getElementType().accept(this,level + 1,typeNode.getChildren().get(NestedTable.ELEMENT_LABEL));
 		}
@@ -456,8 +463,29 @@ class TypeNode {
 		@Override
 		public void visitIndexByTable(IndexByTable type, Integer level, TypeNode typeNode) {
 			appendToLastCell("indexbytable").append("\"" + type.getName() + "\"").append("#" + typeNode.id());
-			newLine().append(indent(level + 1) + IndexByTable.KEY_LABEL).append(type.getIndexType().toString())
-			.newLine().append(indent(level + 1) + IndexByTable.ELEMENT_LABEL + " ");
+			if (transferObjectTree != null) {
+				List<TransferObject> tos = transferObjectTree.getAssociations().get(typeNode);
+				if (tos.isEmpty()) { // part of more complex transferrable type
+					append("|");
+				} else {
+					Preconditions.checkState(tos.size() == 2,"wrong number of associations: %s",tos.size());
+					TransferObject toPointers = tos.get(0);
+					append("| " + indent(toPointers.getDepth()) + toPointers.getDesc()).append("#" + toPointers.getId());
+				}
+			}
+			newLine().append(indent(level + 1) + IndexByTable.KEY_LABEL).append(type.getIndexType().toString());
+			if (transferObjectTree != null) {
+				List<TransferObject> tos = transferObjectTree.getAssociations().get(typeNode);
+				append(""); // skipping id column
+				if (tos.isEmpty()) { // part of more complex transferrable type
+					append("|");
+				} else {
+					Preconditions.checkState(tos.size() == 2,"wrong number of associations: %s",tos.size());
+					TransferObject toIndexes = tos.get(1);
+					append("| " + indent(toIndexes.getDepth()) + toIndexes.getDesc()).append("#" + toIndexes.getId());
+				}
+			}
+			newLine().append(indent(level + 1) + IndexByTable.ELEMENT_LABEL + " ");
 			type.getElementType().accept(this,level + 1,typeNode.getChildren().get(IndexByTable.ELEMENT_LABEL));
 		}
 
