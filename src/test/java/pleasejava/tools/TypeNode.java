@@ -375,7 +375,9 @@ class TypeNode {
 		private final TransferObjectTree transferObjectTree;
 
 		/**
-		 * @param transferObjectTree 
+		 * @param transferObjectTree concrete case of transfer objects
+		 * which are associated with this type tree and will be dumped together;
+		 * null, if only type tree should be dumped
 		 */
 		ToString(TransferObjectTree transferObjectTree) {
 			this.transferObjectTree = transferObjectTree;

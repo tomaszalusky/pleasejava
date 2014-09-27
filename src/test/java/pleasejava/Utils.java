@@ -112,23 +112,44 @@ public class Utils {
 			return Strings.repeat(" ",level * TAB_SPACES);
 		}
 
+		/**
+		 * Appends new empty row in the end of table.
+		 * @return this
+		 */
 		public ToStringSupport newLine() {
 			table.add(Lists.<String>newArrayList());
 			return this;
 		}
 
-		public ToStringSupport appendToLastCell(String cell) {
+		/**
+		 * Replaces content of last cell in last row with the concatenation of old content and appendee
+		 * (i.e. doesn't change number of cells in table, only content)
+		 * @param appendee appended string
+		 * @return this
+		 */
+		public ToStringSupport appendToLastCell(String appendee) {
 			List<String> lastRow = Iterables.getLast(table);
 			int index = lastRow.size() - 1;
-			append(lastRow.remove(index) + cell);
+			append(lastRow.remove(index) + appendee);
 			return this;
 		}
 		
+		/**
+		 * Appends string as new cell at the end of last row of table.
+		 * @param cell
+		 * @return
+		 */
 		public ToStringSupport append(String cell) {
 			Iterables.getLast(table).add(cell);
 			return this;
 		}
 		
+		/**
+		 * Converts table into string. All columns are separated by single space.
+		 * Columns with zero width are ignored.
+		 * Extra whitespace is removed from right (from left are retained).
+		 * @see java.lang.Object#toString()
+		 */
 		@Override
 		public String toString() {
 			StringBuilder b = new StringBuilder();
