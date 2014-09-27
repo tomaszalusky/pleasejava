@@ -5,10 +5,12 @@ import static pleasejava.Utils.appendf;
 
 import java.sql.Array;
 import java.sql.Struct;
+import java.util.List;
 import java.util.Map;
 
 import pleasejava.Utils;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ImmutableListMultimap.Builder;
 import com.google.common.collect.ImmutableMap;
@@ -178,6 +180,9 @@ class TypeNode {
 	}
 	
 	TransferObjectTree toTransferObjectTree() {
+		if (!(type instanceof AbstractSignature)) {
+			throw new IllegalStateException("Transfer object tree can be built only for tree with Procedure or Function root type.");
+		}
 		ImmutableListMultimap.Builder<TypeNode,TransferObject> associationsBuilder = ImmutableListMultimap.builder();
 		TransferObject root = new TransferObject("/",null,this);
 		associationsBuilder.put(this,root);
@@ -189,9 +194,10 @@ class TypeNode {
 	@Override
 	public String toString() {
 		StringBuilder result = new StringBuilder();
-		type.accept(new ToString(result,null),0,this);
-		Utils.align(result);
-		return result.toString();
+		ToString visitor = new ToString(result,null);
+		type.accept(visitor,0,this);
+		//Utils.align(result);
+		return visitor.toString();
 	}
 
 	public String toString(TransferObjectTree transferObjectTree) {
@@ -204,7 +210,7 @@ class TypeNode {
 	static class AddToTransferObject implements TypeVisitorAAA<TypeNode,TransferObject,Boolean> {
 
 		private final ImmutableListMultimap.Builder<TypeNode,TransferObject> associationsBuilder;
-
+		
 		public AddToTransferObject(ImmutableListMultimap.Builder<TypeNode,TransferObject> associationsBuilder) {
 			this.associationsBuilder = associationsBuilder;
 		}
@@ -383,65 +389,97 @@ class TypeNode {
 
 		@Override
 		public void visitProcedureSignature(ProcedureSignature type, Integer level, TypeNode typeNode) {
-			appendf(buf,"procedure \"%s\" #%s", type.getName(), typeNode.id());
+			appendToLastCell("procedure").append("\"" + type.getName() + "\"").append("#" + typeNode.id());
 			if (transferObjectTree != null) {
 				TransferObject to = getOnlyElement(transferObjectTree.getAssociations().get(typeNode));
 				appendf(buf," | %s%s #%s",indent(to.getDepth()),to.getDesc(),to.getId());
 			}
 			for (Map.Entry<String,Parameter> entry : type.getParameters().entrySet()) {
 				String key = entry.getKey();
-				appendf(buf,"%n%s%s %s ", indent(level + 1), key, entry.getValue().getParameterMode().name().toLowerCase());
+				newLine().append(indent(level + 1) + key + " " + entry.getValue().getParameterMode().name().toLowerCase() + " ");
 				entry.getValue().getType().accept(this,level + 1,typeNode.getChildren().get(key));
 			}
 		}
 
 		@Override
 		public void visitFunctionSignature(FunctionSignature type, Integer level, TypeNode typeNode) {
-			appendf(buf,"function \"%s\" #%s", type.getName(), typeNode.id());
-			appendf(buf,"%n%s%s ", indent(level + 1), FunctionSignature.RETURN_LABEL);
+			appendToLastCell("function").append("\"" + type.getName() + "\"").append("#" + typeNode.id());
+			if (transferObjectTree != null) {
+				TransferObject to = getOnlyElement(transferObjectTree.getAssociations().get(typeNode));
+				appendf(buf," | %s%s #%s",indent(to.getDepth()),to.getDesc(),to.getId());
+			}
+			newLine().append(indent(level + 1) + FunctionSignature.RETURN_LABEL + " ");
 			type.getReturnType().accept(this,level + 1,typeNode.getChildren().get(FunctionSignature.RETURN_LABEL));
 			for (Map.Entry<String,Parameter> entry : type.getParameters().entrySet()) {
 				String key = entry.getKey();
-				appendf(buf,"%n%s%s %s ", indent(level + 1), key, entry.getValue().getParameterMode().name().toLowerCase());
+				newLine().append(indent(level + 1) + key + " " + entry.getValue().getParameterMode().name().toLowerCase() + " ");
 				entry.getValue().getType().accept(this,level + 1,typeNode.getChildren().get(key));
 			}
 		}
 
 		@Override
 		public void visitRecord(Record type, Integer level, TypeNode typeNode) {
-			appendf(buf,"record \"%s\" #%s", type.getName(), typeNode.id());
+			appendToLastCell("record").append("\"" + type.getName() + "\"").append("#" + typeNode.id());
+			if (transferObjectTree != null) { // record nodes never have associated TO
+				appendf(buf," |");
+			}
 			for (Map.Entry<String,Type> entry : type.getFields().entrySet()) {
 				String key = entry.getKey();
-				appendf(buf,"%n%s%s ", indent(level + 1), key);
+				newLine().append(indent(level + 1) + key + " ");
 				entry.getValue().accept(this,level + 1,typeNode.getChildren().get(key));
 			}
 		}
 
 		@Override
 		public void visitVarray(Varray type, Integer level, TypeNode typeNode) {
-			appendf(buf,"varray \"%s\" #%s", type.getName(), typeNode.id());
-			appendf(buf,"%n%s%s ", indent(level + 1), Varray.ELEMENT_LABEL);
+			appendToLastCell("varray").append("\"" + type.getName() + "\"").append("#" + typeNode.id());
+			if (transferObjectTree != null) {
+				TransferObject to = getOnlyElement(transferObjectTree.getAssociations().get(typeNode));
+				appendf(buf," | %s%s #%s",indent(to.getDepth()),to.getDesc(),to.getId());
+			}
+			newLine().append(indent(level + 1) + Varray.ELEMENT_LABEL + " ");
 			type.getElementType().accept(this,level + 1,typeNode.getChildren().get(Varray.ELEMENT_LABEL));
 		}
 
 		@Override
 		public void visitNestedTable(NestedTable type, Integer level, TypeNode typeNode) {
-			appendf(buf,"nestedtable \"%s\" #%s", type.getName(), typeNode.id());
-			appendf(buf,"%n%s%s ", indent(level + 1), NestedTable.ELEMENT_LABEL);
+			appendToLastCell("nestedtable").append("\"" + type.getName() + "\"").append("#" + typeNode.id());
+//			if (transferObjectTree != null) {
+//				List<TransferObject> tos = transferObjectTree.getAssociations().get(typeNode);
+//				if (tos.isEmpty()) { // part of more complex transferrable type
+//					appendf(buf," |");
+//				} else {
+//					Preconditions.checkState(tos.size() == 2,"wrong number of associations: %s",tos.size());
+//					TransferObject toPointers = tos.get(0);
+//					TransferObject toDeletions = tos.get(1);
+//					appendf(buf," | %s%s #%s%n| %s%s #%s",indent(toPointers.getDepth()),toPointers.getDesc(),toPointers.getId(),
+//							indent(toDeletions.getDepth()),toDeletions.getDesc(),toDeletions.getId());
+//				}
+//			}
+			newLine().append(indent(level + 1) + NestedTable.ELEMENT_LABEL + " ");
 			type.getElementType().accept(this,level + 1,typeNode.getChildren().get(NestedTable.ELEMENT_LABEL));
 		}
 
 		@Override
 		public void visitIndexByTable(IndexByTable type, Integer level, TypeNode typeNode) {
-			appendf(buf,"indexbytable \"%s\" #%s", type.getName(), typeNode.id());
-			appendf(buf,"%n%s%s %s", indent(level + 1), IndexByTable.KEY_LABEL, type.getIndexType().toString());
-			appendf(buf,"%n%s%s ", indent(level + 1), IndexByTable.ELEMENT_LABEL);
+			appendToLastCell("indexbytable").append("\"" + type.getName() + "\"").append("#" + typeNode.id());
+			newLine().append(indent(level + 1) + IndexByTable.KEY_LABEL + " ").append(type.getIndexType().toString())
+			.newLine().append(indent(level + 1) + IndexByTable.ELEMENT_LABEL + " ");
 			type.getElementType().accept(this,level + 1,typeNode.getChildren().get(IndexByTable.ELEMENT_LABEL));
 		}
 
 		@Override
 		public void visitPrimitive(PrimitiveType type, Integer level, TypeNode typeNode) {
-			appendf(buf,"\"%s\" #%s", type.getName(), typeNode.id());
+			append("\"" + type.getName() + "\"").append("#" + typeNode.id());
+			if (transferObjectTree != null) {
+				List<TransferObject> tos = transferObjectTree.getAssociations().get(typeNode);
+				if (tos.isEmpty()) { // part of more complex transferrable type
+					appendf(buf," |");
+				} else { // decomposition reaches primitive node in which case it must have exactly one TO
+					TransferObject to = getOnlyElement(tos);
+					appendf(buf," | %s%s #%s",indent(to.getDepth()),to.getDesc(),to.getId());
+				}
+			}
 		}
 		
 	}
