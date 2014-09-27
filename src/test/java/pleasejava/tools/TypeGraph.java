@@ -12,6 +12,7 @@ import org.jdom2.Element;
 import org.jdom2.input.SAXBuilder;
 
 import pleasejava.Utils;
+import pleasejava.tools.Type.ToString;
 
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableList;
@@ -124,17 +125,18 @@ public class TypeGraph {
 	public String toString() {
 		StringBuilder result = new StringBuilder();
 		Set<Type> written = Sets.<Type>newHashSet();
+		Type.ToString visitor = new Type.ToString(result,written);
 		for (Set<Type> exhaust = Sets.newLinkedHashSet(getTopologicalOrdering()); !exhaust.isEmpty(); ) {
 			Type first = Iterables.getFirst(exhaust,null);
-			first.accept(new Type.ToString(result,written),0); // write top-level node and all its children
+			first.accept(visitor,0); // write top-level node and all its children
 			for (Deque<Type> q = Lists.newLinkedList(ImmutableSet.of(first)); !q.isEmpty(); ) { // remove top-level node and transitively all its children from set of waiting nodes
 				Type t = q.pollFirst();
 				exhaust.remove(t);
 				q.addAll(children.get(t));
 			}
 		}
-		Utils.align(result);
-		return result.toString();
+		String resultstr = visitor.toString();
+		return resultstr;
 	}
 
 }
@@ -142,8 +144,6 @@ public class TypeGraph {
 /*
 
 - vypis TN spolu s TO
-	- rfct ToStringSupport
-	- migrace Type.ToString na tabulku
 	- migrace TypeNode.ToString na tabulku
 	- - Utils.align
 	- pridat konverzi na TO pro jednotlive typy

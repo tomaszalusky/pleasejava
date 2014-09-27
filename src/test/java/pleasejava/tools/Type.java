@@ -1,7 +1,6 @@
 package pleasejava.tools;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static pleasejava.Utils.appendf;
 
 import java.util.Map;
 import java.util.Map.Entry;
@@ -81,9 +80,10 @@ abstract class Type {
 	@Override
 	public String toString() {
 		StringBuilder result = new StringBuilder();
-		accept(new ToString(result,null),0);
-		Utils.align(result);
-		return result.toString();
+		ToString visitor = new ToString(result,null);
+		accept(visitor,0);
+		//Utils.align(result);
+		return visitor.toString();
 	}
 
 	private static class GetChildren implements TypeVisitorR<Map<String,Type>> {
@@ -154,7 +154,7 @@ abstract class Type {
 			}
 			boolean result = written.contains(type);
 			if (result) {
-				appendf(buf," ...");
+				appendToLastCell(" ...");
 			} else {
 				written.add(type);
 			}
@@ -163,10 +163,10 @@ abstract class Type {
 
 		@Override
 		public void visitProcedureSignature(ProcedureSignature type, Integer level) {
-			appendf(buf,"procedure \"%s\"", type.getName());
+			appendToLastCell("procedure").append("\"" + type.getName() + "\"");
 			if (!checkWritten(type)) {
 				for (Entry<String,Parameter> entry : type.getParameters().entrySet()) {
-					appendf(buf,"%n%s%s %s ", indent(level + 1), entry.getKey(), entry.getValue().getParameterMode().name().toLowerCase());
+					newLine().append(indent(level + 1) + entry.getKey() + " " + entry.getValue().getParameterMode().name().toLowerCase() + " ");
 					entry.getValue().getType().accept(this,level + 1);
 				}
 			}
@@ -174,12 +174,12 @@ abstract class Type {
 
 		@Override
 		public void visitFunctionSignature(FunctionSignature type, Integer level) {
-			appendf(buf,"function \"%s\"", type.getName());
+			appendToLastCell("function").append("\"" + type.getName() + "\"");
 			if (!checkWritten(type)) {
-				appendf(buf,"%n%s%s ", indent(level + 1), FunctionSignature.RETURN_LABEL);
+				newLine().append(indent(level + 1) + FunctionSignature.RETURN_LABEL + " ");
 				type.getReturnType().accept(this,level + 1);
 				for (Entry<String,Parameter> entry : type.getParameters().entrySet()) {
-					appendf(buf,"%n%s%s %s ", indent(level + 1), entry.getKey(), entry.getValue().getParameterMode().name().toLowerCase());
+					newLine().append(indent(level + 1) + entry.getKey() + " " + entry.getValue().getParameterMode().name().toLowerCase() + " ");
 					entry.getValue().getType().accept(this,level + 1);
 				}
 			}
@@ -187,10 +187,10 @@ abstract class Type {
 
 		@Override
 		public void visitRecord(Record type, Integer level) {
-			appendf(buf,"record \"%s\"", type.getName());
+			appendToLastCell("record").append("\"" + type.getName() + "\"");
 			if (!checkWritten(type)) {
 				for (Map.Entry<String,Type> entry : type.getFields().entrySet()) {
-					appendf(buf,"%n%s%s ", indent(level + 1), entry.getKey());
+					newLine().append(indent(level + 1) + entry.getKey() + " ");
 					entry.getValue().accept(this,level + 1);
 				}
 			}
@@ -198,36 +198,35 @@ abstract class Type {
 
 		@Override
 		public void visitVarray(Varray type, Integer level) {
-			appendf(buf,"varray \"%s\"", type.getName());
+			appendToLastCell("varray").append("\"" + type.getName() + "\"");
 			if (!checkWritten(type)) {
-				appendf(buf,"%n%s%s ", indent(level + 1), Varray.ELEMENT_LABEL);
+				newLine().append(indent(level + 1) + Varray.ELEMENT_LABEL + " ");
 				type.getElementType().accept(this,level + 1);
 			}
 		}
 
 		@Override
 		public void visitNestedTable(NestedTable type, Integer level) {
-			appendf(buf,"nestedtable \"%s\"", type.getName());
+			appendToLastCell("nestedtable").append("\"" + type.getName() + "\"");
 			if (!checkWritten(type)) {
-				appendf(buf,"%n%s%s ", indent(level + 1), NestedTable.ELEMENT_LABEL);
+				newLine().append(indent(level + 1) + NestedTable.ELEMENT_LABEL + " ");
 				type.getElementType().accept(this,level + 1);
 			}
 		}
 
 		@Override
 		public void visitIndexByTable(IndexByTable type, Integer level) {
-			appendf(buf,"indexbytable \"%s\"", type.getName());
+			appendToLastCell("indexbytable").append("\"" + type.getName() + "\"");
 			if (!checkWritten(type)) {
-				appendf(buf,"%n%s%s %s%n%s%s ", indent(level + 1), IndexByTable.KEY_LABEL,
-						type.getIndexType().toString(),
-						indent(level + 1), IndexByTable.ELEMENT_LABEL);
+				newLine().append(indent(level + 1) + IndexByTable.KEY_LABEL + " ").append(type.getIndexType().toString())
+				.newLine().append(indent(level + 1) + IndexByTable.ELEMENT_LABEL + " ");
 				type.getElementType().accept(this,level + 1);
 			}
 		}
 
 		@Override
 		public void visitPrimitive(PrimitiveType type, Integer level) {
-			appendf(buf,"\"%s\"", type.getName()); // always written regardless guard set
+			append("\"" + type.getName() + "\""); // always written regardless guard set
 		}
 		
 	}
