@@ -15,7 +15,7 @@ import pleasejava.Utils;
  * @author Tomas Zalusky
  */
 @RunWith(Parameterized.class)
-public class TypeNodeTreeTest extends AbstractTypeGraphTest {
+public class TypeNodeTreeToTransferObjectTreeTest extends AbstractTypeGraphTest {
 
 	private static boolean record = false;
 	
@@ -23,7 +23,7 @@ public class TypeNodeTreeTest extends AbstractTypeGraphTest {
 	
 	private final String expected;
 	
-	public TypeNodeTreeTest(String name) throws IOException {
+	public TypeNodeTreeToTransferObjectTreeTest(String name) throws IOException {
 		this.name = name;
 		this.expected = record ? null : readExpectedOutput(getClass(),name);
 	}
@@ -42,7 +42,8 @@ public class TypeNodeTreeTest extends AbstractTypeGraphTest {
 		TypeGraph graph = loadGraph(name);
 		List<Type> topologicalOrdering = graph.getTopologicalOrdering();
 		TypeNode rootNode = topologicalOrdering.get(0).toTypeNode(null,0);
-		String actual = rootNode.toString();
+		TransferObjectTree tot = rootNode.toTransferObjectTree();
+		String actual = rootNode.toString(tot);
 		if (record) {
 			writeExpectedOutput(getClass(),name,actual);
 		} else {

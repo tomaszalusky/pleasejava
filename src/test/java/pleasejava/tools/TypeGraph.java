@@ -142,12 +142,16 @@ public class TypeGraph {
 
 /*
 
-- vypis TN spolu s TO
-	- migrace TypeNode.ToString na tabulku
-	- - Utils.align
-	- pridat konverzi na TO pro jednotlive typy
+- test pouze na vypis TOT
+- bugfix dag1 - nevypisuje to TO
+- {ps} - simple pointer
+- podtridy TO, zohlednit jejich odlisnosti, zavest fieldy pro ulozeni dat, pripravit na jdbctransferable
+- koncept TypeTree
 - id u TO
 - AddToTO
+- javadoc vseho okolo TO
+- odstranit dokumenty v mar.
+- prejit na package-info, dokumentovat celkovou architekturu
 - vyresit globalni PLSQLConfig
 - nacist ibt a derave nst pres JDBC
 - zapracovat koncept JDBC-transferrable typu, a la ifc JdbcTransfer { convertForth(); convertBack(); } - to bude az u TO, mozna i dale

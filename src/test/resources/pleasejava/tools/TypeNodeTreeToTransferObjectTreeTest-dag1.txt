@@ -1,0 +1,78 @@
+procedure                               "main"          #        | / #id
+    pa in record                        "a"             #1       |
+        fb nestedtable                  "b"             #11      |
+            (element) record            "f"             #11e     |
+                fg record               "g"             #11e1    |
+                    fi indexbytable     "i"             #11e11   |
+                        (key)           "pls_integer"            |
+                        (element)       "varchar2(100)" #11e11e  |
+                    fh record           "h"             #11e12   |
+                        fi indexbytable "i"             #11e121  |
+                            (key)       "pls_integer"            |
+                            (element)   "varchar2(100)" #11e121e |
+                        fj              "varchar2(100)" #11e122  |
+                fi indexbytable         "i"             #11e2    |
+                    (key)               "pls_integer"            |
+                    (element)           "varchar2(100)" #11e2e   |
+        fc record                       "c"             #12      |
+            ff record                   "f"             #121     |
+                fg record               "g"             #1211    |
+                    fi indexbytable     "i"             #12111   |
+                        (key)           "pls_integer"            |
+                        (element)       "varchar2(100)" #12111e  |
+                    fh record           "h"             #12112   |
+                        fi indexbytable "i"             #121121  |
+                            (key)       "pls_integer"            |
+                            (element)   "varchar2(100)" #121121e |
+                        fj              "varchar2(100)" #121122  |
+                fi indexbytable         "i"             #1212    |
+                    (key)               "pls_integer"            |
+                    (element)           "varchar2(100)" #1212e   |
+            fg record                   "g"             #122     |
+                fi indexbytable         "i"             #1221    |
+                    (key)               "pls_integer"            |
+                    (element)           "varchar2(100)" #1221e   |
+                fh record               "h"             #1222    |
+                    fi indexbytable     "i"             #12221   |
+                        (key)           "pls_integer"            |
+                        (element)       "varchar2(100)" #12221e  |
+                    fj                  "varchar2(100)" #12222   |
+    pd in record                        "d"             #2       |
+        fc record                       "c"             #21      |
+            ff record                   "f"             #211     |
+                fg record               "g"             #2111    |
+                    fi indexbytable     "i"             #21111   |
+                        (key)           "pls_integer"            |
+                        (element)       "varchar2(100)" #21111e  |
+                    fh record           "h"             #21112   |
+                        fi indexbytable "i"             #211121  |
+                            (key)       "pls_integer"            |
+                            (element)   "varchar2(100)" #211121e |
+                        fj              "varchar2(100)" #211122  |
+                fi indexbytable         "i"             #2112    |
+                    (key)               "pls_integer"            |
+                    (element)           "varchar2(100)" #2112e   |
+            fg record                   "g"             #212     |
+                fi indexbytable         "i"             #2121    |
+                    (key)               "pls_integer"            |
+                    (element)           "varchar2(100)" #2121e   |
+                fh record               "h"             #2122    |
+                    fi indexbytable     "i"             #21221   |
+                        (key)           "pls_integer"            |
+                        (element)       "varchar2(100)" #21221e  |
+                    fj                  "varchar2(100)" #21222   |
+        fe record                       "e"             #22      |
+            fg record                   "g"             #221     |
+                fi indexbytable         "i"             #2211    |
+                    (key)               "pls_integer"            |
+                    (element)           "varchar2(100)" #2211e   |
+                fh record               "h"             #2212    |
+                    fi indexbytable     "i"             #22121   |
+                        (key)           "pls_integer"            |
+                        (element)       "varchar2(100)" #22121e  |
+                    fj                  "varchar2(100)" #22122   |
+            fh record                   "h"             #222     |
+                fi indexbytable         "i"             #2221    |
+                    (key)               "pls_integer"            |
+                    (element)           "varchar2(100)" #2221e   |
+                fj                      "varchar2(100)" #2222    |
