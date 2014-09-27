@@ -1,7 +1,10 @@
 package pleasejava;
 
+import static com.google.common.base.CharMatcher.WHITESPACE;
 import static com.google.common.collect.FluentIterable.from;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.Assert;
@@ -12,6 +15,8 @@ import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 
 /**
  * @author Tomas Zalusky
@@ -100,19 +105,65 @@ public class Utils {
 		
 		protected static final int TAB_SPACES = 4;
 		
+		protected final List<List<String>> table;
+		
 		protected final StringBuilder buf;
 		
 		public ToStringSupport(StringBuilder buf) {
 			this.buf = buf;
+			this.table = Lists.newArrayList();
+			newLine().append("");
 		}
 
 		protected static String indent(int level) {
 			return Strings.repeat(" ",level * TAB_SPACES);
 		}
 
+		public ToStringSupport newLine() {
+			table.add(Lists.<String>newArrayList());
+			return this;
+		}
+
+		public ToStringSupport appendToLastCell(String cell) {
+			List<String> lastRow = Iterables.getLast(table);
+			int index = lastRow.size() - 1;
+			append(lastRow.remove(index) + cell);
+			return this;
+		}
+		
+		public ToStringSupport append(String cell) {
+			Iterables.getLast(table).add(cell);
+			return this;
+		}
+		
 		@Override
 		public String toString() {
-			return buf.toString();
+			StringBuilder b = new StringBuilder();
+			int size = table.size();
+			List<Integer> maximums = Lists.newArrayList();
+			for (int r = 0; r < size; r++) {
+				List<String> row = table.get(r);
+				if (row.size() > maximums.size()) { // array of maximal lengths must not be shorter than current row
+					maximums.addAll(Collections.nCopies(row.size() - maximums.size(),0));
+				}
+				for (int c = 0; c < row.size(); c++) {
+					String cell = WHITESPACE.trimTrailingFrom(row.get(c));
+					maximums.set(c, Math.max(maximums.get(c), cell.length()));
+				}
+			}
+			for (int r = 0; r < size; r++) {
+				List<String> row = table.get(r);
+				StringBuilder rowBuf = new StringBuilder();
+				for (int c = 0; c < row.size(); c++) {
+					String cell = WHITESPACE.trimTrailingFrom(row.get(c));
+					int max = maximums.get(c);
+					if (max > 0) { // empty columns are ignored
+						appendf(rowBuf,"%s%s ",cell, Strings.repeat(" ",max - cell.length()));
+					}
+				}
+				appendf(b, (r == 0 ? "" : "%n") + "%s", WHITESPACE.trimTrailingFrom(rowBuf));
+			}
+			return b.toString();
 		}
 
 	}
@@ -144,7 +195,7 @@ public class Utils {
 					f = q2 + 1;
 				}
 				int h1 = input.indexOf('#',f);
-				if (h1 == -1) {
+				if (h1 == -1) { // id is not present for keys of index-by table
 					result[2] = "";
 				} else {
 					result[2] = CharMatcher.WHITESPACE.trimTrailingFrom(input.substring(h1));
