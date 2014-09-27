@@ -1,7 +1,6 @@
 package pleasejava.tools;
 
 import static com.google.common.collect.Iterables.getOnlyElement;
-import static pleasejava.Utils.appendf;
 
 import java.sql.Array;
 import java.sql.Struct;
@@ -10,11 +9,8 @@ import java.util.Map;
 
 import pleasejava.Utils;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableListMultimap;
-import com.google.common.collect.ImmutableListMultimap.Builder;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Iterables;
 
 /**
  * Represents one node in type tree.
@@ -193,19 +189,17 @@ class TypeNode {
 	
 	@Override
 	public String toString() {
-		StringBuilder result = new StringBuilder();
-		ToString visitor = new ToString(result,null);
+		ToString visitor = new ToString(null);
 		type.accept(visitor,0,this);
-		//Utils.align(result);
-		return visitor.toString();
+		String result = visitor.toString();
+		return result;
 	}
 
 	public String toString(TransferObjectTree transferObjectTree) {
-		StringBuilder result = new StringBuilder();
-		ToString visitor = new ToString(result,transferObjectTree);
+		ToString visitor = new ToString(transferObjectTree);
 		type.accept(visitor,0,this);
-		//Utils.align(result);
-		return visitor.toString();
+		String result = visitor.toString();
+		return result;
 	}
 
 	static class AddToTransferObject implements TypeVisitorAAA<TypeNode,TransferObject,Boolean> {
@@ -380,11 +374,9 @@ class TypeNode {
 		private final TransferObjectTree transferObjectTree;
 
 		/**
-		 * @param buf buffer for result string
 		 * @param transferObjectTree 
 		 */
-		ToString(StringBuilder buf, TransferObjectTree transferObjectTree) {
-			super(buf);
+		ToString(TransferObjectTree transferObjectTree) {
 			this.transferObjectTree = transferObjectTree;
 		}
 

@@ -123,9 +123,8 @@ public class TypeGraph {
 
 	@Override
 	public String toString() {
-		StringBuilder result = new StringBuilder();
 		Set<Type> written = Sets.<Type>newHashSet();
-		Type.ToString visitor = new Type.ToString(result,written);
+		Type.ToString visitor = new Type.ToString(written);
 		for (Set<Type> exhaust = Sets.newLinkedHashSet(getTopologicalOrdering()); !exhaust.isEmpty(); ) {
 			Type first = Iterables.getFirst(exhaust,null);
 			first.accept(visitor,0); // write top-level node and all its children
@@ -135,8 +134,8 @@ public class TypeGraph {
 				q.addAll(children.get(t));
 			}
 		}
-		String resultstr = visitor.toString();
-		return resultstr;
+		String result = visitor.toString();
+		return result;
 	}
 
 }

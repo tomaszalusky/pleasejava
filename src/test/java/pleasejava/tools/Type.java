@@ -79,11 +79,10 @@ abstract class Type {
 
 	@Override
 	public String toString() {
-		StringBuilder result = new StringBuilder();
-		ToString visitor = new ToString(result,null);
+		ToString visitor = new ToString(null);
 		accept(visitor,0);
-		//Utils.align(result);
-		return visitor.toString();
+		String result = visitor.toString();
+		return result;
 	}
 
 	private static class GetChildren implements TypeVisitorR<Map<String,Type>> {
@@ -137,14 +136,12 @@ abstract class Type {
 		private final Set<Type> written;
 		
 		/**
-		 * @param buf buffer for result string
 		 * @param written guard set of type which have already been written in full format.
 		 * Ensures only first occurence of each type is listed in full format,
 		 * remaining occurences are listed only in concise format.
 		 * Can be <code>null</code> for always using full format (guard disabled).
 		 */
-		ToString(StringBuilder buf, Set<Type> written) {
-			super(buf);
+		ToString(Set<Type> written) {
 			this.written = written;
 		}
 

@@ -1,7 +1,6 @@
 package pleasejava;
 
 import static com.google.common.base.CharMatcher.WHITESPACE;
-import static com.google.common.collect.FluentIterable.from;
 
 import java.util.Collections;
 import java.util.List;
@@ -10,10 +9,7 @@ import java.util.Map;
 import org.junit.Assert;
 import org.junit.ComparisonFailure;
 
-import com.google.common.base.CharMatcher;
 import com.google.common.base.Function;
-import com.google.common.base.Joiner;
-import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -96,9 +92,9 @@ public class Utils {
 	}
 
 	/**
-	 * Helper ancestor class for toString method of hierarchical structures.
-	 * Supports indendation and resulting buffer.
-	 * (I consider adding more logic premature as currently there are only 2 ToString implementations.)
+	 * Helper ancestor class for toString method
+	 * where hierarchical structures are formatted into table-like format.
+	 * Offers fluent API facilitating addition of strings into rows and columns.
 	 * @author Tomas Zalusky
 	 */
 	public static abstract class ToStringSupport {
@@ -107,10 +103,7 @@ public class Utils {
 		
 		protected final List<List<String>> table;
 		
-		protected final StringBuilder buf;
-		
-		public ToStringSupport(StringBuilder buf) {
-			this.buf = buf;
+		public ToStringSupport() {
 			this.table = Lists.newArrayList();
 			newLine().append("");
 		}
@@ -166,59 +159,6 @@ public class Utils {
 			return b.toString();
 		}
 
-	}
-	
-	/**
-	 * Formats content of given buffer to table columns
-	 * based on occurence of certain characters in text:
-	 * <pre>
-	 * first column "second column in quotes" #third column after hash
-	 * </pre>
-	 * @param buf
-	 */
-	public static void align(StringBuilder buf) {
-		final int COLS = 3;
-		final Function<String,String[]> lineSplitter = new Function<String,String[]>() {
-			public String[] apply(String input) {
-				String[] result = new String[COLS];
-				int f = 0;
-				int q1 = input.indexOf('"',f);
-				if (q1 == -1) {
-					result[0] = result[1] = "";
-				} else {
-					result[0] = CharMatcher.WHITESPACE.trimTrailingFrom(input.substring(0,q1));
-					int q2 = input.indexOf('"',q1 + 1);
-					if (input.regionMatches(q2, "\" ...", 0, 5)) { // ellipsis is treated as part of name
-						q2 += 4;
-					}
-					result[1] = CharMatcher.WHITESPACE.trimTrailingFrom(input.substring(q1,q2 + 1));
-					f = q2 + 1;
-				}
-				int h1 = input.indexOf('#',f);
-				if (h1 == -1) { // id is not present for keys of index-by table
-					result[2] = "";
-				} else {
-					result[2] = CharMatcher.WHITESPACE.trimTrailingFrom(input.substring(h1));
-				}
-				return result;
-			}
-		};
-		final int[] maximums = new int[COLS];
-		Iterable<String> lines = Splitter.onPattern("\\r?\\n").split(buf);
-		for (String line : lines) {
-			String[] parts = lineSplitter.apply(line);
-			for (int i = 0; i < COLS; i++) maximums[i] = Math.max(maximums[i], parts[i].length());
-		}
-		StringBuilder result = Joiner.on(LS).appendTo(new StringBuilder(), from(lines).transform(new Function<String,String>() {
-			public String apply(String line) {
-				StringBuilder result = new StringBuilder();
-				String[] parts = lineSplitter.apply(line);
-				for (int i = 0; i < COLS; i++) appendf(result,"%s%s ",parts[i], Strings.repeat(" ",maximums[i] - parts[i].length()));
-				return CharMatcher.WHITESPACE.trimTrailingFrom(result).toString();
-			}
-		}));
-		buf.setLength(0);
-		buf.append(result);
 	}
 	
 }
