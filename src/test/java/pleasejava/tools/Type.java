@@ -218,7 +218,7 @@ abstract class Type {
 		public void visitIndexByTable(IndexByTable type, Integer level) {
 			appendToLastCell("indexbytable").append("\"" + type.getName() + "\"");
 			if (!checkWritten(type)) {
-				newLine().append(indent(level + 1) + IndexByTable.KEY_LABEL + " ").append(type.getIndexType().toString())
+				newLine().append(indent(level + 1) + IndexByTable.KEY_LABEL).append(type.getIndexType().toString())
 				.newLine().append(indent(level + 1) + IndexByTable.ELEMENT_LABEL + " ");
 				type.getElementType().accept(this,level + 1);
 			}

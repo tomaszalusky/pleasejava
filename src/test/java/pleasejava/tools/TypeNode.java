@@ -463,7 +463,7 @@ class TypeNode {
 		@Override
 		public void visitIndexByTable(IndexByTable type, Integer level, TypeNode typeNode) {
 			appendToLastCell("indexbytable").append("\"" + type.getName() + "\"").append("#" + typeNode.id());
-			newLine().append(indent(level + 1) + IndexByTable.KEY_LABEL + " ").append(type.getIndexType().toString())
+			newLine().append(indent(level + 1) + IndexByTable.KEY_LABEL).append(type.getIndexType().toString())
 			.newLine().append(indent(level + 1) + IndexByTable.ELEMENT_LABEL + " ");
 			type.getElementType().accept(this,level + 1,typeNode.getChildren().get(IndexByTable.ELEMENT_LABEL));
 		}
