@@ -275,7 +275,7 @@ class TypeNode {
 		public void visitVarray(Varray type, TypeNode typeNode, TransferObject parent, Boolean inCollection) {
 			if (type.isJdbcTransferrable()) {
 				if (inCollection) {
-					TransferObject child = new TransferObject("{p}",parent,typeNode);
+					TransferObject child = new Pointers(parent,typeNode,false);
 					associationsBuilder.put(typeNode, child);
 					parent.addChild(child);
 					TypeNode childTypeNode = typeNode.getChildren().get(Varray.ELEMENT_LABEL);
@@ -288,7 +288,7 @@ class TypeNode {
 					parent.addChild(child);
 				}
 			} else {
-				TransferObject pointers = new TransferObject(inCollection ? "{p}" : "{sp}",parent,typeNode);
+				TransferObject pointers = new Pointers(parent,typeNode,!inCollection);
 				associationsBuilder.put(typeNode, pointers);
 				parent.addChild(pointers);
 				TypeNode childTypeNode = typeNode.getChildren().get(Varray.ELEMENT_LABEL);
@@ -300,7 +300,7 @@ class TypeNode {
 		public void visitNestedTable(NestedTable type, TypeNode typeNode, TransferObject parent, Boolean inCollection) {
 			if (type.isJdbcTransferrable()) {
 				if (inCollection) { // TODO deletion
-					TransferObject child = new TransferObject("{p}",parent,typeNode);
+					TransferObject child = new Pointers(parent,typeNode,false);
 					associationsBuilder.put(typeNode, child);
 					parent.addChild(child);
 					TypeNode childTypeNode = typeNode.getChildren().get(NestedTable.ELEMENT_LABEL);
@@ -313,7 +313,7 @@ class TypeNode {
 					parent.addChild(child);
 				}
 			} else {
-				TransferObject pointers = new TransferObject(inCollection ? "{p}" : "{sp}",parent,typeNode);
+				TransferObject pointers = new Pointers(parent,typeNode,!inCollection);
 				associationsBuilder.put(typeNode, pointers);
 				parent.addChild(pointers);
 				TransferObject deletions = new TransferObject("{d}",pointers,typeNode);
@@ -328,7 +328,7 @@ class TypeNode {
 		public void visitIndexByTable(IndexByTable type, TypeNode typeNode, TransferObject parent, Boolean inCollection) {
 			if (type.isJdbcTransferrable()) {
 				if (inCollection) { // TODO indexes
-					TransferObject child = new TransferObject("{p}",parent,typeNode);
+					TransferObject child = new Pointers(parent,typeNode,false);
 					associationsBuilder.put(typeNode, child);
 					parent.addChild(child);
 					TypeNode childTypeNode = typeNode.getChildren().get(IndexByTable.ELEMENT_LABEL);
@@ -341,7 +341,7 @@ class TypeNode {
 					parent.addChild(child);
 				}
 			} else {
-				TransferObject pointers = new TransferObject(inCollection ? "{p}" : "{sp}",parent,typeNode);
+				TransferObject pointers = new Pointers(parent,typeNode,!inCollection);
 				associationsBuilder.put(typeNode, pointers);
 				parent.addChild(pointers);
 				TransferObject indexes = new TransferObject("{i:" + type.getIndexType().name + "}",pointers,typeNode);
