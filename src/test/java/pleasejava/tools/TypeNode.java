@@ -181,7 +181,7 @@ class TypeNode {
 			throw new IllegalStateException("Transfer object tree can be built only for tree with Procedure or Function root type.");
 		}
 		ImmutableListMultimap.Builder<TypeNode,TransferObject> associationsBuilder = ImmutableListMultimap.builder();
-		TransferObject root = new TransferObject("/",null,this);
+		TransferObject root = new RootTransferObject(this);
 		associationsBuilder.put(this,root);
 		type.accept(new AddToTransferObject(associationsBuilder),this,root,false);
 		TransferObjectTree result = new TransferObjectTree(this, root, associationsBuilder.build());
