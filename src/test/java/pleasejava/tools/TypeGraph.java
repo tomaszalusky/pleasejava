@@ -142,7 +142,6 @@ public class TypeGraph {
 
 /*
 
-- {ps} - simple pointer
 - podtridy TO, zohlednit jejich odlisnosti, zavest fieldy pro ulozeni dat, pripravit na jdbctransferable
 - koncept TypeTree
 - id u TO

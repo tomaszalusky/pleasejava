@@ -288,7 +288,7 @@ class TypeNode {
 					parent.addChild(child);
 				}
 			} else {
-				TransferObject pointers = new TransferObject("{p}",parent,typeNode);
+				TransferObject pointers = new TransferObject(inCollection ? "{p}" : "{sp}",parent,typeNode);
 				associationsBuilder.put(typeNode, pointers);
 				parent.addChild(pointers);
 				TypeNode childTypeNode = typeNode.getChildren().get(Varray.ELEMENT_LABEL);
@@ -313,7 +313,7 @@ class TypeNode {
 					parent.addChild(child);
 				}
 			} else {
-				TransferObject pointers = new TransferObject("{p}",parent,typeNode);
+				TransferObject pointers = new TransferObject(inCollection ? "{p}" : "{sp}",parent,typeNode);
 				associationsBuilder.put(typeNode, pointers);
 				parent.addChild(pointers);
 				TransferObject deletions = new TransferObject("{d}",pointers,typeNode);
@@ -341,7 +341,7 @@ class TypeNode {
 					parent.addChild(child);
 				}
 			} else {
-				TransferObject pointers = new TransferObject("{p}",parent,typeNode);
+				TransferObject pointers = new TransferObject(inCollection ? "{p}" : "{sp}",parent,typeNode);
 				associationsBuilder.put(typeNode, pointers);
 				parent.addChild(pointers);
 				TransferObject indexes = new TransferObject("{i:" + type.getIndexType().name + "}",pointers,typeNode);
