@@ -15,6 +15,7 @@ import org.junit.runners.Suite.SuiteClasses;
 		TypeGraphLoadTest.class,
 		TypeGraphTopologicalOrderingTest.class,
 		TypeNodeTreeTest.class,
+		TransferObjectTreeTest.class,
 		TypeNodeTreeToTransferObjectTreeTest.class
 })
 public class AllTests {

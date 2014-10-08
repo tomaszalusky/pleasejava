@@ -142,7 +142,6 @@ public class TypeGraph {
 
 /*
 
-- test pouze na vypis TOT
 - bugfix dag1 - nevypisuje to TO
 - {ps} - simple pointer
 - podtridy TO, zohlednit jejich odlisnosti, zavest fieldy pro ulozeni dat, pripravit na jdbctransferable
