@@ -142,7 +142,6 @@ public class TypeGraph {
 
 /*
 
-- bugfix dag1 - nevypisuje to TO
 - {ps} - simple pointer
 - podtridy TO, zohlednit jejich odlisnosti, zavest fieldy pro ulozeni dat, pripravit na jdbctransferable
 - koncept TypeTree

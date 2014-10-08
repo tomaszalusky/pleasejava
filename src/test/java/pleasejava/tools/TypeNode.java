@@ -416,8 +416,14 @@ class TypeNode {
 		@Override
 		public void visitRecord(Record type, Integer level, TypeNode typeNode) {
 			appendToLastCell("record").append("\"" + type.getName() + "\"").append("#" + typeNode.id());
-			if (transferObjectTree != null) { // record nodes never have associated TO
-				append("|");
+			if (transferObjectTree != null) {
+				List<TransferObject> tos = transferObjectTree.getAssociations().get(typeNode);
+				if (tos.isEmpty()) { // part of more complex transferrable type
+					append("|");
+				} else { // JDBC-transferrable record needs TO, other records nodes never have associated TO due to decomposition
+					TransferObject to = getOnlyElement(tos);
+					append("| " + indent(to.getDepth()) + to.getDesc()).append("#" + to.getId());
+				}
 			}
 			for (Map.Entry<String,Type> entry : type.getFields().entrySet()) {
 				String key = entry.getKey();
