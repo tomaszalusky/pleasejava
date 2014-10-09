@@ -279,11 +279,11 @@ class TypeNode {
 					associationsBuilder.put(typeNode, child);
 					parent.addChild(child);
 					TypeNode childTypeNode = typeNode.getChildren().get(Varray.ELEMENT_LABEL);
-					TransferObject grandchild = new TransferObject(type.getName(),child,childTypeNode);
+					TransferObject grandchild = new JdbcTransferrableCollection(type, child, childTypeNode);
 					associationsBuilder.put(childTypeNode, grandchild);
 					child.addChild(grandchild);
 				} else {
-					TransferObject child = new TransferObject(type.getName(),parent,typeNode);
+					TransferObject child = new JdbcTransferrableCollection(type, parent, typeNode);
 					associationsBuilder.put(typeNode, child);
 					parent.addChild(child);
 				}
@@ -304,11 +304,11 @@ class TypeNode {
 					associationsBuilder.put(typeNode, child);
 					parent.addChild(child);
 					TypeNode childTypeNode = typeNode.getChildren().get(NestedTable.ELEMENT_LABEL);
-					TransferObject grandchild = new TransferObject(type.getName(),child,childTypeNode);
+					TransferObject grandchild = new JdbcTransferrableCollection(type, child, childTypeNode);
 					associationsBuilder.put(childTypeNode, grandchild);
 					child.addChild(grandchild);
 				} else {
-					TransferObject child = new TransferObject(type.getName(),parent,typeNode);
+					TransferObject child = new JdbcTransferrableCollection(type, parent, typeNode);
 					associationsBuilder.put(typeNode, child);
 					parent.addChild(child);
 				}
@@ -332,11 +332,11 @@ class TypeNode {
 					associationsBuilder.put(typeNode, child);
 					parent.addChild(child);
 					TypeNode childTypeNode = typeNode.getChildren().get(IndexByTable.ELEMENT_LABEL);
-					TransferObject grandchild = new TransferObject(type.getName(),child,childTypeNode);
+					TransferObject grandchild = new JdbcTransferrableCollection(type, child, childTypeNode);
 					associationsBuilder.put(childTypeNode, grandchild);
 					child.addChild(grandchild);
 				} else {
-					TransferObject child = new TransferObject(type.getName(),parent,typeNode);
+					TransferObject child = new JdbcTransferrableCollection(type, parent, typeNode);
 					associationsBuilder.put(typeNode, child);
 					parent.addChild(child);
 				}

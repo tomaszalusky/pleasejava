@@ -150,7 +150,7 @@ public class TypeGraph {
 - odstranit dokumenty v mar.
 - prejit na package-info, dokumentovat celkovou architekturu
 - vyresit globalni PLSQLConfig
-- nacist ibt a derave nst pres JDBC
+- nacist ibt a derave nst pres JDBC, zrevidovat tvorbu TO u jdbct kolekci
 - zapracovat koncept JDBC-transferrable typu, a la ifc JdbcTransfer { convertForth(); convertBack(); } - to bude az u TO, mozna i dale
 - overit funkcnost pro dosavadni testcasy
 - overit funkcnost pro nove jdbct typy
