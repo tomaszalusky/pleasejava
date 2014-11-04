@@ -142,7 +142,7 @@ public class TypeGraph {
 
 /*
 
-- podtridy TO, zohlednit jejich odlisnosti, zavest fieldy pro ulozeni dat, pripravit na jdbctransferable
+- podtridy TO, zohlednit jejich odlisnosti, zavest fieldy pro ulozeni dat, pripravit na jdbctransferrable
 - koncept TypeTree
 - id u TO
 - AddToTO
