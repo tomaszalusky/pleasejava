@@ -323,7 +323,7 @@ class TypeNode {
 				TransferObject pointers = new Pointers(parent,typeNode,!inCollection);
 				associationsBuilder.put(typeNode, pointers);
 				parent.addChild(pointers);
-				TransferObject deletions = new TransferObject("{d}",pointers,typeNode);
+				TransferObject deletions = new Deletions(pointers,typeNode);
 				associationsBuilder.put(typeNode, deletions);
 				pointers.addChild(deletions);
 				TypeNode childTypeNode = typeNode.getChildren().get(NestedTable.ELEMENT_LABEL);
