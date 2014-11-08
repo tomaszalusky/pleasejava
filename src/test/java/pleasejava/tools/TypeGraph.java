@@ -121,6 +121,12 @@ public class TypeGraph {
 		return result;
 	}
 
+	TypeNodeTree toTypeNodeTree(AbstractSignature rootType) {
+		TypeNode rootNode = rootType.toTypeNode(null,0);
+		TypeNodeTree result = new TypeNodeTree(rootNode);
+		return result;
+	}
+	
 	@Override
 	public String toString() {
 		Set<Type> written = Sets.<Type>newHashSet();
@@ -142,7 +148,6 @@ public class TypeGraph {
 
 /*
 
-- koncept TypeTree
 - id u TO
 - AddToTO
 - javadoc vseho okolo TO

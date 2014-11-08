@@ -41,9 +41,10 @@ public class TypeNodeTreeToTransferObjectTreeTest extends AbstractTypeGraphTest 
 	public void test() throws IOException {
 		TypeGraph graph = loadGraph(name);
 		List<Type> topologicalOrdering = graph.getTopologicalOrdering();
-		TypeNode rootNode = topologicalOrdering.get(0).toTypeNode(null,0);
-		TransferObjectTree tot = rootNode.toTransferObjectTree();
-		String actual = rootNode.toString(tot);
+		AbstractSignature rootType = (AbstractSignature)topologicalOrdering.get(0);
+		TypeNodeTree tnt = graph.toTypeNodeTree(rootType);
+		TransferObjectTree tot = tnt.toTransferObjectTree();
+		String actual = tnt.toString(tot);
 		if (record) {
 			writeExpectedOutput(getClass(),name,actual);
 		} else {
