@@ -19,7 +19,7 @@ public class JdbcTransferrableCollection extends TransferObject {
 	 * @param typeNode
 	 */
 	public JdbcTransferrableCollection(Type type, TransferObject parent, TypeNode typeNode) {
-		super(type.getName(), parent, typeNode);
+		super(parent, typeNode);
 		this.type = type;
 	}
 	

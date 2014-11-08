@@ -13,8 +13,8 @@ public class Pointers extends TransferObject {
 
 	private final boolean simple;
 	
-	public Pointers(TransferObject parent, TypeNode typeNode, boolean simple) {
-		super(simple ? "{sp}" : "{p}", parent, typeNode);
+	public Pointers(boolean simple, TransferObject parent, TypeNode typeNode) {
+		super(parent, typeNode);
 		this.simple = simple;
 	}
 	

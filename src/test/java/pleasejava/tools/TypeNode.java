@@ -282,7 +282,7 @@ class TypeNode {
 		public void visitVarray(Varray type, TypeNode typeNode, TransferObject parent, Boolean inCollection) {
 			if (type.isJdbcTransferrable()) {
 				if (inCollection) {
-					TransferObject child = new Pointers(parent,typeNode,false);
+					TransferObject child = new Pointers(false,parent,typeNode);
 					associationsBuilder.put(typeNode, child);
 					parent.addChild(child);
 					TypeNode childTypeNode = typeNode.getChildren().get(Varray.ELEMENT_LABEL);
@@ -295,7 +295,7 @@ class TypeNode {
 					parent.addChild(child);
 				}
 			} else {
-				TransferObject pointers = new Pointers(parent,typeNode,!inCollection);
+				TransferObject pointers = new Pointers(!inCollection,parent,typeNode);
 				associationsBuilder.put(typeNode, pointers);
 				parent.addChild(pointers);
 				TypeNode childTypeNode = typeNode.getChildren().get(Varray.ELEMENT_LABEL);
@@ -307,7 +307,7 @@ class TypeNode {
 		public void visitNestedTable(NestedTable type, TypeNode typeNode, TransferObject parent, Boolean inCollection) {
 			if (type.isJdbcTransferrable()) {
 				if (inCollection) { // TODO deletion
-					TransferObject child = new Pointers(parent,typeNode,false);
+					TransferObject child = new Pointers(false,parent,typeNode);
 					associationsBuilder.put(typeNode, child);
 					parent.addChild(child);
 					TypeNode childTypeNode = typeNode.getChildren().get(NestedTable.ELEMENT_LABEL);
@@ -320,7 +320,7 @@ class TypeNode {
 					parent.addChild(child);
 				}
 			} else {
-				TransferObject pointers = new Pointers(parent,typeNode,!inCollection);
+				TransferObject pointers = new Pointers(!inCollection,parent,typeNode);
 				associationsBuilder.put(typeNode, pointers);
 				parent.addChild(pointers);
 				TransferObject deletions = new Deletions(pointers,typeNode);
@@ -335,7 +335,7 @@ class TypeNode {
 		public void visitIndexByTable(IndexByTable type, TypeNode typeNode, TransferObject parent, Boolean inCollection) {
 			if (type.isJdbcTransferrable()) {
 				if (inCollection) { // TODO indexes
-					TransferObject child = new Pointers(parent,typeNode,false);
+					TransferObject child = new Pointers(false,parent,typeNode);
 					associationsBuilder.put(typeNode, child);
 					parent.addChild(child);
 					TypeNode childTypeNode = typeNode.getChildren().get(IndexByTable.ELEMENT_LABEL);
@@ -348,7 +348,7 @@ class TypeNode {
 					parent.addChild(child);
 				}
 			} else {
-				TransferObject pointers = new Pointers(parent,typeNode,!inCollection);
+				TransferObject pointers = new Pointers(!inCollection,parent,typeNode);
 				associationsBuilder.put(typeNode, pointers);
 				parent.addChild(pointers);
 				TransferObject indexes = new Indexes(type.getIndexType(), pointers, typeNode);
@@ -395,7 +395,7 @@ class TypeNode {
 			appendToLastCell("procedure").append("\"" + type.getName() + "\"").append("#" + typeNode.id());
 			if (transferObjectTree != null) {
 				TransferObject to = getOnlyElement(transferObjectTree.getAssociations().get(typeNode));
-				append("| " + indent(to.getDepth()) + to.getDesc()).append("#" + to.getId());
+				append("| " + indent(to.getDepth()) + to.toStringDescription()).append("#" + to.getId());
 			}
 			for (Map.Entry<String,Parameter> entry : type.getParameters().entrySet()) {
 				String key = entry.getKey();
@@ -409,7 +409,7 @@ class TypeNode {
 			appendToLastCell("function").append("\"" + type.getName() + "\"").append("#" + typeNode.id());
 			if (transferObjectTree != null) {
 				TransferObject to = getOnlyElement(transferObjectTree.getAssociations().get(typeNode));
-				append("| " + indent(to.getDepth()) + to.getDesc()).append("#" + to.getId());
+				append("| " + indent(to.getDepth()) + to.toStringDescription()).append("#" + to.getId());
 			}
 			newLine().append(indent(level + 1) + FunctionSignature.RETURN_LABEL + " ");
 			type.getReturnType().accept(this,level + 1,typeNode.getChildren().get(FunctionSignature.RETURN_LABEL));
@@ -429,7 +429,7 @@ class TypeNode {
 					append("|");
 				} else { // JDBC-transferrable record needs TO, other records nodes never have associated TO due to decomposition
 					TransferObject to = getOnlyElement(tos);
-					append("| " + indent(to.getDepth()) + to.getDesc()).append("#" + to.getId());
+					append("| " + indent(to.getDepth()) + to.toStringDescription()).append("#" + to.getId());
 				}
 			}
 			for (Map.Entry<String,Type> entry : type.getFields().entrySet()) {
@@ -448,7 +448,7 @@ class TypeNode {
 					append("|");
 				} else {
 					TransferObject to = getOnlyElement(tos);
-					append("| " + indent(to.getDepth()) + to.getDesc()).append("#" + to.getId());
+					append("| " + indent(to.getDepth()) + to.toStringDescription()).append("#" + to.getId());
 				}
 			}
 			newLine().append(indent(level + 1) + Varray.ELEMENT_LABEL + " ");
@@ -466,9 +466,9 @@ class TypeNode {
 					Preconditions.checkState(tos.size() == 2,"wrong number of associations: %s",tos.size());
 					TransferObject toPointers = tos.get(0);
 					TransferObject toDeletions = tos.get(1);
-					append("| " + indent(toPointers.getDepth()) + toPointers.getDesc()).append("#" + toPointers.getId())
+					append("| " + indent(toPointers.getDepth()) + toPointers.toStringDescription()).append("#" + toPointers.getId())
 					.newLine().append("").append("").append("")
-					.append("| " + indent(toDeletions.getDepth()) + toDeletions.getDesc()).append("#" + toDeletions.getId());
+					.append("| " + indent(toDeletions.getDepth()) + toDeletions.toStringDescription()).append("#" + toDeletions.getId());
 				}
 			}
 			newLine().append(indent(level + 1) + NestedTable.ELEMENT_LABEL + " ");
@@ -485,7 +485,7 @@ class TypeNode {
 				} else {
 					Preconditions.checkState(tos.size() == 2,"wrong number of associations: %s",tos.size());
 					TransferObject toPointers = tos.get(0);
-					append("| " + indent(toPointers.getDepth()) + toPointers.getDesc()).append("#" + toPointers.getId());
+					append("| " + indent(toPointers.getDepth()) + toPointers.toStringDescription()).append("#" + toPointers.getId());
 				}
 			}
 			newLine().append(indent(level + 1) + IndexByTable.KEY_LABEL).append(type.getIndexType().toString());
@@ -497,7 +497,7 @@ class TypeNode {
 				} else {
 					Preconditions.checkState(tos.size() == 2,"wrong number of associations: %s",tos.size());
 					TransferObject toIndexes = tos.get(1);
-					append("| " + indent(toIndexes.getDepth()) + toIndexes.getDesc()).append("#" + toIndexes.getId());
+					append("| " + indent(toIndexes.getDepth()) + toIndexes.toStringDescription()).append("#" + toIndexes.getId());
 				}
 			}
 			newLine().append(indent(level + 1) + IndexByTable.ELEMENT_LABEL + " ");
@@ -513,7 +513,7 @@ class TypeNode {
 					append("|");
 				} else { // decomposition reaches primitive node in which case it must have exactly one TO
 					TransferObject to = getOnlyElement(tos);
-					append("| " + indent(to.getDepth()) + to.getDesc()).append("#" + to.getId());
+					append("| " + indent(to.getDepth()) + to.toStringDescription()).append("#" + to.getId());
 				}
 			}
 		}

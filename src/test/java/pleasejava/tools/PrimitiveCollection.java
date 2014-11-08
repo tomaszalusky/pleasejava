@@ -14,7 +14,7 @@ public class PrimitiveCollection extends TransferObject {
 	private final List<Object> data = Lists.newArrayList();  // elements of type which is compatible with type
 
 	public PrimitiveCollection(PrimitiveType type, TransferObject parent, TypeNode typeNode) {
-		super("{" + type.name + "}", parent, typeNode);
+		super(parent, typeNode);
 		this.type = type;
 	}
 

@@ -12,8 +12,6 @@ import com.google.common.collect.Lists;
  */
 public abstract class TransferObject {
 
-	private String desc; // TODO some string characteristics, only temporary, will be replaced by subclass of TO and another data 
-	
 	private final TransferObject parent;
 	
 	private final List<TransferObject> children = Lists.newArrayList(); // mutable
@@ -22,15 +20,10 @@ public abstract class TransferObject {
 
 	private final TypeNode typeNode;
 	
-	protected TransferObject(String desc, TransferObject parent, TypeNode typeNode) {
-		this.desc = desc;
+	protected TransferObject(TransferObject parent, TypeNode typeNode) {
 		this.parent = parent;
 		this.typeNode = typeNode;
 		this.depth = parent == null ? 0 : parent.depth + 1;
-	}
-
-	public String getDesc() {
-		return desc;
 	}
 
 	public int getDepth() {
