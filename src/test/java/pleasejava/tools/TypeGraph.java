@@ -116,7 +116,7 @@ public class TypeGraph {
 		return topologicalOrdering;
 	}
 	
-	Type findType(Class<? extends Type> typeClass, String typeName) {
+	Type findType(Class<? extends Type> typeClass, String typeName) { // TODO remove (dead code) or utilize?
 		Type result = allTypesIndex.get(typeClass,typeName);
 		return result;
 	}
