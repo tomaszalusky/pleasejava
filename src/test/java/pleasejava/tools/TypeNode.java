@@ -203,6 +203,13 @@ class TypeNode {
 		return result;
 	}
 
+	/**
+	 * Ensures adding appropriate transfer object to type node.
+	 * First generic argument is type node of visited {@link Type}. The visit... methods generate transfer objects for this type node.
+	 * Second generic argument is parent in transfer object tree under which transfer objects are added.
+	 * Third argument is a flag denoting descend into collection structure, which results into generating vector rather than scalar structures.
+	 * @author Tomas Zalusky
+	 */
 	static class AddToTransferObject implements TypeVisitorAAA<TypeNode,TransferObject,Boolean> {
 
 		private final ImmutableListMultimap.Builder<TypeNode,TransferObject> associationsBuilder;
@@ -344,7 +351,7 @@ class TypeNode {
 				TransferObject pointers = new Pointers(parent,typeNode,!inCollection);
 				associationsBuilder.put(typeNode, pointers);
 				parent.addChild(pointers);
-				TransferObject indexes = new TransferObject("{i:" + type.getIndexType().name + "}",pointers,typeNode);
+				TransferObject indexes = new Indexes(type.getIndexType(), pointers, typeNode);
 				associationsBuilder.put(typeNode, indexes);
 				pointers.addChild(indexes);
 				TypeNode childTypeNode = typeNode.getChildren().get(IndexByTable.ELEMENT_LABEL);
