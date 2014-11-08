@@ -11,7 +11,7 @@ public class PrimitiveScalar extends TransferObject {
 	private Object data;  // runtime type is compatible with type
 
 	public PrimitiveScalar(PrimitiveType type, TransferObject parent, TypeNode typeNode) {
-		super(parent, typeNode);
+		super(parent, typeNode, typeNode.id());
 		this.type = type;
 	}
 	

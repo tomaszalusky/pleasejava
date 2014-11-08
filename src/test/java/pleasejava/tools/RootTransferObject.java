@@ -6,7 +6,7 @@ package pleasejava.tools;
 public class RootTransferObject extends TransferObject {
 
 	public RootTransferObject(TypeNode typeNode) {
-		super(null,typeNode);
+		super(null, typeNode, typeNode.id());
 	}
 	
 	@Override

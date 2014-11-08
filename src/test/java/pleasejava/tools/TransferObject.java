@@ -19,11 +19,14 @@ public abstract class TransferObject {
 	private final int depth;
 
 	private final TypeNode typeNode;
+
+	private final String id;
 	
-	protected TransferObject(TransferObject parent, TypeNode typeNode) {
+	protected TransferObject(TransferObject parent, TypeNode typeNode, String id) {
 		this.parent = parent;
 		this.typeNode = typeNode;
 		this.depth = parent == null ? 0 : parent.depth + 1;
+		this.id = id;
 	}
 
 	public int getDepth() {
@@ -51,7 +54,7 @@ public abstract class TransferObject {
 	protected abstract String toStringDescription();
 	
 	public String getId() {
-		return "id";
+		return id;
 	}
 
 }

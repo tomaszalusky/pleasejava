@@ -16,7 +16,7 @@ public class JdbcTransferrableRecord extends TransferObject {
 	 * @param typeNode
 	 */
 	public JdbcTransferrableRecord(Type type, TransferObject parent, TypeNode typeNode) {
-		super(parent, typeNode);
+		super(parent, typeNode, typeNode.id());
 		this.type = type;
 	}
 	

@@ -148,7 +148,6 @@ public class TypeGraph {
 
 /*
 
-- id u TO
 - AddToTO
 - javadoc vseho okolo TO
 - odstranit dokumenty v mar.

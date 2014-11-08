@@ -12,7 +12,7 @@ public class Deletions extends TransferObject {
 	private List<Boolean> data = Lists.newArrayList();
 
 	public Deletions(TransferObject parent, TypeNode typeNode) {
-		super(parent, typeNode);
+		super(parent, typeNode, typeNode.id() + "d");
 	}
 	
 	@Override

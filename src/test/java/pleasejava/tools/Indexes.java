@@ -14,7 +14,7 @@ public class Indexes extends TransferObject {
 	private final List<Object> data = Lists.newArrayList();  // elements of type which is compatible with indexType
 
 	public Indexes(PrimitiveType indexType, TransferObject parent, TypeNode typeNode) {
-		super(parent, typeNode);
+		super(parent, typeNode, typeNode.id() + "i");
 		this.indexType = indexType;
 	}
 	
