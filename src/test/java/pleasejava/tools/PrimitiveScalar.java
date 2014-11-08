@@ -15,4 +15,9 @@ public class PrimitiveScalar extends TransferObject {
 		this.type = type;
 	}
 	
+	@Override
+	protected String toStringDescription() {
+		return type.getName();
+	}
+	
 }

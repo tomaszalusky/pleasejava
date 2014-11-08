@@ -10,7 +10,7 @@ import com.google.common.collect.Lists;
 /**
  * @author Tomas Zalusky
  */
-public class TransferObject {
+public abstract class TransferObject {
 
 	private String desc; // TODO some string characteristics, only temporary, will be replaced by subclass of TO and another data 
 	
@@ -22,7 +22,7 @@ public class TransferObject {
 
 	private final TypeNode typeNode;
 	
-	public TransferObject(String desc, TransferObject parent, TypeNode typeNode) {
+	protected TransferObject(String desc, TransferObject parent, TypeNode typeNode) {
 		this.desc = desc;
 		this.parent = parent;
 		this.typeNode = typeNode;
@@ -49,12 +49,14 @@ public class TransferObject {
 	}
 
 	private void toStringBuilder(StringBuilder buf) {
-		Utils.appendf(buf,"%s%s%n",Strings.repeat(" ",4*depth),desc);
+		Utils.appendf(buf,"%s%s%n",Strings.repeat(" ",4*depth),toStringDescription());
 		for (TransferObject child : children) {
 			child.toStringBuilder(buf);
 		}
 	}
-
+	
+	protected abstract String toStringDescription();
+	
 	public String getId() {
 		return "id";
 	}

@@ -18,4 +18,9 @@ public class Indexes extends TransferObject {
 		this.indexType = indexType;
 	}
 	
+	@Override
+	protected String toStringDescription() {
+		return "{i:" + indexType.name + "}";
+	}
+	
 }

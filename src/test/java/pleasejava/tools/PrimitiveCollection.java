@@ -17,5 +17,9 @@ public class PrimitiveCollection extends TransferObject {
 		super("{" + type.name + "}", parent, typeNode);
 		this.type = type;
 	}
+
+	protected String toStringDescription() {
+		return "{" + type.name + "}";
+	}
 	
 }

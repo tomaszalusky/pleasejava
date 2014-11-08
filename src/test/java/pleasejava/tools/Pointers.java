@@ -9,12 +9,18 @@ import com.google.common.collect.Lists;
  */
 public class Pointers extends TransferObject {
 
-	private List<Integer> data = Lists.newArrayList();
+	private final List<Integer> data = Lists.newArrayList();
 
-	private boolean simple;
+	private final boolean simple;
 	
 	public Pointers(TransferObject parent, TypeNode typeNode, boolean simple) {
 		super(simple ? "{sp}" : "{p}", parent, typeNode);
+		this.simple = simple;
+	}
+	
+	@Override
+	protected String toStringDescription() {
+		return simple ? "{sp}" : "{p}";
 	}
 	
 }

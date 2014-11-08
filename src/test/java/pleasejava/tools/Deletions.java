@@ -15,4 +15,9 @@ public class Deletions extends TransferObject {
 		super("{d}", parent, typeNode);
 	}
 	
+	@Override
+	protected String toStringDescription() {
+		return "{d}";
+	}
+
 }

@@ -9,7 +9,9 @@ import com.google.common.collect.Lists;
  */
 public class JdbcTransferrableCollection extends TransferObject {
 
-	private Collection<?> data = Lists.newArrayList();
+	private final Type type;
+	
+	private final Collection<?> data = Lists.newArrayList();
 
 	/**
 	 * @param type type of transferred collection
@@ -18,6 +20,12 @@ public class JdbcTransferrableCollection extends TransferObject {
 	 */
 	public JdbcTransferrableCollection(Type type, TransferObject parent, TypeNode typeNode) {
 		super(type.getName(), parent, typeNode);
+		this.type = type;
+	}
+	
+	@Override
+	protected String toStringDescription() {
+		return type.getName();
 	}
 	
 }

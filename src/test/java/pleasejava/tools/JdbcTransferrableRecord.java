@@ -1,14 +1,13 @@
 package pleasejava.tools;
 
-import java.util.Collection;
-
-import com.google.common.collect.Lists;
 
 /**
  * @author Tomas Zalusky
  */
 public class JdbcTransferrableRecord extends TransferObject {
 
+	private Type type;
+	
 	private Object data;
 
 	/**
@@ -18,6 +17,12 @@ public class JdbcTransferrableRecord extends TransferObject {
 	 */
 	public JdbcTransferrableRecord(Type type, TransferObject parent, TypeNode typeNode) {
 		super(type.getName(), parent, typeNode);
+		this.type = type;
+	}
+	
+	@Override
+	protected String toStringDescription() {
+		return type.getName();
 	}
 	
 }
