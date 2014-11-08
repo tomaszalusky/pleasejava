@@ -256,7 +256,7 @@ class TypeNode {
 					childTypeNode.getType().accept(this,childTypeNode,parent,inCollection);
 				}
 			} else {
-				TransferObject child = new TransferObject(type.getName(),parent,typeNode);
+				TransferObject child = new JdbcTransferrableRecord(type,parent,typeNode);
 				associationsBuilder.put(typeNode,child);
 				parent.addChild(child);
 			}
