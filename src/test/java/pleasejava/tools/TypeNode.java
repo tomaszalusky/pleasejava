@@ -363,9 +363,9 @@ class TypeNode {
 		public void visitPrimitive(PrimitiveType type, TypeNode typeNode, TransferObject parent, Boolean inCollection) {
 			TransferObject child;
 			if (inCollection) {
-				child = new TransferObject("{" + type.getName() + "}",parent,typeNode);
+				child = new PrimitiveCollection(type, parent, typeNode);
 			} else {
-				child = new TransferObject(type.getName(),parent,typeNode);
+				child = new PrimitiveScalar(type,parent,typeNode);
 			}
 			associationsBuilder.put(typeNode, child);
 			parent.addChild(child);
