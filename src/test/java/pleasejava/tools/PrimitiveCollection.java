@@ -5,6 +5,8 @@ import java.util.List;
 import com.google.common.collect.Lists;
 
 /**
+ * Collection of primitive values.
+ * Can be sent via JDBC as a whole (i.e. using java.sql.Array).
  * @author Tomas Zalusky
  */
 public class PrimitiveCollection extends TransferObject {

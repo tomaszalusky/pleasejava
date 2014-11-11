@@ -11,6 +11,12 @@ public class TransferObjectTree {
 	
 	private final TransferObject root;
 	
+	/**
+	 * Represents assignment of {@link TransferObject}s to {@link TypeNode}.
+	 * It cannot be stored in {@link TypeNode} since
+	 * {@link TypeNode} is intended to be universal for many calls.
+	 * Inverse association is stored in {@link TransferObject}.
+	 */
 	private final ListMultimap<TypeNode,TransferObject> associations;
 	
 	public TransferObjectTree(TypeNode typeTreeRoot, TransferObject root, ListMultimap<TypeNode,TransferObject> associations) {

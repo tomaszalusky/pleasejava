@@ -30,7 +30,8 @@ import com.google.common.collect.Table;
 import static com.google.common.collect.FluentIterable.from;
 
 /**
- * Represents immutable oriented graph whose nodes are all types in given testcase
+ * Represents immutable oriented graph whose nodes represent some subset of all types
+ * (including procedure or function signature)
  * and edges represent dependency between types.
  * 
  * @author Tomas Zalusky
@@ -148,12 +149,12 @@ public class TypeGraph {
 
 /*
 
-- AddToTO
 - javadoc vseho okolo TO
 - odstranit dokumenty v mar.
 - prejit na package-info, dokumentovat celkovou architekturu
 - vyresit globalni PLSQLConfig
-- nacist ibt a derave nst pres JDBC, zrevidovat tvorbu TO u jdbct kolekci
+- nacist ibt a derave nst pres JDBC
+- zrevidovat tvorbu TO u jdbct kolekci
 - zapracovat koncept JDBC-transferrable typu, a la ifc JdbcTransfer { convertForth(); convertBack(); } - to bude az u TO, mozna i dale
 - overit funkcnost pro dosavadni testcasy
 - overit funkcnost pro nove jdbct typy

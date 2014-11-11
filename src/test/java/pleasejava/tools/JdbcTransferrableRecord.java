@@ -2,6 +2,8 @@ package pleasejava.tools;
 
 
 /**
+ * Represents record which can be transferred via JDBC as whole.
+ * This can be possible only for top-level records.
  * @author Tomas Zalusky
  */
 public class JdbcTransferrableRecord extends TransferObject {

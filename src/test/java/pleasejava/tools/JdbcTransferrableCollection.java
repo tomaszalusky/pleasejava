@@ -5,6 +5,8 @@ import java.util.Collection;
 import com.google.common.collect.Lists;
 
 /**
+ * Represents collection which can be transferred via JDBC as whole.
+ * This can be possible only for top-level collections.
  * @author Tomas Zalusky
  */
 public class JdbcTransferrableCollection extends TransferObject {

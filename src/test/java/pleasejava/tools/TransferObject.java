@@ -8,6 +8,23 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
 /**
+ * <p>
+ * Represents one value which can be transferred via JDBC.
+ * It essentially corresponds with one "?" (questionmark) in JDBC notation of SQL call.
+ * </p>
+ * <p>
+ * Concrete subclasses describe particular parts of structure sent between PLSQL and Java.
+ * </p>
+ * <p>
+ * Every transfer object is associated with a {@link TypeNode}.
+ * Inverse association is also stored and maintained by {@link TypeNodeTree}.
+ * Transfer objects form a tree roughly corresponding {@link TypeNodeTree}, see {@link TransferObjectTree} for more detail.
+ * </p>
+ * <p>
+ * Transfer object have own identifier.
+ * It is derived from its {@link TypeNode} identifier
+ * and used for creating PLSQL identifiers in generated code in consistent, systematic and readable manner.
+ * </p>
  * @author Tomas Zalusky
  */
 public abstract class TransferObject {
@@ -62,33 +79,6 @@ public abstract class TransferObject {
 /**
 ITO - Intermediate Transfer Object
 ==================================
-
-je hodnota odpovidajici typu, ktery je JDBCT, a která popisuje èást struktury pøedávané mezi PLSQL a Javou.
-Odpovida jednomu otazniku v JDBC zapisu SQL dotazu.
-
-Typy ITO objektù:
-- skalární (napø. 1 varchar2 nebo top-level record apod. - data vyjadrena jednou promennou JDBCT typu) - JDBCT
-- kolekce pointerù - {p}
-- kolekce deleted pøíznakù - {d}
-- kolekce klíèù v index-by table {i}
-- kolekce skalárních hodnot - {JDBCT}, coz je vlastne JDBCTC
-
-Vıznam pointeru: 
-- vymezuje interval v dìtské kolekci:
-  - nech p je rodièovská kolekce pointerù
-  - nech c je dìtská kolekce (pointeru nebo dat)
-  - pro i-tı pointer v p je dìtská kolekce popsána následovnì:
-    - záporná hodnota znaèí null kolekci (její absolutní hodnota ale nese informaci o horní mezi pøedchozí kolekce)
-    - kladná hodnota vymezuje interval <c[p[i]],abs(c[p[i+1]))
-      - sémantika mezí je pøesnì shodná jako u guava Range.closedOpen, tj.
-        - dolní mez je inclusive
-        - horní exclusive
-        - <x,x) vyjadøuje prázdnou mnoinu
-      - abs je kvùli moné následné hodnotì null
-  - poslední prvek je zaráka, tj. {p} kolekce mají vdy o 1 prvek víc ne normální kolekce
-
-Kadı ITO je asociován s nìjakım uzel PTT a je mu pøidìlen identifikátor, kterı vychází z identifikátoru uzlu PTT a pridava k nemu dalsi informaci.
-ITO objekty tvoøí také strom.
 
 Algoritmus tvorby ITO a asociace s PTT:
 ---------------------------------------

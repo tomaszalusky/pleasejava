@@ -2,6 +2,7 @@ package pleasejava.tools;
 
 
 /**
+ * Single (scalar) value of primitive type.
  * @author Tomas Zalusky
  */
 public class PrimitiveScalar extends TransferObject {

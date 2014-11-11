@@ -5,6 +5,10 @@ import java.util.List;
 import com.google.common.collect.Lists;
 
 /**
+ * Collection of indexes in index-by table.
+ * This specific {@link TransferObject} is utilized only for index-by tables.
+ * Values in this collection represent values of indexes in index-by table, i.e. keys of associative array,
+ * table values are in corresponding {@link PrimitiveCollection} at matching index.
  * @author Tomas Zalusky
  */
 public class Indexes extends TransferObject {

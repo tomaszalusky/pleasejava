@@ -15,56 +15,7 @@ import com.google.common.collect.ImmutableMap;
 /**
  * Represents one node in type tree.
  * <p>
- * Type tree is a tree which describes parameters of PLSQL procedure or function and their dependencies on another types.
- * For example, given <code>tableofnum</code> is declared as <code>table of number</code>,
- * <code>procedure foo(a1 tableofnum, a2 varchar2(20))</code> is described by tree:
- * </p>
- * <pre>
- * foo
- * |
- * |------- tableofnum
- * |        |
- * |         ---------- number
- * |
- *  ------- varchar2(20)
- * </pre> 
- * <p>
- * Following rules hold for type tree:
- * </p>
- * <ul>
- * <li>node for {@link ProcedureSignature} or {@link FunctionSignature} type is root of tree.
- * These types are artificial ({@link AbstractSignature more info}) and only those can occur as a root.
- * Each child represents parameter of PLSQL procedure or function in order of declaration.
- * In the case of PLSQL function, extra child represents return type and occurs as the very first child.
- * </li>
- * <li>node for {@link PrimitiveType} is leaf of tree, which corresponds with intuitive fact that
- * every complex type finally breaks down into primitive types.
- * (Note that type tree represents decomposition of all complex types, even those that are top-level
- * and can be sent via JDBC {@link Array} or {@link Struct}.
- * The ability of being transferred by JDBC is under responsibility of different classes and doesn't influence type tree.)
- * </li>
- * <li>node for {@link NestedTable} has one child which represents nested table element type.
- * </li>
- * <li>node for {@link Varray} has one child which represents varray element type.
- * </li>
- * <li>node for {@link IndexByTable} has one child which represents index-by table element type.
- * Note that key type doesn't have {@link TypeNode} since it would complicate creation of subsequent structures.
- * (For convenience it is still written in indented manner in
- * {@link ToString#visitIndexByTable(IndexByTable, Integer, TypeNode) toString} anyway).
- * </li>
- * <li>node for {@link Record} has at least one child, 
- * each child represents field of PLSQL record in order of declaration.
- * </li>
- * </ul>
- * <p>
  * Every node has multipurpose string identifier, see {@link #computeId(TypeNode, int)}.
- * </p>
- * <p>
- * Note that unlike {@link Type}, {@link TypeNode} represents occurence of type
- * at concrete point in procedure or function signature and cannot be shared.
- * For example, a procedure <code>foo(a1 tableofrecord, a2 tableofrecord)</code>
- * has two children of type {@link NestedTable},
- * where <em>each of them</em> has its own child of type {@link Record}.
  * </p>
  * @author Tomas Zalusky
  */
