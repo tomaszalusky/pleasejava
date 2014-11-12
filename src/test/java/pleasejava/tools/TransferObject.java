@@ -75,32 +75,3 @@ public abstract class TransferObject {
 	}
 
 }
-
-/**
-ITO - Intermediate Transfer Object
-==================================
-
-Algoritmus tvorby ITO a asociace s PTT:
----------------------------------------
-- nech N je uzel PTT
-- je-li N typu JDBCT a je souèástí kolekce  (nemusi byt list)
-  - pøidej ITO {JDBCT}
-  - id = id(N)
-  - break
-- je-li N typu JDBCT a není souèástí kolekce   (nemusi byt list)
-  - pøidej ITO JDBCT
-  - id = id(N)
-  - break
-- pro N typu kolekce
-  - pøidej ITO {p}
-  - rodièem ITO je ITO {p} nejbliší vyšší kolekce, pokud existuje
-  - id = id(N)
-- pro N typu nested table
-  - pøidej k potomku ITO {d}
-  - rodièem ITO je ITO {p} u N
-  - id = id(N) + "d"
-- pro N typu index-by table
-  - pøidej k potomku ITO {i}
-  - rodièem ITO je ITO {p} u N
-  - id = id(N) + "i"
-*/

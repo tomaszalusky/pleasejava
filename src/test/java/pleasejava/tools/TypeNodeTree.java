@@ -91,10 +91,15 @@ public class TypeNodeTree {
 	}
 	
 	/**
+	 * <p>
 	 * Ensures adding appropriate transfer object to type node.
-	 * First generic argument is type node of visited {@link Type}. The visit... methods generate transfer objects for this type node.
+	 * First generic argument is type node of visited {@link Type}.
+	 * The visit... methods generate transfer objects for this type node,
+	 * see concrete algorithms in javadoc of particular methods.
 	 * Second generic argument is parent in transfer object tree under which transfer objects are added.
-	 * Third argument is a flag denoting descend into collection structure, which results into generating vector rather than scalar structures.
+	 * Third argument is a flag denoting descend into collection structure,
+	 * which results into generating vector rather than scalar structures.
+	 * </p>
 	 * @author Tomas Zalusky
 	 */
 	static class AddToTransferObject implements TypeVisitorAAA<TypeNode,TransferObject,Boolean> {
@@ -118,6 +123,10 @@ public class TypeNodeTree {
 			}
 		}
 
+		/**
+		 * Same as {@link #visitProcedureSignature(ProcedureSignature, TypeNode, TransferObject, Boolean)}.
+		 * @see pleasejava.tools.TypeVisitorAAA#visitFunctionSignature(pleasejava.tools.FunctionSignature, java.lang.Object, java.lang.Object, java.lang.Object)
+		 */
 		@Override
 		public void visitFunctionSignature(FunctionSignature type, TypeNode typeNode, TransferObject parent, Boolean inCollection) {
 			TypeNode returnTypeNode = typeNode.getChildren().get(FunctionSignature.RETURN_LABEL);
@@ -133,6 +142,24 @@ public class TypeNodeTree {
 		 * (which is not JDBC-transferrable - otherwise it would be processed in its visitor method)
 		 * they must be decomposed as if they weren't transferrable
 		 * because there are no means how to send such a sequence to db.
+
+Algoritmus tvorby ITO a asociace s PTT:
+---------------------------------------
+- nechù N je uzel PTT
+- pro N typu kolekce
+  - p¯idej ITO {p}
+  - rodiËem ITO je ITO {p} nejbliûöÌ vyööÌ kolekce, pokud existuje
+  - id = id(N)
+- pro N typu nested table
+  - p¯idej k potomku ITO {d}
+  - rodiËem ITO je ITO {p} u N
+  - id = id(N) + "d"
+- pro N typu index-by table
+  - p¯idej k potomku ITO {i}
+  - rodiËem ITO je ITO {p} u N
+  - id = id(N) + "i"
+
+		 * 
 		 * @see pleasejava.tools.TypeVisitorAAA#visitRecord(pleasejava.tools.Record, java.lang.Object, java.lang.Object, java.lang.Object)
 		 */
 		@Override
@@ -246,13 +273,25 @@ public class TypeNodeTree {
 			}
 		}
 
+		/**
+		 * <p>
+		 * For primitive type which is element of collection,
+		 * the {@link PrimitiveCollection} must be emitted.
+		 * </p>
+		 * <p>
+		 * For primitive type which is not element of collection
+		 * (i.e. for example simple procedure parameters),
+		 * the {@link PrimitiveScalar} suffices.
+		 * </p>
+		 * @see pleasejava.tools.TypeVisitorAAA#visitPrimitive(pleasejava.tools.PrimitiveType, java.lang.Object, java.lang.Object, java.lang.Object)
+		 */
 		@Override
 		public void visitPrimitive(PrimitiveType type, TypeNode typeNode, TransferObject parent, Boolean inCollection) {
 			TransferObject child;
 			if (inCollection) {
 				child = new PrimitiveCollection(type, parent, typeNode);
 			} else {
-				child = new PrimitiveScalar(type,parent,typeNode);
+				child = new PrimitiveScalar(type, parent, typeNode);
 			}
 			associationsBuilder.put(typeNode, child);
 			parent.addChild(child);
