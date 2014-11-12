@@ -142,24 +142,6 @@ public class TypeNodeTree {
 		 * (which is not JDBC-transferrable - otherwise it would be processed in its visitor method)
 		 * they must be decomposed as if they weren't transferrable
 		 * because there are no means how to send such a sequence to db.
-
-Algoritmus tvorby ITO a asociace s PTT:
----------------------------------------
-- nechù N je uzel PTT
-- pro N typu kolekce
-  - p¯idej ITO {p}
-  - rodiËem ITO je ITO {p} nejbliûöÌ vyööÌ kolekce, pokud existuje
-  - id = id(N)
-- pro N typu nested table
-  - p¯idej k potomku ITO {d}
-  - rodiËem ITO je ITO {p} u N
-  - id = id(N) + "d"
-- pro N typu index-by table
-  - p¯idej k potomku ITO {i}
-  - rodiËem ITO je ITO {p} u N
-  - id = id(N) + "i"
-
-		 * 
 		 * @see pleasejava.tools.TypeVisitorAAA#visitRecord(pleasejava.tools.Record, java.lang.Object, java.lang.Object, java.lang.Object)
 		 */
 		@Override
@@ -177,19 +159,28 @@ Algoritmus tvorby ITO a asociace s PTT:
 		}
 
 		/**
+		 * <p>
 		 * For JDBC-transferrable (toplevel) collection which is element of another collection,
 		 * toplevel collection collects elements across all particular collections.
-		 * Hence, there is no need for further decomposition,
-		 * we need only one more pointer collection to distinguish particular collections.
-		 * 
+		 * Neither collection nor its elements are further decomposed.
+		 * Hence, {@link Pointers} collection (which distinguishes particular collections) is just added to parent,
+		 * {@link JdbcTransferrableCollection} (which represents data of particular collections) is added to pointers.
+		 * </p>
+		 * <p>
 		 * For JDBC-transferrable collection which is not element of another collection,
-		 * (the case when toplevel collection is directly used as procedure parameter or at most as field in record (possibly in other records)),
-		 * the collection it self is transfer object and can be used as is.
-		 * 
+		 * the collection itself is transfer object and can be used as is.
+		 * This is the case when toplevel collection is directly used as procedure parameter
+		 * or at most as field in record (possibly in other records).
+		 * Hence, {@link JdbcTransferrableCollection} suffices to be added to parent.
+		 * </p>
+		 * <p>
 		 * Non-JDBC-transferrable collections must be decomposed,
 		 * e.g. only pointer collection is currently known to be needed,
-		 * children of transfer object will be constructed later. 
-		 * 
+		 * children of transfer object will be constructed later.
+		 * Hence, {@link Pointers} collection is just added to parent
+		 * (the parent represents transfer object for the nearest outer collection
+		 * or {@link RootTransferObject} if such collection doesn't exist). 
+		 * </p>
 		 * @see pleasejava.tools.TypeVisitorAAA#visitVarray(pleasejava.tools.Varray, java.lang.Object, java.lang.Object, java.lang.Object)
 		 */
 		@Override
@@ -217,6 +208,14 @@ Algoritmus tvorby ITO a asociace s PTT:
 			}
 		}
 
+		/**
+		 * Same as {@link #visitVarray(Varray, TypeNode, TransferObject, Boolean)},
+		 * enriched with deletion information.
+		 * If {@link Pointers} are added to parent,
+		 * then also {@link Deletions} transfer object is added as child of {@link Pointers}.
+		 * Pointers point not only into data collection(s) but also into collection of deletion flags.
+		 * @see pleasejava.tools.TypeVisitorAAA#visitNestedTable(pleasejava.tools.NestedTable, java.lang.Object, java.lang.Object, java.lang.Object)
+		 */
 		@Override
 		public void visitNestedTable(NestedTable type, TypeNode typeNode, TransferObject parent, Boolean inCollection) {
 			if (type.isJdbcTransferrable()) {
@@ -245,6 +244,14 @@ Algoritmus tvorby ITO a asociace s PTT:
 			}
 		}
 
+		/**
+		 * Same as {@link #visitVarray(Varray, TypeNode, TransferObject, Boolean)},
+		 * enriched with index information.
+		 * If {@link Pointers} are added to parent,
+		 * then also {@link Indexes} transfer object is added as child of {@link Pointers}.
+		 * Pointers point not only into data collection(s) but also into collection of index values.
+		 * @see pleasejava.tools.TypeVisitorAAA#visitNestedTable(pleasejava.tools.NestedTable, java.lang.Object, java.lang.Object, java.lang.Object)
+		 */
 		@Override
 		public void visitIndexByTable(IndexByTable type, TypeNode typeNode, TransferObject parent, Boolean inCollection) {
 			if (type.isJdbcTransferrable()) {

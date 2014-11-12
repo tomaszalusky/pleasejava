@@ -3,6 +3,9 @@ package pleasejava.tools;
 import com.google.common.collect.ListMultimap;
 
 /**
+ * Tree of transfer objects.
+ * Core data structure for all data transferred between PLSQL and Java
+ * in single procedure (or function) call.
  * @author Tomas Zalusky
  */
 public class TransferObjectTree {

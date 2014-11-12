@@ -149,7 +149,6 @@ public class TypeGraph {
 
 /*
 
-- javadoc vseho okolo TO
 - odstranit dokumenty v mar.
 - prejit na package-info, dokumentovat celkovou architekturu
 - vyresit globalni PLSQLConfig
