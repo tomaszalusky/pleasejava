@@ -1,5 +1,4 @@
 /**
- * - nacist ibt pres JDBC
  * - nacist derave nst pres JDBC
  * - zrevidovat tvorbu TO u jdbct kolekci
  * - zapracovat koncept JDBC-transferrable typu, a la ifc JdbcTransfer { convertForth(); convertBack(); } - to bude az u TO, mozna i dale

@@ -246,38 +246,24 @@ public class TypeNodeTree {
 
 		/**
 		 * Same as {@link #visitVarray(Varray, TypeNode, TransferObject, Boolean)},
-		 * enriched with index information.
-		 * If {@link Pointers} are added to parent,
-		 * then also {@link Indexes} transfer object is added as child of {@link Pointers}.
-		 * Pointers point not only into data collection(s) but also into collection of index values.
+		 * except following exceptions:
+		 * <ul>
+		 * <li>only non-JDBC-transferrable types decomposition is considered (since index-by tables are never JDBC-transferrable)</li>
+		 * <li>type node tree is enriched with index information and {@link Indexes} transfer object is added as child of {@link Pointers}.
+		 * Pointers point not only into data collection(s) but also into collection of index values.</li>
+		 * </ul>
 		 * @see pleasejava.tools.TypeVisitorAAA#visitNestedTable(pleasejava.tools.NestedTable, java.lang.Object, java.lang.Object, java.lang.Object)
 		 */
 		@Override
 		public void visitIndexByTable(IndexByTable type, TypeNode typeNode, TransferObject parent, Boolean inCollection) {
-			if (type.isJdbcTransferrable()) {
-				if (inCollection) { // TODO indexes
-					TransferObject child = new Pointers(false,parent,typeNode);
-					associationsBuilder.put(typeNode, child);
-					parent.addChild(child);
-					TypeNode childTypeNode = typeNode.getChildren().get(IndexByTable.ELEMENT_LABEL);
-					TransferObject grandchild = new JdbcTransferrableCollection(type, child, childTypeNode);
-					associationsBuilder.put(childTypeNode, grandchild);
-					child.addChild(grandchild);
-				} else {
-					TransferObject child = new JdbcTransferrableCollection(type, parent, typeNode);
-					associationsBuilder.put(typeNode, child);
-					parent.addChild(child);
-				}
-			} else {
-				TransferObject pointers = new Pointers(!inCollection,parent,typeNode);
-				associationsBuilder.put(typeNode, pointers);
-				parent.addChild(pointers);
-				TransferObject indexes = new Indexes(type.getIndexType(), pointers, typeNode);
-				associationsBuilder.put(typeNode, indexes);
-				pointers.addChild(indexes);
-				TypeNode childTypeNode = typeNode.getChildren().get(IndexByTable.ELEMENT_LABEL);
-				childTypeNode.getType().accept(this,childTypeNode,pointers,true);
-			}
+			TransferObject pointers = new Pointers(!inCollection,parent,typeNode);
+			associationsBuilder.put(typeNode, pointers);
+			parent.addChild(pointers);
+			TransferObject indexes = new Indexes(type.getIndexType(), pointers, typeNode);
+			associationsBuilder.put(typeNode, indexes);
+			pointers.addChild(indexes);
+			TypeNode childTypeNode = typeNode.getChildren().get(IndexByTable.ELEMENT_LABEL);
+			childTypeNode.getType().accept(this,childTypeNode,pointers,true);
 		}
 
 		/**

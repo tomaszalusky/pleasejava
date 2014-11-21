@@ -66,4 +66,16 @@ class IndexByTable extends Type {
 		return Objects.hash(this.name,this.elementType,this.indexType);
 	}
 
+	/**
+	 * Index-by tables are never JDBC-transferrable because they are PLSQL types and not database types.
+	 * @see pleasejava.tools.Type#isJdbcTransferrable()
+	 */
+	@Override
+	boolean isJdbcTransferrable() {
+		if (super.isJdbcTransferrable()) {
+			throw new Error("System error: wrong detection of JDBC-transferability for index-by table " + getName());
+		}
+		return false;
+	}
+
 }
