@@ -231,12 +231,17 @@ class TypeNode {
 				if (tos.isEmpty()) { // part of more complex transferrable type
 					append("|");
 				} else {
-					Preconditions.checkState(tos.size() == 2,"wrong number of associations: %s",tos.size());
+					Preconditions.checkState(tos.size() == 2 || tos.size() == 3,"wrong number of associations: %s",tos.size());
 					TransferObject toPointers = tos.get(0);
 					TransferObject toDeletions = tos.get(1);
 					append("| " + indent(toPointers.getDepth()) + toPointers.toStringDescription()).append("#" + toPointers.getId())
 					.newLine().append("").append("").append("")
 					.append("| " + indent(toDeletions.getDepth()) + toDeletions.toStringDescription()).append("#" + toDeletions.getId());
+					if (tos.size() == 3) { // JDBC-transferrable nested table is associated with type node too (yet)
+						TransferObject toData = tos.get(2);
+						newLine().append("").append("").append("")
+						.append("| " + indent(toData.getDepth()) + toData.toStringDescription()).append("#" + toData.getId());
+					}
 				}
 			}
 			newLine().append(indent(level + 1) + NestedTable.ELEMENT_LABEL + " ");

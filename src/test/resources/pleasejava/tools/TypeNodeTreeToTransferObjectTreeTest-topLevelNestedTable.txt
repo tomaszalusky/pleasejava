@@ -1,0 +1,7 @@
+procedure                "dummy"   #    | /            #
+    arg in nestedtable   "nst1"    #1   |     {sp}     #1
+                                        |         {d}  #1d
+                                        |         nst1 #1t
+        (element) record "rec"     #1e  |
+            b            "boolean" #1e1 |
+            i            "integer" #1e2 |

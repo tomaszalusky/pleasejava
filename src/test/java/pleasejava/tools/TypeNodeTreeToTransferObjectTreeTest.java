@@ -34,6 +34,7 @@ public class TypeNodeTreeToTransferObjectTreeTest extends AbstractTypeGraphTest 
 				{"simple"},
 				{"dag1"},
 				{"alltypes"},
+				{"topLevelNestedTable"},
 		});
 	}
 

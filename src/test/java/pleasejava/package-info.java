@@ -1,6 +1,11 @@
 /**
  * - nacist derave nst pres JDBC
- * - zrevidovat tvorbu TO u jdbct kolekci
+ * - zrevidovat tvorbu TO u jdbct struktur
+ *   - nst
+ *     - jednoduche
+ *     - vnorene
+ *   - varray
+ *   - jdbct record
  * - zapracovat koncept JDBC-transferrable typu, a la ifc JdbcTransfer { convertForth(); convertBack(); } - to bude az u TO, mozna i dale
  * - overit funkcnost pro dosavadni testcasy
  * - overit funkcnost pro nove jdbct typy

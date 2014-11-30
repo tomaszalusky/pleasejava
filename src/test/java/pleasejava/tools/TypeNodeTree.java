@@ -228,9 +228,15 @@ public class TypeNodeTree {
 					associationsBuilder.put(childTypeNode, grandchild);
 					child.addChild(grandchild);
 				} else {
-					TransferObject child = new JdbcTransferrableCollection(type, parent, typeNode);
+					TransferObject pointers = new Pointers(true,parent,typeNode);
+					associationsBuilder.put(typeNode, pointers);
+					parent.addChild(pointers);
+					TransferObject deletions = new Deletions(pointers,typeNode);
+					associationsBuilder.put(typeNode, deletions);
+					pointers.addChild(deletions);
+					TransferObject child = new JdbcTransferrableCollection(type, pointers, typeNode); // TODO not sure which of pointers,child should be associated with typenode, will be clarified when developing data transfer algorithm (if shows as unnecessary, need to correct also toString and ID generation)
 					associationsBuilder.put(typeNode, child);
-					parent.addChild(child);
+					pointers.addChild(child);
 				}
 			} else {
 				TransferObject pointers = new Pointers(!inCollection,parent,typeNode);

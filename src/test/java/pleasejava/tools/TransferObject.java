@@ -10,7 +10,10 @@ import com.google.common.collect.Lists;
 /**
  * <p>
  * Represents one value which can be transferred via JDBC.
- * It essentially corresponds with one "?" (questionmark) in JDBC notation of SQL call.
+ * It essentially corresponds with one "?" (questionmark) in JDBC notation of SQL call
+ * (more precisely: every JDBC parameter has corresponding TO
+ * but some transfer objects may finally not be turned into JDBC parameters
+ * since either they are auxiliary or information they carry can be derived from other TOs during optimization).
  * </p>
  * <p>
  * Concrete subclasses describe particular parts of structure sent between PLSQL and Java.
@@ -21,7 +24,7 @@ import com.google.common.collect.Lists;
  * Transfer objects form a tree roughly corresponding {@link TypeNodeTree}, see {@link TransferObjectTree} for more detail.
  * </p>
  * <p>
- * Transfer object have own identifier.
+ * Each transfer object has its own identifier.
  * It is derived from its {@link TypeNode} identifier
  * and used for creating PLSQL identifiers in generated code in consistent, systematic and readable manner.
  * </p>

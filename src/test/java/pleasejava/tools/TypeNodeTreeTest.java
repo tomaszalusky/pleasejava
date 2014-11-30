@@ -34,6 +34,7 @@ public class TypeNodeTreeTest extends AbstractTypeGraphTest {
 				{"simple"},
 				{"dag1"},
 				{"alltypes"},
+				{"topLevelNestedTable"},
 		});
 	}
 

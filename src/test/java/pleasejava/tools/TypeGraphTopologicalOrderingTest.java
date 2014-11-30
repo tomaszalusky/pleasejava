@@ -74,6 +74,7 @@ public class TypeGraphTopologicalOrderingTest extends AbstractTypeGraphTest {
 				varchar2(100)          pls_integer  boolean             integer      number(30)                         varchar2(200)  
 				 */
 				)},
+				{"topLevelNestedTable", ImmutableList.of("dummy","nst1","rec","boolean","integer")},
 		});
 	}
 

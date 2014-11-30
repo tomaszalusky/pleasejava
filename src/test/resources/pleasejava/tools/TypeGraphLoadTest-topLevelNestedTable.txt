@@ -1,0 +1,5 @@
+procedure                "dummy"
+    arg in nestedtable   "nst1"
+        (element) record "rec"
+            b            "boolean"
+            i            "integer"
