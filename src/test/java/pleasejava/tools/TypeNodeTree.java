@@ -242,12 +242,15 @@ public class TypeNodeTree {
 					pointers.addChild(child);
 				}
 			} else {
+				TransferObject pointersToDeletions = new Pointers(!inCollection,true,parent,typeNode);
+				associationsBuilder.put(typeNode, pointersToDeletions);
+				parent.addChild(pointersToDeletions);
+				TransferObject deletions = new Deletions(pointersToDeletions,typeNode);
+				associationsBuilder.put(typeNode, deletions);
+				pointersToDeletions.addChild(deletions);
 				TransferObject pointers = new Pointers(!inCollection,false,parent, typeNode);
 				associationsBuilder.put(typeNode, pointers);
 				parent.addChild(pointers);
-				TransferObject deletions = new Deletions(pointers,typeNode);
-				associationsBuilder.put(typeNode, deletions);
-				pointers.addChild(deletions);
 				TypeNode childTypeNode = typeNode.getChildren().get(NestedTable.ELEMENT_LABEL);
 				childTypeNode.getType().accept(this,childTypeNode,pointers,true);
 			}

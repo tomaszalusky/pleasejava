@@ -13,19 +13,23 @@
         {p}
             {boolean}
             {integer}
-    {sp}
+    {sq}
         {d}
+    {sp}
         {p}
             {boolean}
             {integer}
-    {sp}
+    {sq}
         {d}
-        {p}
+    {sp}
+        {q}
             {d}
+        {p}
             {boolean}
             {integer}
-    {sp}
+    {sq}
         {d}
+    {sp}
         {boolean}
         {integer}
     {sp}
@@ -47,20 +51,23 @@
             {i:string(20)}
             {p}
                 {varchar2(100)}
-    {sp}
+    {sq}
         {d}
+    {sp}
         {p}
             {i:string(20)}
             {p}
                 {varchar2(100)}
     {sp}
         {i:long}
-        {p}
+        {q}
             {d}
+        {p}
             {varchar2(200)}
     {sp}
-        {p}
+        {q}
             {d}
+        {p}
             {varchar2(200)}
     clob
     {sp}
@@ -76,19 +83,23 @@
         {p}
             {boolean}
             {integer}
-    {sp}
+    {sq}
         {d}
+    {sp}
         {p}
             {boolean}
             {integer}
-    {sp}
+    {sq}
         {d}
-        {p}
+    {sp}
+        {q}
             {d}
+        {p}
             {boolean}
             {integer}
-    {sp}
+    {sq}
         {d}
+    {sp}
         {boolean}
         {integer}
     {sp}
@@ -110,19 +121,22 @@
             {i:string(20)}
             {p}
                 {varchar2(100)}
-    {sp}
+    {sq}
         {d}
+    {sp}
         {p}
             {i:string(20)}
             {p}
                 {varchar2(100)}
     {sp}
         {i:long}
-        {p}
+        {q}
             {d}
+        {p}
             {varchar2(200)}
     {sp}
-        {p}
+        {q}
             {d}
+        {p}
             {varchar2(200)}
     clob

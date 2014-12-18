@@ -17,22 +17,26 @@ function                       "echo"                #        | /               
             (element) record   "a_test_package.rec3" #2ee     |
                 f_boolean      "boolean"             #2ee1    |             {boolean}           #2ee1
                 f_integer      "integer"             #2ee2    |             {integer}           #2ee2
-    pi_nst2 in nestedtable     "a_test_package.nst2" #3       |     {sp}                        #3p
+    pi_nst2 in nestedtable     "a_test_package.nst2" #3       |     {sq}                        #3q
                                                               |         {d}                     #3d
+                                                              |     {sp}                        #3p
         (element) varray       "a_test_package.var4" #3e      |         {p}                     #3ep
             (element) record   "a_test_package.rec3" #3ee     |
                 f_boolean      "boolean"             #3ee1    |             {boolean}           #3ee1
                 f_integer      "integer"             #3ee2    |             {integer}           #3ee2
-    pi_nst3 in nestedtable     "a_test_package.nst3" #4       |     {sp}                        #4p
+    pi_nst3 in nestedtable     "a_test_package.nst3" #4       |     {sq}                        #4q
                                                               |         {d}                     #4d
-        (element) nestedtable  "a_test_package.nst4" #4e      |         {p}                     #4ep
+                                                              |     {sp}                        #4p
+        (element) nestedtable  "a_test_package.nst4" #4e      |         {q}                     #4eq
                                                               |             {d}                 #4ed
+                                                              |         {p}                     #4ep
             (element) record   "a_test_package.rec3" #4ee     |
                 f_boolean      "boolean"             #4ee1    |             {boolean}           #4ee1
                 f_integer      "integer"             #4ee2    |             {integer}           #4ee2
     pi_rec1 in record          "a_test_package.rec1" #5       |
-        f_nst4 nestedtable     "a_test_package.nst4" #51      |     {sp}                        #51p
+        f_nst4 nestedtable     "a_test_package.nst4" #51      |     {sq}                        #51q
                                                               |         {d}                     #51d
+                                                              |     {sp}                        #51p
             (element) record   "a_test_package.rec3" #51e     |
                 f_boolean      "boolean"             #51e1    |         {boolean}               #51e1
                 f_integer      "integer"             #51e2    |         {integer}               #51e2
@@ -55,20 +59,23 @@ function                       "echo"                #        | /               
             (key)              "string(20)"                   |             {i:string(20)}      #7ei
             (element) varray   "a_test_package.var5" #7ee     |             {p}                 #7eep
                 (element)      "varchar2(100)"       #7eee    |                 {varchar2(100)} #7eee
-    pi_nst1 in nestedtable     "a_test_package.nst1" #8       |     {sp}                        #8p
+    pi_nst1 in nestedtable     "a_test_package.nst1" #8       |     {sq}                        #8q
                                                               |         {d}                     #8d
+                                                              |     {sp}                        #8p
         (element) indexbytable "a_test_package.ibt5" #8e      |         {p}                     #8ep
             (key)              "string(20)"                   |             {i:string(20)}      #8ei
             (element) varray   "a_test_package.var5" #8ee     |             {p}                 #8eep
                 (element)      "varchar2(100)"       #8eee    |                 {varchar2(100)} #8eee
     pi_ibt3 in indexbytable    "a_test_package.ibt3" #9       |     {sp}                        #9p
         (key)                  "long"                         |         {i:long}                #9i
-        (element) nestedtable  "a_test_package.nst5" #9e      |         {p}                     #9ep
+        (element) nestedtable  "a_test_package.nst5" #9e      |         {q}                     #9eq
                                                               |             {d}                 #9ed
+                                                              |         {p}                     #9ep
             (element)          "varchar2(200)"       #9ee     |             {varchar2(200)}     #9ee
     pi_var2 in varray          "a_test_package.var2" #_10_    |     {sp}                        #_10_p
-        (element) nestedtable  "a_test_package.nst5" #_10_e   |         {p}                     #_10_ep
+        (element) nestedtable  "a_test_package.nst5" #_10_e   |         {q}                     #_10_eq
                                                               |             {d}                 #_10_ed
+                                                              |         {p}                     #_10_ep
             (element)          "varchar2(200)"       #_10_ee  |             {varchar2(200)}     #_10_ee
     pi_clob in                 "clob"                #_11_    |     clob                        #_11_
     po_ibt1 out indexbytable   "a_test_package.ibt1" #_12_    |     {sp}                        #_12_p
@@ -88,22 +95,26 @@ function                       "echo"                #        | /               
             (element) record   "a_test_package.rec3" #_13_ee  |
                 f_boolean      "boolean"             #_13_ee1 |             {boolean}           #_13_ee1
                 f_integer      "integer"             #_13_ee2 |             {integer}           #_13_ee2
-    po_nst2 out nestedtable    "a_test_package.nst2" #_14_    |     {sp}                        #_14_p
+    po_nst2 out nestedtable    "a_test_package.nst2" #_14_    |     {sq}                        #_14_q
                                                               |         {d}                     #_14_d
+                                                              |     {sp}                        #_14_p
         (element) varray       "a_test_package.var4" #_14_e   |         {p}                     #_14_ep
             (element) record   "a_test_package.rec3" #_14_ee  |
                 f_boolean      "boolean"             #_14_ee1 |             {boolean}           #_14_ee1
                 f_integer      "integer"             #_14_ee2 |             {integer}           #_14_ee2
-    po_nst3 out nestedtable    "a_test_package.nst3" #_15_    |     {sp}                        #_15_p
+    po_nst3 out nestedtable    "a_test_package.nst3" #_15_    |     {sq}                        #_15_q
                                                               |         {d}                     #_15_d
-        (element) nestedtable  "a_test_package.nst4" #_15_e   |         {p}                     #_15_ep
+                                                              |     {sp}                        #_15_p
+        (element) nestedtable  "a_test_package.nst4" #_15_e   |         {q}                     #_15_eq
                                                               |             {d}                 #_15_ed
+                                                              |         {p}                     #_15_ep
             (element) record   "a_test_package.rec3" #_15_ee  |
                 f_boolean      "boolean"             #_15_ee1 |             {boolean}           #_15_ee1
                 f_integer      "integer"             #_15_ee2 |             {integer}           #_15_ee2
     po_rec1 out record         "a_test_package.rec1" #_16_    |
-        f_nst4 nestedtable     "a_test_package.nst4" #_16_1   |     {sp}                        #_16_1p
+        f_nst4 nestedtable     "a_test_package.nst4" #_16_1   |     {sq}                        #_16_1q
                                                               |         {d}                     #_16_1d
+                                                              |     {sp}                        #_16_1p
             (element) record   "a_test_package.rec3" #_16_1e  |
                 f_boolean      "boolean"             #_16_1e1 |         {boolean}               #_16_1e1
                 f_integer      "integer"             #_16_1e2 |         {integer}               #_16_1e2
@@ -126,19 +137,22 @@ function                       "echo"                #        | /               
             (key)              "string(20)"                   |             {i:string(20)}      #_18_ei
             (element) varray   "a_test_package.var5" #_18_ee  |             {p}                 #_18_eep
                 (element)      "varchar2(100)"       #_18_eee |                 {varchar2(100)} #_18_eee
-    po_nst1 out nestedtable    "a_test_package.nst1" #_19_    |     {sp}                        #_19_p
+    po_nst1 out nestedtable    "a_test_package.nst1" #_19_    |     {sq}                        #_19_q
                                                               |         {d}                     #_19_d
+                                                              |     {sp}                        #_19_p
         (element) indexbytable "a_test_package.ibt5" #_19_e   |         {p}                     #_19_ep
             (key)              "string(20)"                   |             {i:string(20)}      #_19_ei
             (element) varray   "a_test_package.var5" #_19_ee  |             {p}                 #_19_eep
                 (element)      "varchar2(100)"       #_19_eee |                 {varchar2(100)} #_19_eee
     po_ibt3 out indexbytable   "a_test_package.ibt3" #_20_    |     {sp}                        #_20_p
         (key)                  "long"                         |         {i:long}                #_20_i
-        (element) nestedtable  "a_test_package.nst5" #_20_e   |         {p}                     #_20_ep
+        (element) nestedtable  "a_test_package.nst5" #_20_e   |         {q}                     #_20_eq
                                                               |             {d}                 #_20_ed
+                                                              |         {p}                     #_20_ep
             (element)          "varchar2(200)"       #_20_ee  |             {varchar2(200)}     #_20_ee
     po_var2 out varray         "a_test_package.var2" #_21_    |     {sp}                        #_21_p
-        (element) nestedtable  "a_test_package.nst5" #_21_e   |         {p}                     #_21_ep
+        (element) nestedtable  "a_test_package.nst5" #_21_e   |         {q}                     #_21_eq
                                                               |             {d}                 #_21_ed
+                                                              |         {p}                     #_21_ep
             (element)          "varchar2(200)"       #_21_ee  |             {varchar2(200)}     #_21_ee
     po_clob out                "clob"                #_22_    |     clob                        #_22_
