@@ -49,15 +49,23 @@ public class Pointers extends TransferObject {
 	 * or collections on the top of multilevel hierarchy.
 	 */
 	private final boolean simple;
+
+	/**
+	 * If true, the pointer list points into collections of deleted indexes.
+	 * If false, the pointer list points into collection of data.
+	 * Utilized only for nested tables.
+	 */
+	private final boolean deletions;
 	
-	public Pointers(boolean simple, TransferObject parent, TypeNode typeNode) {
-		super(parent, typeNode, typeNode.id());
+	public Pointers(boolean simple, boolean deletions, TransferObject parent, TypeNode typeNode) {
+		super(parent, typeNode, typeNode.id() + (deletions ? "q" : ""/*TODO better "p" too for distinguishability*/));
 		this.simple = simple;
+		this.deletions = deletions;
 	}
 	
 	@Override
 	protected String toStringDescription() {
-		return simple ? "{sp}" : "{p}";
+		return String.format("{%s%s}", simple ? "s" : "", deletions ? "q" : "p");
 	}
 	
 }

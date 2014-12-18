@@ -187,7 +187,7 @@ public class TypeNodeTree {
 		public void visitVarray(Varray type, TypeNode typeNode, TransferObject parent, Boolean inCollection) {
 			if (type.isJdbcTransferrable()) {
 				if (inCollection) {
-					TransferObject child = new Pointers(false,parent,typeNode);
+					TransferObject child = new Pointers(false,false,parent, typeNode);
 					associationsBuilder.put(typeNode, child);
 					parent.addChild(child);
 					TypeNode childTypeNode = typeNode.getChildren().get(Varray.ELEMENT_LABEL);
@@ -200,7 +200,7 @@ public class TypeNodeTree {
 					parent.addChild(child);
 				}
 			} else {
-				TransferObject pointers = new Pointers(!inCollection,parent,typeNode);
+				TransferObject pointers = new Pointers(!inCollection,false,parent, typeNode);
 				associationsBuilder.put(typeNode, pointers);
 				parent.addChild(pointers);
 				TypeNode childTypeNode = typeNode.getChildren().get(Varray.ELEMENT_LABEL);
@@ -220,26 +220,29 @@ public class TypeNodeTree {
 		public void visitNestedTable(NestedTable type, TypeNode typeNode, TransferObject parent, Boolean inCollection) {
 			if (type.isJdbcTransferrable()) {
 				if (inCollection) { // TODO deletion
-					TransferObject child = new Pointers(false,parent,typeNode);
+					TransferObject child = new Pointers(false,false,parent, typeNode);
 					associationsBuilder.put(typeNode, child);
 					parent.addChild(child);
 					TypeNode childTypeNode = typeNode.getChildren().get(NestedTable.ELEMENT_LABEL);
 					TransferObject grandchild = new JdbcTransferrableCollection(type, child, childTypeNode);
 					associationsBuilder.put(childTypeNode, grandchild);
 					child.addChild(grandchild);
-				} else {
-					TransferObject pointers = new Pointers(true,parent,typeNode);
+				} else { // TODO not sure which of pointers,child should be associated with typenode, will be clarified when developing data transfer algorithm (if shows as unnecessary, need to correct also toString and ID generation)
+					TransferObject pointers = new Pointers(true,false,parent,typeNode);
 					associationsBuilder.put(typeNode, pointers);
 					parent.addChild(pointers);
-					TransferObject deletions = new Deletions(pointers,typeNode);
-					associationsBuilder.put(typeNode, deletions);
-					pointers.addChild(deletions);
-					TransferObject child = new JdbcTransferrableCollection(type, pointers, typeNode); // TODO not sure which of pointers,child should be associated with typenode, will be clarified when developing data transfer algorithm (if shows as unnecessary, need to correct also toString and ID generation)
+					TransferObject child = new JdbcTransferrableCollection(type, pointers, typeNode);
 					associationsBuilder.put(typeNode, child);
 					pointers.addChild(child);
+					TransferObject pointersToDeletions = new Pointers(true,true,parent,typeNode);
+					associationsBuilder.put(typeNode, pointersToDeletions);
+					parent.addChild(pointersToDeletions);
+					TransferObject deletions = new Deletions(pointersToDeletions,typeNode);
+					associationsBuilder.put(typeNode, deletions);
+					pointersToDeletions.addChild(deletions);
 				}
 			} else {
-				TransferObject pointers = new Pointers(!inCollection,parent,typeNode);
+				TransferObject pointers = new Pointers(!inCollection,false,parent, typeNode);
 				associationsBuilder.put(typeNode, pointers);
 				parent.addChild(pointers);
 				TransferObject deletions = new Deletions(pointers,typeNode);
@@ -262,7 +265,7 @@ public class TypeNodeTree {
 		 */
 		@Override
 		public void visitIndexByTable(IndexByTable type, TypeNode typeNode, TransferObject parent, Boolean inCollection) {
-			TransferObject pointers = new Pointers(!inCollection,parent,typeNode);
+			TransferObject pointers = new Pointers(!inCollection,false,parent, typeNode);
 			associationsBuilder.put(typeNode, pointers);
 			parent.addChild(pointers);
 			TransferObject indexes = new Indexes(type.getIndexType(), pointers, typeNode);
