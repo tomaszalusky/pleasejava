@@ -1,5 +1,5 @@
 procedure                "dummy"   #    | /            #
-    arg in nestedtable   "nst1"    #1   |     {sp}     #1
+    arg in nestedtable   "nst1"    #1   |     {sp}     #1p
                                         |         nst1 #1e
                                         |     {sq}     #1q
                                         |         {d}  #1d

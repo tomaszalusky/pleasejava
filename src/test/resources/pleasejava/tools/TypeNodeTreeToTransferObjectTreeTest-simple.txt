@@ -1,3 +1,3 @@
 procedure         "main"                #   | /                 #
-    a in varray   "a_test_package.var1" #1  |     {sp}          #1
+    a in varray   "a_test_package.var1" #1  |     {sp}          #1p
         (element) "integer"             #1e |         {integer} #1e

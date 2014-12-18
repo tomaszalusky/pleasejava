@@ -58,7 +58,7 @@ public class Pointers extends TransferObject {
 	private final boolean deletions;
 	
 	public Pointers(boolean simple, boolean deletions, TransferObject parent, TypeNode typeNode) {
-		super(parent, typeNode, typeNode.id() + (deletions ? "q" : ""/*TODO better "p" too for distinguishability*/));
+		super(parent, typeNode, typeNode.id() + (deletions ? "q" : "p"));
 		this.simple = simple;
 		this.deletions = deletions;
 	}
