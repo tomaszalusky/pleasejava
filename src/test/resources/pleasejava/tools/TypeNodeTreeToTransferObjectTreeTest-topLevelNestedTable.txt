@@ -1,8 +1,8 @@
 procedure                "dummy"   #    | /            #
-    arg in nestedtable   "nst1"    #1   |     {sp}     #1p
-                                        |         nst1 #1e
-                                        |     {sq}     #1q
+    arg in nestedtable   "nst1"    #1   |     {sq}     #1q
                                         |         {d}  #1d
+                                        |     {sp}     #1p
+                                        |         nst1 #1e
         (element) record "rec"     #1e  |
             b            "boolean" #1e1 |
             i            "integer" #1e2 |

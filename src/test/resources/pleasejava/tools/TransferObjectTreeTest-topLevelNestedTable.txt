@@ -1,5 +1,5 @@
 /
-    {sp}
-        nst1
     {sq}
         {d}
+    {sp}
+        nst1
