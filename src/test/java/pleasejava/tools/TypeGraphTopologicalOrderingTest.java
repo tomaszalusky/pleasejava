@@ -75,6 +75,7 @@ public class TypeGraphTopologicalOrderingTest extends AbstractTypeGraphTest {
 				 */
 				)},
 				{"topLevelNestedTable", ImmutableList.of("dummy","nst1","rec","boolean","integer")},
+				{"topLevelNestedTableInPackageNestedTable", ImmutableList.of("dummy","pkg.nst2","nst1","rec","boolean","integer")},
 		});
 	}
 
