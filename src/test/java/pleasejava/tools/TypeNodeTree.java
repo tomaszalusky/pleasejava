@@ -211,23 +211,34 @@ public class TypeNodeTree {
 		/**
 		 * Same as {@link #visitVarray(Varray, TypeNode, TransferObject, Boolean)},
 		 * enriched with deletion information.
-		 * If {@link Pointers} are added to parent,
-		 * then also {@link Deletions} transfer object is added as child of {@link Pointers}.
-		 * Pointers point not only into data collection(s) but also into collection of deletion flags.
+		 * Every collection is represented by two pointer collections:
+		 * first points into {@link Deletions} transfer object (q-pointers in toString),
+		 * second points into data (p-pointers in toString).
+		 * The indices of these two collections are independent and
+		 * together represent the content of whole collection.
+		 * For example, let <code>q</code> be <code>[1,4]</code>
+		 * and <code>p</code> be <code>[b,c,e]</code>.
+		 * Then <code>q</code> and <code>p</code> represent collection <code>[a,b,c,d,e]</code>
+		 * after performing <code>delete(1)</code> and <code>delete(4)</code>.
 		 * @see pleasejava.tools.TypeVisitorAAA#visitNestedTable(pleasejava.tools.NestedTable, java.lang.Object, java.lang.Object, java.lang.Object)
 		 */
 		@Override
 		public void visitNestedTable(NestedTable type, TypeNode typeNode, TransferObject parent, Boolean inCollection) {
 			if (type.isJdbcTransferrable()) {
-				if (inCollection) { // TODO deletion
-					TransferObject child = new Pointers(false,false,parent, typeNode);
+				if (inCollection) {
+					TransferObject pointersToDeletions = new Pointers(false,true,parent,typeNode);
+					associationsBuilder.put(typeNode, pointersToDeletions);
+					parent.addChild(pointersToDeletions);
+					TransferObject deletions = new Deletions(pointersToDeletions,typeNode);
+					associationsBuilder.put(typeNode, deletions);
+					pointersToDeletions.addChild(deletions);
+					TransferObject pointers = new Pointers(false,false,parent, typeNode);
+					associationsBuilder.put(typeNode, pointers);
+					parent.addChild(pointers);
+					TransferObject child = new JdbcTransferrableCollection(type, pointers, typeNode); // not typeNode.getChildren().get(NestedTable.ELEMENT_LABEL); because JTC TO must be associated with TN representing nested table, not its element
 					associationsBuilder.put(typeNode, child);
-					parent.addChild(child);
-					TypeNode childTypeNode = typeNode.getChildren().get(NestedTable.ELEMENT_LABEL);
-					TransferObject grandchild = new JdbcTransferrableCollection(type, child, childTypeNode);
-					associationsBuilder.put(childTypeNode, grandchild);
-					child.addChild(grandchild);
-				} else { // TODO not sure which of pointers,child should be associated with typenode, will be clarified when developing data transfer algorithm (if shows as unnecessary, need to correct also toString and ID generation)
+					pointers.addChild(child);
+				} else { // TODO not sure which of pointers,child should be associated with typenode, will be clarified when developing data transfer algorithm (if shows as unnecessary, need to correct also ID generation)
 					TransferObject pointersToDeletions = new Pointers(true,true,parent,typeNode);
 					associationsBuilder.put(typeNode, pointersToDeletions);
 					parent.addChild(pointersToDeletions);
