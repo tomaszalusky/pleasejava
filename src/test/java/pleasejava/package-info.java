@@ -1,12 +1,7 @@
 /**
- * - nacist derave nst pres JDBC
+ * ? nacist derave nst pres JDBC
  * - zrevidovat tvorbu TO u jdbct struktur
- *   - nst
- *     - jednoduche
- *     - vnorene 2
- *     - vnorene 3
  *   - varray
- *     - jednoduche
  *     - vnorene 2
  *     - vnorene 3
  *     - nst ve varray
@@ -21,6 +16,7 @@
  * - guavu pryc
  * - param. testy pryc
  * - sloucit type graph pro vic testu
+ * - robustni toString u TO
  * 
  * later:
  * - komentar patri az k TO: potomka typu trojstavový boolean, který charakterizuje nastavení null u prvkù (true/false), a pøíznak smazání prvku (null) POZN. ZREVIDOVAT, NEZDA SE MI, ZE BY V JEDNOM MISTE BYLA INFORMACE O CELE TABULCE I O JEJICH PRVCICH, A ZE NEMA TOTEZ VARRAY

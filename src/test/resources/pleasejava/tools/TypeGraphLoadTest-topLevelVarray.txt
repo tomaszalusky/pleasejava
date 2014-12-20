@@ -1,0 +1,5 @@
+procedure                "dummy"
+    arg in varray        "var1"
+        (element) record "rec"
+            b            "boolean"
+            i            "integer"

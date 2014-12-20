@@ -187,17 +187,20 @@ public class TypeNodeTree {
 		public void visitVarray(Varray type, TypeNode typeNode, TransferObject parent, Boolean inCollection) {
 			if (type.isJdbcTransferrable()) {
 				if (inCollection) {
-					TransferObject child = new Pointers(false,false,parent, typeNode);
-					associationsBuilder.put(typeNode, child);
-					parent.addChild(child);
+					TransferObject pointers = new Pointers(false,false,parent, typeNode);
+					associationsBuilder.put(typeNode, pointers);
+					parent.addChild(pointers);
 					TypeNode childTypeNode = typeNode.getChildren().get(Varray.ELEMENT_LABEL);
-					TransferObject grandchild = new JdbcTransferrableCollection(type, child, childTypeNode);
+					TransferObject grandchild = new JdbcTransferrableCollection(type, pointers, childTypeNode);
 					associationsBuilder.put(childTypeNode, grandchild);
-					child.addChild(grandchild);
+					pointers.addChild(grandchild);
 				} else {
-					TransferObject child = new JdbcTransferrableCollection(type, parent, typeNode);
+					TransferObject pointers = new Pointers(true,false,parent,typeNode);
+					associationsBuilder.put(typeNode, pointers);
+					parent.addChild(pointers);
+					TransferObject child = new JdbcTransferrableCollection(type, pointers, typeNode);
 					associationsBuilder.put(typeNode, child);
-					parent.addChild(child);
+					pointers.addChild(child);
 				}
 			} else {
 				TransferObject pointers = new Pointers(!inCollection,false,parent, typeNode);

@@ -213,8 +213,14 @@ class TypeNode {
 				if (tos.isEmpty()) { // part of more complex transferrable type
 					append("|");
 				} else {
-					TransferObject to = getOnlyElement(tos);
-					append("| " + indent(to.getDepth()) + to.toStringDescription()).append("#" + to.getId());
+					for (int i = 0;;) {
+						TransferObject to = tos.get(i);
+						append("| " + indent(to.getDepth()) + to.toStringDescription()).append("#" + to.getId());
+						if (++i == tos.size()) {
+							break;
+						}
+						newLine().append("").append("").append("");
+					}
 				}
 			}
 			newLine().append(indent(level + 1) + Varray.ELEMENT_LABEL + " ");

@@ -1,0 +1,6 @@
+procedure                "dummy"   #    | /            #
+    arg in varray        "var1"    #1   |     {sp}     #1p
+                                        |         var1 #1e
+        (element) record "rec"     #1e  |
+            b            "boolean" #1e1 |
+            i            "integer" #1e2 |
