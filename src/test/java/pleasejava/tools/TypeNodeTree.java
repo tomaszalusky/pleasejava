@@ -190,10 +190,9 @@ public class TypeNodeTree {
 					TransferObject pointers = new Pointers(false,false,parent, typeNode);
 					associationsBuilder.put(typeNode, pointers);
 					parent.addChild(pointers);
-					TypeNode childTypeNode = typeNode.getChildren().get(Varray.ELEMENT_LABEL);
-					TransferObject grandchild = new JdbcTransferrableCollection(type, pointers, childTypeNode);
-					associationsBuilder.put(childTypeNode, grandchild);
-					pointers.addChild(grandchild);
+					TransferObject child = new JdbcTransferrableCollection(type, pointers, typeNode); // not typeNode.getChildren().get(Varray.ELEMENT_LABEL); - see below for reason
+					associationsBuilder.put(typeNode, child);
+					pointers.addChild(child);
 				} else {
 					TransferObject pointers = new Pointers(true,false,parent,typeNode);
 					associationsBuilder.put(typeNode, pointers);
