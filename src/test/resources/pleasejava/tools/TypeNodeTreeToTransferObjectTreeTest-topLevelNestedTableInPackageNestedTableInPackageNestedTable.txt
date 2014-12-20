@@ -1,0 +1,14 @@
+procedure                         "dummy"    #      | /                    #
+    arg in nestedtable            "pkg.nst3" #1     |     {sq}             #1q
+                                                    |         {d}          #1d
+                                                    |     {sp}             #1p
+        (element) nestedtable     "pkg.nst2" #1e    |         {q}          #1eq
+                                                    |             {d}      #1ed
+                                                    |         {p}          #1ep
+            (element) nestedtable "nst1"     #1ee   |             {q}      #1eeq
+                                                    |                 {d}  #1eed
+                                                    |             {p}      #1eep
+                                                    |                 nst1 #1eee
+                (element) record  "rec"      #1eee  |
+                    b             "boolean"  #1eee1 |
+                    i             "integer"  #1eee2 |

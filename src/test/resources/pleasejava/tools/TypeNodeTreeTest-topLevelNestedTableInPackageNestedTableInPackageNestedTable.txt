@@ -1,0 +1,7 @@
+procedure                         "dummy"    #
+    arg in nestedtable            "pkg.nst3" #1
+        (element) nestedtable     "pkg.nst2" #1e
+            (element) nestedtable "nst1"     #1ee
+                (element) record  "rec"      #1eee
+                    b             "boolean"  #1eee1
+                    i             "integer"  #1eee2
