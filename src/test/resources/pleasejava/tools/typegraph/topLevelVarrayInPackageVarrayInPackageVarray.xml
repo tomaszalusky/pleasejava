@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<typegraph>
+	<procedure name="dummy">
+		<in name="arg" type="pkg.var3" />
+	</procedure>
+	<varray name="pkg.var3" of="pkg.var2" />
+	<varray name="pkg.var2" of="var1" />
+	<varray name="var1" of="rec" />
+	<record name="rec">
+		<field name="b" type="boolean" />
+		<field name="i" type="integer" />
+	</record>
+</typegraph>

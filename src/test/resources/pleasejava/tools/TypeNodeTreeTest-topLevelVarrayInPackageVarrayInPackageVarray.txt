@@ -1,0 +1,7 @@
+procedure                        "dummy"    #
+    arg in varray                "pkg.var3" #1
+        (element) varray         "pkg.var2" #1e
+            (element) varray     "var1"     #1ee
+                (element) record "rec"      #1eee
+                    b            "boolean"  #1eee1
+                    i            "integer"  #1eee2
