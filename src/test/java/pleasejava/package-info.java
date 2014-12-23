@@ -1,9 +1,6 @@
 /**
  * ? nacist derave nst pres JDBC
  * - zrevidovat tvorbu TO u jdbct struktur
- *   - varray
- *     - nst ve varray
- *     - varray v nst
  *   - jdbct record
  *   - vratit suffix TO pro transferrable kolekci na t - 1eee u TO plete, kdyz u TN je to id recordu
  * - zapracovat koncept JDBC-transferrable typu, a la ifc JdbcTransfer { convertForth(); convertBack(); } - to bude az u TO, mozna i dale

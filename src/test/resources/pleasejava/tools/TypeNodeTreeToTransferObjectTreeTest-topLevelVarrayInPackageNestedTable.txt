@@ -1,0 +1,9 @@
+procedure                    "dummy"    #     | /                #
+    arg in nestedtable       "pkg.nst2" #1    |     {sq}         #1q
+                                              |         {d}      #1d
+                                              |     {sp}         #1p
+        (element) varray     "var1"     #1e   |         {p}      #1ep
+                                              |             var1 #1ee
+            (element) record "rec"      #1ee  |
+                b            "boolean"  #1ee1 |
+                i            "integer"  #1ee2 |
