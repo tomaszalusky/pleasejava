@@ -138,9 +138,9 @@ public class TypeNodeTree {
 		}
 
 		/**
-		 * If JDBC-transferrable type is part of collection
+		 * If JDBC-transferrable record type is part of collection
 		 * (which is not JDBC-transferrable - otherwise it would be processed in its visitor method)
-		 * they must be decomposed as if they weren't transferrable
+		 * then it must be decomposed as if it wasn't transferrable
 		 * because there are no means how to send such a sequence to db.
 		 * @see pleasejava.tools.TypeVisitorAAA#visitRecord(pleasejava.tools.Record, java.lang.Object, java.lang.Object, java.lang.Object)
 		 */

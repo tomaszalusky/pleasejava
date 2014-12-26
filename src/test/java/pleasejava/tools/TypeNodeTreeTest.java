@@ -42,6 +42,7 @@ public class TypeNodeTreeTest extends AbstractTypeGraphTest {
 				{"topLevelVarrayInPackageVarrayInPackageVarray"},
 				{"topLevelNestedTableInPackageVarray"},
 				{"topLevelVarrayInPackageNestedTable"},
+				{"topLevelRecord"},
 		});
 	}
 

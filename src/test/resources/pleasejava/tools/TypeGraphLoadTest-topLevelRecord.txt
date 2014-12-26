@@ -1,0 +1,4 @@
+procedure         "dummy"
+    arg in record "rec"
+        b         "boolean"
+        i         "integer"

@@ -82,6 +82,7 @@ public class TypeGraphTopologicalOrderingTest extends AbstractTypeGraphTest {
 				{"topLevelVarrayInPackageVarrayInPackageVarray", ImmutableList.of("dummy","pkg.var3","pkg.var2","var1","rec","boolean","integer")},
 				{"topLevelNestedTableInPackageVarray", ImmutableList.of("dummy","pkg.var2","nst1","rec","boolean","integer")},
 				{"topLevelVarrayInPackageNestedTable", ImmutableList.of("dummy","pkg.nst2","var1","rec","boolean","integer")},
+				{"topLevelRecord", ImmutableList.of("dummy","rec","boolean","integer")},
 		});
 	}
 
