@@ -58,6 +58,7 @@ public class TypeGraphLoadTest extends AbstractTypeGraphTest {
 				{"topLevelNestedTableInPackageVarray" , null                                , null},
 				{"topLevelVarrayInPackageNestedTable"           , null                                , null},
 				{"topLevelRecord"       , null                                , null},
+				{"topLevelRecordInPackageRecord"       , null                                , null},
 				{"invalidType"          , UndeclaredTypeException.class       , "'nonexisting'"},
 				{"invalidPlsqlConstruct", InvalidPlsqlConstructException.class, "'nonexisting'"},
 				{"invalidDependencies"  , TypeCircularityException.class      , "'nst1'"},

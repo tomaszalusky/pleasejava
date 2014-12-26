@@ -1,0 +1,3 @@
+/
+    rec
+    varchar2(10)

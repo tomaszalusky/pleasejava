@@ -1,0 +1,6 @@
+procedure         "dummy"
+    arg in record "pkg.rec2"
+        r record  "rec"
+            b     "boolean"
+            i     "integer"
+        v         "varchar2(10)"
