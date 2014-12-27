@@ -1,6 +1,6 @@
 procedure         "dummy"        #    | /                #
     arg in record "pkg.rec2"     #1   |
-        r record  "rec"          #11  |     rec          #11
+        r record  "rec"          #11  |     rec          #11s
             b     "boolean"      #111 |
             i     "integer"      #112 |
         v         "varchar2(10)" #12  |     varchar2(10) #12

@@ -1,5 +1,5 @@
 procedure                               "main"          #        | /     #
-    pa in record                        "a"             #1       |     a #1
+    pa in record                        "a"             #1       |     a #1s
         fb nestedtable                  "b"             #11      |
             (element) record            "f"             #11e     |
                 fg record               "g"             #11e1    |
@@ -37,7 +37,7 @@ procedure                               "main"          #        | /     #
                         (key)           "pls_integer"            |
                         (element)       "varchar2(100)" #12221e  |
                     fj                  "varchar2(100)" #12222   |
-    pd in record                        "d"             #2       |     d #2
+    pd in record                        "d"             #2       |     d #2s
         fc record                       "c"             #21      |
             ff record                   "f"             #211     |
                 fg record               "g"             #2111    |

@@ -1,4 +1,4 @@
 procedure         "dummy"   #   | /       #
-    arg in record "rec"     #1  |     rec #1
+    arg in record "rec"     #1  |     rec #1s
         b         "boolean" #11 |
         i         "integer" #12 |

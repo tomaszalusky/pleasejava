@@ -3,7 +3,7 @@ procedure                     "dummy"    #     | /                #
         (element) nestedtable "nst1"     #1e   |         {q}      #1eq
                                                |             {d}  #1ed
                                                |         {p}      #1ep
-                                               |             nst1 #1ee
+                                               |             nst1 #1ea
             (element) record  "rec"      #1ee  |
                 b             "boolean"  #1ee1 |
                 i             "integer"  #1ee2 |

@@ -3,7 +3,7 @@ procedure                    "dummy"    #     | /                #
                                               |         {d}      #1d
                                               |     {sp}         #1p
         (element) varray     "var1"     #1e   |         {p}      #1ep
-                                              |             var1 #1ee
+                                              |             var1 #1ea
             (element) record "rec"      #1ee  |
                 b            "boolean"  #1ee1 |
                 i            "integer"  #1ee2 |

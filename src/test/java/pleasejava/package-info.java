@@ -1,5 +1,4 @@
 /**
- * - vratit suffix TO pro transferrable kolekci na t - 1eee u TO plete, kdyz u TN je to id recordu
  * - robustni toString u TO
  * - param. testy pryc
  * - sloucit type graph pro vic testu

@@ -8,7 +8,7 @@ procedure                         "dummy"    #      | /                    #
             (element) nestedtable "nst1"     #1ee   |             {q}      #1eeq
                                                     |                 {d}  #1eed
                                                     |             {p}      #1eep
-                                                    |                 nst1 #1eee
+                                                    |                 nst1 #1eea
                 (element) record  "rec"      #1eee  |
                     b             "boolean"  #1eee1 |
                     i             "integer"  #1eee2 |
