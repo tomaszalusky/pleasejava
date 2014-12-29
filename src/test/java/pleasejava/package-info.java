@@ -1,5 +1,7 @@
 /**
- * - robustni toString u TO
+ * - PrimitiveHolder
+ * - vysusit volani append...
+ * - SetMultimap associations
  * - param. testy pryc
  * - sloucit type graph pro vic testu
  * - strucnejsi nazvovou konvenci pro testy

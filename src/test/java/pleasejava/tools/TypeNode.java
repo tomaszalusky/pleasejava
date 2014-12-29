@@ -160,7 +160,7 @@ class TypeNode {
 		public void visitProcedureSignature(ProcedureSignature type, Integer level, TypeNode typeNode) {
 			appendToLastCell("procedure").append("\"" + type.getName() + "\"").append("#" + typeNode.id());
 			if (transferObjectTree != null) {
-				TransferObject to = getOnlyElement(transferObjectTree.getAssociations().get(typeNode));
+				TransferObject to = transferObjectTree.getTransferObject(typeNode, RootTransferObject.class);
 				append("| " + indent(to.getDepth()) + to.toStringDescription()).append("#" + to.getId());
 			}
 			for (Map.Entry<String,Parameter> entry : type.getParameters().entrySet()) {
@@ -174,7 +174,7 @@ class TypeNode {
 		public void visitFunctionSignature(FunctionSignature type, Integer level, TypeNode typeNode) {
 			appendToLastCell("function").append("\"" + type.getName() + "\"").append("#" + typeNode.id());
 			if (transferObjectTree != null) {
-				TransferObject to = getOnlyElement(transferObjectTree.getAssociations().get(typeNode));
+				TransferObject to = transferObjectTree.getTransferObject(typeNode, RootTransferObject.class);
 				append("| " + indent(to.getDepth()) + to.toStringDescription()).append("#" + to.getId());
 			}
 			newLine().append(indent(level + 1) + FunctionSignature.RETURN_LABEL + " ");
@@ -190,12 +190,11 @@ class TypeNode {
 		public void visitRecord(Record type, Integer level, TypeNode typeNode) {
 			appendToLastCell("record").append("\"" + type.getName() + "\"").append("#" + typeNode.id());
 			if (transferObjectTree != null) {
-				List<TransferObject> tos = transferObjectTree.getAssociations().get(typeNode);
-				if (tos.isEmpty()) { // part of more complex transferrable type
+				if (transferObjectTree.hasTransferObject(typeNode)) { // only JDBC-transferrable record needs TO, other records nodes never have associated TO due to decomposition
+					TransferObject toS = transferObjectTree.getTransferObject(typeNode, JdbcTransferrableRecord.class);
+					append("| " + indent(toS.getDepth()) + toS.toStringDescription()).append("#" + toS.getId());
+				} else { // part of more complex transferrable type
 					append("|");
-				} else { // JDBC-transferrable record needs TO, other records nodes never have associated TO due to decomposition
-					TransferObject to = getOnlyElement(tos);
-					append("| " + indent(to.getDepth()) + to.toStringDescription()).append("#" + to.getId());
 				}
 			}
 			for (Map.Entry<String,Type> entry : type.getFields().entrySet()) {
@@ -209,18 +208,16 @@ class TypeNode {
 		public void visitVarray(Varray type, Integer level, TypeNode typeNode) {
 			appendToLastCell("varray").append("\"" + type.getName() + "\"").append("#" + typeNode.id());
 			if (transferObjectTree != null) {
-				List<TransferObject> tos = transferObjectTree.getAssociations().get(typeNode);
-				if (tos.isEmpty()) { // part of more complex transferrable type
-					append("|");
-				} else {
-					for (int i = 0;;) {
-						TransferObject to = tos.get(i);
-						append("| " + indent(to.getDepth()) + to.toStringDescription()).append("#" + to.getId());
-						if (++i == tos.size()) {
-							break;
-						}
+				if (transferObjectTree.hasTransferObject(typeNode)) {
+					TransferObject toP = transferObjectTree.getTransferObject(typeNode, DataPointers.class);
+					append("| " + indent(toP.getDepth()) + toP.toStringDescription()).append("#" + toP.getId());
+					TransferObject toA = transferObjectTree.getTransferObject(typeNode, JdbcTransferrableCollection.class);
+					if (toA != null) {
 						newLine().append("").append("").append("");
+						append("| " + indent(toA.getDepth()) + toA.toStringDescription()).append("#" + toA.getId());
 					}
+				} else { // part of more complex transferrable type
+					append("|");
 				}
 			}
 			newLine().append(indent(level + 1) + Varray.ELEMENT_LABEL + " ");
@@ -231,18 +228,22 @@ class TypeNode {
 		public void visitNestedTable(NestedTable type, Integer level, TypeNode typeNode) {
 			appendToLastCell("nestedtable").append("\"" + type.getName() + "\"").append("#" + typeNode.id());
 			if (transferObjectTree != null) {
-				List<TransferObject> tos = transferObjectTree.getAssociations().get(typeNode);
-				if (tos.isEmpty()) { // part of more complex transferrable type
-					append("|");
-				} else {
-					for (int i = 0;;) {
-						TransferObject to = tos.get(i);
-						append("| " + indent(to.getDepth()) + to.toStringDescription()).append("#" + to.getId());
-						if (++i == tos.size()) {
-							break;
-						}
+				if (transferObjectTree.hasTransferObject(typeNode)) {
+					TransferObject toQ = transferObjectTree.getTransferObject(typeNode, DeletionsPointers.class);
+					append("| " + indent(toQ.getDepth()) + toQ.toStringDescription()).append("#" + toQ.getId());
+					TransferObject toD = transferObjectTree.getTransferObject(typeNode, Deletions.class);
+					newLine().append("").append("").append("");
+					append("| " + indent(toD.getDepth()) + toD.toStringDescription()).append("#" + toD.getId());
+					TransferObject toP = transferObjectTree.getTransferObject(typeNode, DataPointers.class);
+					newLine().append("").append("").append("");
+					append("| " + indent(toP.getDepth()) + toP.toStringDescription()).append("#" + toP.getId());
+					TransferObject toA = transferObjectTree.getTransferObject(typeNode, JdbcTransferrableCollection.class);
+					if (toA != null) {
 						newLine().append("").append("").append("");
+						append("| " + indent(toA.getDepth()) + toA.toStringDescription()).append("#" + toA.getId());
 					}
+				} else { // part of more complex transferrable type
+					append("|");
 				}
 			}
 			newLine().append(indent(level + 1) + NestedTable.ELEMENT_LABEL + " ");
@@ -253,25 +254,21 @@ class TypeNode {
 		public void visitIndexByTable(IndexByTable type, Integer level, TypeNode typeNode) {
 			appendToLastCell("indexbytable").append("\"" + type.getName() + "\"").append("#" + typeNode.id());
 			if (transferObjectTree != null) {
-				List<TransferObject> tos = transferObjectTree.getAssociations().get(typeNode);
-				if (tos.isEmpty()) { // part of more complex transferrable type
+				if (transferObjectTree.hasTransferObject(typeNode)) {
+					TransferObject toP = transferObjectTree.getTransferObject(typeNode, DataPointers.class);
+					append("| " + indent(toP.getDepth()) + toP.toStringDescription()).append("#" + toP.getId());
+				} else { // part of more complex transferrable type
 					append("|");
-				} else {
-					Preconditions.checkState(tos.size() == 2,"wrong number of associations: %s",tos.size());
-					TransferObject toPointers = tos.get(0);
-					append("| " + indent(toPointers.getDepth()) + toPointers.toStringDescription()).append("#" + toPointers.getId());
 				}
 			}
 			newLine().append(indent(level + 1) + IndexByTable.KEY_LABEL).append(type.getIndexType().toString());
 			if (transferObjectTree != null) {
-				List<TransferObject> tos = transferObjectTree.getAssociations().get(typeNode);
 				append(""); // skipping id column
-				if (tos.isEmpty()) { // part of more complex transferrable type
+				if (transferObjectTree.hasTransferObject(typeNode)) {
+					TransferObject toI = transferObjectTree.getTransferObject(typeNode, Indexes.class);
+					append("| " + indent(toI.getDepth()) + toI.toStringDescription()).append("#" + toI.getId());
+				} else { // part of more complex transferrable type
 					append("|");
-				} else {
-					Preconditions.checkState(tos.size() == 2,"wrong number of associations: %s",tos.size());
-					TransferObject toIndexes = tos.get(1);
-					append("| " + indent(toIndexes.getDepth()) + toIndexes.toStringDescription()).append("#" + toIndexes.getId());
 				}
 			}
 			newLine().append(indent(level + 1) + IndexByTable.ELEMENT_LABEL + " ");
@@ -282,12 +279,14 @@ class TypeNode {
 		public void visitPrimitive(PrimitiveType type, Integer level, TypeNode typeNode) {
 			append("\"" + type.getName() + "\"").append("#" + typeNode.id());
 			if (transferObjectTree != null) {
-				List<TransferObject> tos = transferObjectTree.getAssociations().get(typeNode);
-				if (tos.isEmpty()) { // part of more complex transferrable type
-					append("|");
-				} else { // decomposition reaches primitive node in which case it must have exactly one TO
-					TransferObject to = getOnlyElement(tos);
+				if (transferObjectTree.hasTransferObject(typeNode)) { // decomposition reaches primitive node in which case it must have exactly one TO
+					TransferObject to = transferObjectTree.getTransferObject(typeNode, PrimitiveScalar.class);
+					if (to == null) {
+						to = transferObjectTree.getTransferObject(typeNode, PrimitiveCollection.class);
+					}
 					append("| " + indent(to.getDepth()) + to.toStringDescription()).append("#" + to.getId());
+				} else { // part of more complex transferrable type
+					append("|");
 				}
 			}
 		}
