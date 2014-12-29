@@ -1,5 +1,4 @@
 /**
- * - SetMultimap associations
  * - param. testy pryc
  * - sloucit type graph pro vic testu
  * - strucnejsi nazvovou konvenci pro testy

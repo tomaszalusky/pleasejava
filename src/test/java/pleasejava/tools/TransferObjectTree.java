@@ -2,10 +2,10 @@ package pleasejava.tools;
 
 import static com.google.common.collect.FluentIterable.from;
 
-import java.util.List;
+import java.util.Set;
 
 import com.google.common.collect.Iterables;
-import com.google.common.collect.ListMultimap;
+import com.google.common.collect.SetMultimap;
 
 /**
  * Tree of transfer objects.
@@ -25,9 +25,9 @@ public class TransferObjectTree {
 	 * {@link TypeNode} is intended to be universal for many calls.
 	 * Inverse association is stored in {@link TransferObject}.
 	 */
-	private final ListMultimap<TypeNode,TransferObject> associations;
+	private final SetMultimap<TypeNode,TransferObject> associations;
 	
-	public TransferObjectTree(TypeNode typeTreeRoot, TransferObject root, ListMultimap<TypeNode,TransferObject> associations) {
+	public TransferObjectTree(TypeNode typeTreeRoot, TransferObject root, SetMultimap<TypeNode,TransferObject> associations) {
 		this.typeTreeRoot = typeTreeRoot;
 		this.root = root;
 		this.associations = associations;
@@ -41,7 +41,7 @@ public class TransferObjectTree {
 	 * @return transfer object; null, if no transfer object of required class is associated with given type node
 	 */
 	public <T extends TransferObject> T getTransferObject(TypeNode typeNode, Class<T> transferObjectClass) {
-		List<TransferObject> all = associations.get(typeNode);
+		Set<TransferObject> all = associations.get(typeNode);
 		T result = Iterables.getOnlyElement(from(all).filter(transferObjectClass),null);
 		return result;
 	}

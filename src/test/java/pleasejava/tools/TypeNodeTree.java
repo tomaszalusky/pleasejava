@@ -6,7 +6,7 @@ import java.util.Map;
 
 import pleasejava.tools.TypeNode.ToString;
 
-import com.google.common.collect.ImmutableListMultimap;
+import com.google.common.collect.ImmutableSetMultimap;
 
 /**
  * Represents hierarchy of type nodes for concrete procedure or function.
@@ -73,7 +73,7 @@ public class TypeNodeTree {
 	}
 
 	TransferObjectTree toTransferObjectTree() {
-		ImmutableListMultimap.Builder<TypeNode,TransferObject> associationsBuilder = ImmutableListMultimap.builder();
+		ImmutableSetMultimap.Builder<TypeNode,TransferObject> associationsBuilder = ImmutableSetMultimap.builder();
 		TransferObject root = new RootTransferObject(rootNode);
 		associationsBuilder.put(rootNode,root);
 		rootNode.getType().accept(new AddToTransferObject(associationsBuilder),rootNode,root,false);
@@ -104,9 +104,9 @@ public class TypeNodeTree {
 	 */
 	static class AddToTransferObject implements TypeVisitorAAA<TypeNode,TransferObject,Boolean> {
 
-		private final ImmutableListMultimap.Builder<TypeNode,TransferObject> associationsBuilder;
+		private final ImmutableSetMultimap.Builder<TypeNode,TransferObject> associationsBuilder;
 		
-		public AddToTransferObject(ImmutableListMultimap.Builder<TypeNode,TransferObject> associationsBuilder) {
+		public AddToTransferObject(ImmutableSetMultimap.Builder<TypeNode,TransferObject> associationsBuilder) {
 			this.associationsBuilder = associationsBuilder;
 		}
 
