@@ -40,7 +40,7 @@ import com.google.common.collect.Range;
  * </p>
  * @author Tomas Zalusky
  */
-public class Pointers extends TransferObject {
+public abstract class Pointers extends TransferObject {
 
 	private final List<Integer> data = Lists.newArrayList();
 
