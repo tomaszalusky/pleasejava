@@ -1,5 +1,4 @@
 /**
- * - vysusit volani append...
  * - SetMultimap associations
  * - param. testy pryc
  * - sloucit type graph pro vic testu
