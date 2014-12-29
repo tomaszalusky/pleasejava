@@ -1,11 +1,10 @@
 package pleasejava.tools;
 
-
 /**
  * Single (scalar) value of primitive type.
  * @author Tomas Zalusky
  */
-public class PrimitiveScalar extends TransferObject {
+public class PrimitiveScalar extends PrimitiveHolder {
 
 	private final PrimitiveType type;
 	

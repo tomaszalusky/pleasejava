@@ -9,7 +9,7 @@ import com.google.common.collect.Lists;
  * Can be sent via JDBC as a whole (i.e. using java.sql.Array).
  * @author Tomas Zalusky
  */
-public class PrimitiveCollection extends TransferObject {
+public class PrimitiveCollection extends PrimitiveHolder {
 
 	private final PrimitiveType type;
 	

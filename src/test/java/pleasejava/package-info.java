@@ -1,5 +1,4 @@
 /**
- * - PrimitiveHolder
  * - vysusit volani append...
  * - SetMultimap associations
  * - param. testy pryc

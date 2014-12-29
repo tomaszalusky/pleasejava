@@ -1,13 +1,9 @@
 package pleasejava.tools;
 
-import static com.google.common.collect.Iterables.getOnlyElement;
-
-import java.util.List;
 import java.util.Map;
 
 import pleasejava.Utils;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 
 /**
@@ -280,10 +276,7 @@ class TypeNode {
 			append("\"" + type.getName() + "\"").append("#" + typeNode.id());
 			if (transferObjectTree != null) {
 				if (transferObjectTree.hasTransferObject(typeNode)) { // decomposition reaches primitive node in which case it must have exactly one TO
-					TransferObject to = transferObjectTree.getTransferObject(typeNode, PrimitiveScalar.class);
-					if (to == null) {
-						to = transferObjectTree.getTransferObject(typeNode, PrimitiveCollection.class);
-					}
+					TransferObject to = transferObjectTree.getTransferObject(typeNode, PrimitiveHolder.class);
 					append("| " + indent(to.getDepth()) + to.toStringDescription()).append("#" + to.getId());
 				} else { // part of more complex transferrable type
 					append("|");
