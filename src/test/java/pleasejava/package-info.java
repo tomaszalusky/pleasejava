@@ -1,6 +1,4 @@
 /**
- * - sloucit type graph pro vic testu
- * - strucnejsi nazvovou konvenci pro testy
  * 
  * later,technicke:
  * - J8
