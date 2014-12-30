@@ -25,7 +25,7 @@ public class TypeGraphLoadTest extends AbstractTypeGraphTest {
 
 	private static boolean record = false;
 
-	private final String name;
+	private final String graphName;
 	
 	private final String expected;
 
@@ -36,9 +36,9 @@ public class TypeGraphLoadTest extends AbstractTypeGraphTest {
 	@Rule
 	public ExpectedException exception = ExpectedException.none();
 	
-	public TypeGraphLoadTest(String name, Class<? extends Exception> exceptionClass, Object expectedMessageOrMatcher) throws IOException {
-		this.name = name;
-		this.expected = record ? null : (exceptionClass == null ? readExpectedOutput(getClass(),name) : null);
+	public TypeGraphLoadTest(String graphName, Class<? extends Exception> exceptionClass, Object expectedMessageOrMatcher) throws IOException {
+		this.graphName = graphName;
+		this.expected = record ? null : (exceptionClass == null ? readExpectedOutput(getClass(),graphName) : null);
 		this.exceptionClass = exceptionClass;
 		this.expectedMessageOrMatcher = expectedMessageOrMatcher;
 	}
@@ -49,16 +49,7 @@ public class TypeGraphLoadTest extends AbstractTypeGraphTest {
 				{"simple"               , null                                , null},
 				{"dag1"                 , null                                , null},
 				{"allTypes"             , null                                , null},
-				{"topLevelNestedTable"  , null                                , null},
-				{"topLevelNestedTableInPackageNestedTable" , null                                , null},
-				{"topLevelNestedTableInPackageNestedTableInPackageNestedTable" , null            , null},
-				{"topLevelVarray"       , null                                , null},
-				{"topLevelVarrayInPackageVarray"           , null                                , null},
-				{"topLevelVarrayInPackageVarrayInPackageVarray", null, null},
-				{"topLevelNestedTableInPackageVarray" , null                                , null},
-				{"topLevelVarrayInPackageNestedTable"           , null                                , null},
-				{"topLevelRecord"       , null                                , null},
-				{"topLevelRecordInPackageRecord"       , null                                , null},
+				{"topLevel"             , null                                , null},
 				{"invalidType"          , UndeclaredTypeException.class       , "'nonexisting'"},
 				{"invalidPlsqlConstruct", InvalidPlsqlConstructException.class, "'nonexisting'"},
 				{"invalidDependencies"  , TypeCircularityException.class      , "'nst1'"},
@@ -84,12 +75,12 @@ public class TypeGraphLoadTest extends AbstractTypeGraphTest {
 			} else {
 				exception.expect((Matcher<?>)expectedMessageOrMatcher);
 			}
-			loadGraph(name);
+			loadGraph(graphName);
 		} else {
-			TypeGraph typeGraph = loadGraph(name);
+			TypeGraph typeGraph = loadGraph(graphName);
 			String actual = typeGraph.toString();
 			if (record) {
-				writeExpectedOutput(getClass(),name,actual);
+				writeExpectedOutput(getClass(),graphName,actual);
 			} else {
 				Utils.assertEquals(expected,actual);
 			}

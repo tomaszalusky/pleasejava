@@ -160,7 +160,7 @@ abstract class Type {
 
 		@Override
 		public void visitProcedureSignature(ProcedureSignature type, Integer level) {
-			appendToLastCell("procedure").append("\"" + type.getName() + "\"");
+			newLine().append("procedure").append("\"" + type.getName() + "\"");
 			if (!checkWritten(type)) {
 				for (Entry<String,Parameter> entry : type.getParameters().entrySet()) {
 					newLine().append(indent(level + 1) + entry.getKey() + " " + entry.getValue().getParameterMode().name().toLowerCase() + " ");
@@ -171,7 +171,7 @@ abstract class Type {
 
 		@Override
 		public void visitFunctionSignature(FunctionSignature type, Integer level) {
-			appendToLastCell("function").append("\"" + type.getName() + "\"");
+			newLine().append("function").append("\"" + type.getName() + "\"");
 			if (!checkWritten(type)) {
 				newLine().append(indent(level + 1) + FunctionSignature.RETURN_LABEL + " ");
 				type.getReturnType().accept(this,level + 1);

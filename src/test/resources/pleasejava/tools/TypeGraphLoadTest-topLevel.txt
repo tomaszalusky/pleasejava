@@ -1,0 +1,32 @@
+procedure                         "pn_pn_tn_tr"
+    arg in nestedtable            "pkg.nst3"
+        (element) nestedtable     "pkg.nst2"
+            (element) nestedtable "nst1"
+                (element) record  "rec"
+                    b             "boolean"
+                    i             "integer"
+procedure                         "pn_tn_tr"
+    arg in nestedtable            "pkg.nst2" ...
+procedure                         "pv_tn_tr"
+    arg in varray                 "pkg.varn"
+        (element) nestedtable     "nst1" ...
+procedure                         "tn_tr"
+    arg in nestedtable            "nst1" ...
+procedure                         "pv_pv_tv_tr"
+    arg in varray                 "pkg.var3"
+        (element) varray          "pkg.var2"
+            (element) varray      "var1"
+                (element) record  "rec" ...
+procedure                         "pv_tv_tr"
+    arg in varray                 "pkg.var2" ...
+procedure                         "pn_tv_tr"
+    arg in nestedtable            "pkg.nstv"
+        (element) varray          "var1" ...
+procedure                         "tv_tr"
+    arg in varray                 "var1" ...
+procedure                         "pr_tr"
+    arg in record                 "pkg.rec2"
+        r record                  "rec" ...
+        v                         "varchar2(10)"
+procedure                         "tr"
+    arg in record                 "rec" ...

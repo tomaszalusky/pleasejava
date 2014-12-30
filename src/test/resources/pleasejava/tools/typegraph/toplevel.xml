@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<typegraph><!-- various combinations of toplevel and package collection and record types -->
+
+	<procedure name="pn_pn_tn_tr">
+		<in name="arg" type="pkg.nst3" />
+	</procedure>
+	<procedure name="pn_tn_tr">
+		<in name="arg" type="pkg.nst2" />
+	</procedure>
+	<procedure name="pv_tn_tr">
+		<in name="arg" type="pkg.varn" />
+	</procedure>
+	<procedure name="tn_tr">
+		<in name="arg" type="nst1" />
+	</procedure>
+	<procedure name="pv_pv_tv_tr">
+		<in name="arg" type="pkg.var3" />
+	</procedure>
+	<procedure name="pv_tv_tr">
+		<in name="arg" type="pkg.var2" />
+	</procedure>
+	<procedure name="pn_tv_tr">
+		<in name="arg" type="pkg.nstv" />
+	</procedure>
+	<procedure name="tv_tr">
+		<in name="arg" type="var1" />
+	</procedure>
+	
+	<procedure name="pr_tr">
+		<in name="arg" type="pkg.rec2" />
+	</procedure>
+	<procedure name="tr">
+		<in name="arg" type="rec" />
+	</procedure>
+
+	<nestedtable name="pkg.nst3" of="pkg.nst2" />
+	<nestedtable name="pkg.nst2" of="nst1" />
+	<varray name="pkg.varn" of="nst1" />
+	<nestedtable name="nst1" of="rec" />
+	
+	<varray name="pkg.var3" of="pkg.var2" />
+	<varray name="pkg.var2" of="var1" />
+	<nestedtable name="pkg.nstv" of="var1" />
+	<varray name="var1" of="rec" />
+	
+	<record name="pkg.rec2">
+		<field name="r" type="rec" />
+		<field name="v" type="varchar2(10)" />
+	</record>
+
+	<record name="rec">
+		<field name="b" type="boolean" />
+		<field name="i" type="integer" />
+	</record>
+
+</typegraph>

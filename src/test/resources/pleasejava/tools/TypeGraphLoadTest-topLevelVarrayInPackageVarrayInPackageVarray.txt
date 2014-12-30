@@ -1,7 +1,0 @@
-procedure                        "dummy"
-    arg in varray                "pkg.var3"
-        (element) varray         "pkg.var2"
-            (element) varray     "var1"
-                (element) record "rec"
-                    b            "boolean"
-                    i            "integer"

@@ -105,7 +105,7 @@ public class Utils {
 		
 		public ToStringSupport() {
 			this.table = Lists.newArrayList();
-			newLine().append("");
+			//newLine().append("");
 		}
 
 		protected static String indent(int level) {
@@ -114,10 +114,13 @@ public class Utils {
 
 		/**
 		 * Appends new empty row in the end of table.
+		 * Prevents addition of new lines into empty table.
 		 * @return this
 		 */
 		public ToStringSupport newLine() {
-			table.add(Lists.<String>newArrayList());
+			if (!table.isEmpty()) {
+				table.add(Lists.<String>newArrayList());
+			}
 			return this;
 		}
 
@@ -128,7 +131,10 @@ public class Utils {
 		 * @return this
 		 */
 		public ToStringSupport appendToLastCell(String appendee) {
-			List<String> lastRow = Iterables.getLast(table);
+			List<String> lastRow = Iterables.getLast(table,null);
+			if (lastRow == null) {
+				table.add(lastRow = Lists.<String>newArrayList(""));
+			}
 			int index = lastRow.size() - 1;
 			append(lastRow.remove(index) + appendee);
 			return this;
@@ -136,11 +142,16 @@ public class Utils {
 		
 		/**
 		 * Appends string as new cell at the end of last row of table.
+		 * Creates new row if no such exists.
 		 * @param cell
 		 * @return
 		 */
 		public ToStringSupport append(String cell) {
-			Iterables.getLast(table).add(cell);
+			List<String> lastRow = Iterables.getLast(table,null);
+			if (lastRow == null) {
+				table.add(lastRow = Lists.<String>newArrayList());
+			}
+			lastRow.add(cell);
 			return this;
 		}
 		

@@ -1,6 +1,0 @@
-procedure                    "dummy"
-    arg in nestedtable       "pkg.nst2"
-        (element) varray     "var1"
-            (element) record "rec"
-                b            "boolean"
-                i            "integer"
