@@ -3,7 +3,6 @@ package pleasejava.tools;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,44 +18,49 @@ public class TransferObjectTreeTest extends AbstractTypeGraphTest {
 
 	private static boolean record = false;
 	
-	private final String name;
+	private final String graphName;
 	
+	private final String executableName;
+
 	private final String expected;
 	
-	public TransferObjectTreeTest(String name) throws IOException {
-		this.name = name;
-		this.expected = record ? null : readExpectedOutput(getClass(),name);
+	public TransferObjectTreeTest(String graphName, String executableName) throws IOException {
+		this.graphName = graphName;
+		this.executableName = executableName;
+		this.expected = record ? null : readExpectedOutput(getClass(),graphName,executableName);
 	}
 
-	@Parameterized.Parameters(name = "{index}: {0}")
+	@Parameterized.Parameters(name = "{index}: {0}-{1}")
 	public static Collection<Object[]> data() {
 		return Arrays.asList(new Object[][] {
-				{"simple"},
-				{"dag1"},
-				{"alltypes"},
-				{"topLevelNestedTable"},
-				{"topLevelNestedTableInPackageNestedTable"},
-				{"topLevelNestedTableInPackageNestedTableInPackageNestedTable"},
-				{"topLevelVarray"},
-				{"topLevelVarrayInPackageVarray"},
-				{"topLevelVarrayInPackageVarrayInPackageVarray"},
-				{"topLevelNestedTableInPackageVarray"},
-				{"topLevelVarrayInPackageNestedTable"},
-				{"topLevelRecord"},
-				{"topLevelRecordInPackageRecord"},
+				{"simple"  ,"main"},
+				{"dag1"    ,"main"},
+				{"alltypes","echo"},
+				{"topLevel","tn_tr"},
+				{"topLevel","pn_tn_tr"},
+				{"topLevel","pn_pn_tn_tr"},
+				{"topLevel","tv_tr"},
+				{"topLevel","pv_tv_tr"},
+				{"topLevel","pv_pv_tv_tr"},
+				{"topLevel","pv_tn_tr"},
+				{"topLevel","pn_tv_tr"},
+				{"topLevel","tr"},
+				{"topLevel","pr_tr"},
 		});
 	}
 
 	@Test
 	public void test() throws IOException {
-		TypeGraph graph = loadGraph(name);
-		List<Type> topologicalOrdering = graph.getTopologicalOrdering();
-		AbstractSignature rootType = (AbstractSignature)topologicalOrdering.get(0);
+		TypeGraph graph = loadGraph(graphName);
+		AbstractSignature rootType = graph.findType(ProcedureSignature.class,executableName);
+		if (rootType == null) { // silly check but anyway it will be refactored when disambiguating overloads (procedures and functions are only special kind of overload)
+			rootType = graph.findType(FunctionSignature.class,executableName);
+		}
 		TypeNodeTree tnt = graph.toTypeNodeTree(rootType);
 		TransferObjectTree tot = tnt.toTransferObjectTree();
 		String actual = tot.toString();
 		if (record) {
-			writeExpectedOutput(getClass(),name,actual);
+			writeExpectedOutput(getClass(),graphName,executableName,actual);
 		} else {
 			Utils.assertEquals(expected,actual);
 		}
