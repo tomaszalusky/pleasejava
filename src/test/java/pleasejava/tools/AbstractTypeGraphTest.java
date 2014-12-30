@@ -30,9 +30,18 @@ public abstract class AbstractTypeGraphTest {
 	}
 
 	protected static String readExpectedOutput(Class<?> clazz, String graphName) throws IOException {
+		String fileName = clazz.getSimpleName() + "-" + graphName + ".txt";
+		return doReadExpectedOutput(clazz, fileName);
+	}
+	
+	protected static String readExpectedOutput(Class<?> clazz, String graphName, String executableName) throws IOException {
+		String fileName = clazz.getSimpleName() + "-" + graphName + "-" + executableName + ".txt";
+		return doReadExpectedOutput(clazz, fileName);
+	}
+	
+	private static String doReadExpectedOutput(Class<?> clazz, String fileName) throws IOException {
 		URL resource;
 		try {
-			String fileName = clazz.getSimpleName() + "-" + graphName + ".txt";
 			resource = Resources.getResource(clazz,fileName);
 		} catch (IllegalArgumentException e) { // resource does not exist
 			throw propagate(e);
@@ -42,6 +51,16 @@ public abstract class AbstractTypeGraphTest {
 	}
 
 	protected static void writeExpectedOutput(Class<?> clazz, String graphName, String content) throws IOException {
+		String fileName = clazz.getSimpleName() + "-" + graphName + ".txt";
+		doWriteExpectedOutput(clazz, fileName, content);
+	}
+	
+	protected static void writeExpectedOutput(Class<?> clazz, String graphName, String executableName, String content) throws IOException {
+		String fileName = clazz.getSimpleName() + "-" + graphName + "-" + executableName + ".txt";
+		doWriteExpectedOutput(clazz, fileName, content);
+	}
+	
+	private static void doWriteExpectedOutput(Class<?> clazz, String fileName, String content) throws IOException {
 		File targetTestClassesDir;
 		try {
 			targetTestClassesDir = new File(clazz.getProtectionDomain().getCodeSource().getLocation().toURI());
@@ -50,7 +69,6 @@ public abstract class AbstractTypeGraphTest {
 		}
 		File serverRootDir = targetTestClassesDir.getParentFile().getParentFile();
 		File srcTestResourcesDir = new File(serverRootDir,"src/test/resources");
-		String fileName = clazz.getSimpleName() + "-" + graphName + ".txt";
 		for (File defaultPackageDir : ImmutableList.of(srcTestResourcesDir,targetTestClassesDir)) { // recorded resource is stored into both src/test/resources and target/classes in order to prevent Eclipse or Maven inconsistencies
 			File packageDir = new File(defaultPackageDir,clazz.getPackage().getName().replace(".","/"));
 			File resource = new File(packageDir,fileName);

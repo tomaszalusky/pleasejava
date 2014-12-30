@@ -117,9 +117,17 @@ public class TypeGraph {
 		return topologicalOrdering;
 	}
 	
-	Type findType(Class<? extends Type> typeClass, String typeName) { // TODO remove (dead code) or utilize?
+	/**
+	 * Finds type of given class and name.
+	 * @param typeClass type class. Note the type is seeked by its exact runtime class,
+	 * not by instanceof operator. This is particularly a pitfall in case of procedures and functions,
+	 * where no type can be found using {@link AbstractSignature} class, concrete subclass must be used.
+	 * @param typeName type name
+	 * @return type instance; null if no type found
+	 */
+	<T extends Type> T findType(Class<T> typeClass, String typeName) {
 		Type result = allTypesIndex.get(typeClass,typeName);
-		return result;
+		return typeClass.cast(result);
 	}
 
 	TypeNodeTree toTypeNodeTree(AbstractSignature rootType) {
