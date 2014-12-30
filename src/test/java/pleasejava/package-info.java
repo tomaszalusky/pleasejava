@@ -1,6 +1,5 @@
 /**
  * - sloucit type graph pro vic testu
- *   - rfct top.ord.
  *   - rfct TNT
  *   - rfct TOT
  *   - rfct TNTTTOT

@@ -21,12 +21,12 @@ import com.google.common.collect.ImmutableList;
 @RunWith(Parameterized.class)
 public class TypeGraphTopologicalOrderingTest extends AbstractTypeGraphTest {
 
-	private final String name;
+	private final String graphName;
 	
 	private final List<String> expectedNames;
 	
-	public TypeGraphTopologicalOrderingTest(String name, List<String> expectedNames) {
-		this.name = name;
+	public TypeGraphTopologicalOrderingTest(String graphName, List<String> expectedNames) {
+		this.graphName = graphName;
 		this.expectedNames = expectedNames;
 	}
 
@@ -74,22 +74,17 @@ public class TypeGraphTopologicalOrderingTest extends AbstractTypeGraphTest {
 				varchar2(100)          pls_integer  boolean             integer      number(30)                         varchar2(200)  
 				 */
 				)},
-				{"topLevelNestedTable", ImmutableList.of("dummy","nst1","rec","boolean","integer")},
-				{"topLevelNestedTableInPackageNestedTable", ImmutableList.of("dummy","pkg.nst2","nst1","rec","boolean","integer")},
-				{"topLevelNestedTableInPackageNestedTableInPackageNestedTable", ImmutableList.of("dummy","pkg.nst3","pkg.nst2","nst1","rec","boolean","integer")},
-				{"topLevelVarray", ImmutableList.of("dummy","var1","rec","boolean","integer")},
-				{"topLevelVarrayInPackageVarray", ImmutableList.of("dummy","pkg.var2","var1","rec","boolean","integer")},
-				{"topLevelVarrayInPackageVarrayInPackageVarray", ImmutableList.of("dummy","pkg.var3","pkg.var2","var1","rec","boolean","integer")},
-				{"topLevelNestedTableInPackageVarray", ImmutableList.of("dummy","pkg.var2","nst1","rec","boolean","integer")},
-				{"topLevelVarrayInPackageNestedTable", ImmutableList.of("dummy","pkg.nst2","var1","rec","boolean","integer")},
-				{"topLevelRecord", ImmutableList.of("dummy","rec","boolean","integer")},
-				{"topLevelRecordInPackageRecord", ImmutableList.of("dummy","pkg.rec2","rec","varchar2(10)","boolean","integer")},
+				{"topLevel",ImmutableList.of(
+						"pn_pn_tn_tr","pn_tn_tr","pv_tn_tr","tn_tr","pv_pv_tv_tr","pv_tv_tr","pn_tv_tr","tv_tr","pr_tr","tr",
+						"pkg.nst3","pkg.varn","pkg.var3","pkg.nstv","pkg.rec2","pkg.nst2","pkg.var2",
+						"varchar2(10)","nst1","var1","rec","boolean","integer"
+				)},
 		});
 	}
 
 	@Test
 	public void test() throws IOException {
-		TypeGraph graph = loadGraph(name);
+		TypeGraph graph = loadGraph(graphName);
 		List<Type> actual = graph.getTopologicalOrdering();
 		List<String> actualNames = from(actual).transform(Type._getName).toList();
 		assertEquals(expectedNames, actualNames);
