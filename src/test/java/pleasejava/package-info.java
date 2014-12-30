@@ -1,6 +1,5 @@
 /**
  * - sloucit type graph pro vic testu
- *   - rfct TNT
  *   - rfct TOT
  *   - rfct TNTTTOT
  * - strucnejsi nazvovou konvenci pro testy

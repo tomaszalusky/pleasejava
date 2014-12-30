@@ -1,5 +1,5 @@
-procedure                    "dummy"    #
-    arg in nestedtable       "pkg.nst2" #1
+procedure                    "pn_tv_tr" #
+    arg in nestedtable       "pkg.nstv" #1
         (element) varray     "var1"     #1e
             (element) record "rec"      #1ee
                 b            "boolean"  #1ee1

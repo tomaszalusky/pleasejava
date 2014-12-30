@@ -1,4 +1,4 @@
-procedure                    "dummy"    #
+procedure                    "pv_tv_tr" #
     arg in varray            "pkg.var2" #1
         (element) varray     "var1"     #1e
             (element) record "rec"      #1ee

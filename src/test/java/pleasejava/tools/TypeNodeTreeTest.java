@@ -33,19 +33,19 @@ public class TypeNodeTreeTest extends AbstractTypeGraphTest {
 	@Parameterized.Parameters(name = "{index}: {0}-{1}")
 	public static Collection<Object[]> data() {
 		return Arrays.asList(new Object[][] {
-				{"simple","main"},
-				{"dag1","main"},
+				{"simple"  ,"main"},
+				{"dag1"    ,"main"},
 				{"alltypes","echo"},
-				{"topLevelNestedTable","dummy"},
-				{"topLevelNestedTableInPackageNestedTable","dummy"},
-				{"topLevelNestedTableInPackageNestedTableInPackageNestedTable","dummy"},
-				{"topLevelVarray","dummy"},
-				{"topLevelVarrayInPackageVarray","dummy"},
-				{"topLevelVarrayInPackageVarrayInPackageVarray","dummy"},
-				{"topLevelNestedTableInPackageVarray","dummy"},
-				{"topLevelVarrayInPackageNestedTable","dummy"},
-				{"topLevelRecord","dummy"},
-				{"topLevelRecordInPackageRecord","dummy"},
+				{"topLevel","tn_tr"},
+				{"topLevel","pn_tn_tr"},
+				{"topLevel","pn_pn_tn_tr"},
+				{"topLevel","tv_tr"},
+				{"topLevel","pv_tv_tr"},
+				{"topLevel","pv_pv_tv_tr"},
+				{"topLevel","pv_tn_tr"},
+				{"topLevel","pn_tv_tr"},
+				{"topLevel","tr"},
+				{"topLevel","pr_tr"},
 		});
 	}
 

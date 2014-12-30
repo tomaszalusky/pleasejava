@@ -1,4 +1,4 @@
-procedure                     "dummy"    #
+procedure                     "pn_tn_tr" #
     arg in nestedtable        "pkg.nst2" #1
         (element) nestedtable "nst1"     #1e
             (element) record  "rec"      #1ee

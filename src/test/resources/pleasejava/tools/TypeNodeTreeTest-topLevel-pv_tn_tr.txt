@@ -1,5 +1,5 @@
-procedure                     "dummy"    #
-    arg in varray             "pkg.var2" #1
+procedure                     "pv_tn_tr" #
+    arg in varray             "pkg.varn" #1
         (element) nestedtable "nst1"     #1e
             (element) record  "rec"      #1ee
                 b             "boolean"  #1ee1

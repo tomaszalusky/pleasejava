@@ -1,4 +1,4 @@
-procedure                "dummy"   #
+procedure                "tn_tr"   #
     arg in nestedtable   "nst1"    #1
         (element) record "rec"     #1e
             b            "boolean" #1e1
