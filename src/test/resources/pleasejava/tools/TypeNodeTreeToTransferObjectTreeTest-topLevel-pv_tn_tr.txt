@@ -1,5 +1,5 @@
-procedure                     "dummy"    #     | /                #
-    arg in varray             "pkg.var2" #1    |     {sp}         #1p
+procedure                     "pv_tn_tr" #     | /                #
+    arg in varray             "pkg.varn" #1    |     {sp}         #1p
         (element) nestedtable "nst1"     #1e   |         {q}      #1eq
                                                |             {d}  #1ed
                                                |         {p}      #1ep

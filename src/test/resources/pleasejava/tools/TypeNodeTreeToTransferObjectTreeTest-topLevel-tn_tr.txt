@@ -1,4 +1,4 @@
-procedure                "dummy"   #    | /            #
+procedure                "tn_tr"   #    | /            #
     arg in nestedtable   "nst1"    #1   |     {sq}     #1q
                                         |         {d}  #1d
                                         |     {sp}     #1p

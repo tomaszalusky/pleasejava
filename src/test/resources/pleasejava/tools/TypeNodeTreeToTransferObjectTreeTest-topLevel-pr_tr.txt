@@ -1,4 +1,4 @@
-procedure         "dummy"        #    | /                #
+procedure         "pr_tr"        #    | /                #
     arg in record "pkg.rec2"     #1   |
         r record  "rec"          #11  |     rec          #11s
             b     "boolean"      #111 |
