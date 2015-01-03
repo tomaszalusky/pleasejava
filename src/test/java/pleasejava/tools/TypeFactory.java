@@ -1,5 +1,6 @@
 package pleasejava.tools;
 
+import java.lang.annotation.Annotation;
 import java.util.List;
 import java.util.Map;
 
@@ -7,6 +8,9 @@ import org.jdom2.Element;
 import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
+
+import plsql.Plsql;
+import plsql.Plsql.Varchar2;
 
 import com.google.common.base.Enums;
 import com.google.common.base.Optional;
@@ -64,6 +68,22 @@ class TypeFactory {
 			typeByName.put(name, Optional.<Type>absent()); // marked as being built
 			Type result;
 			if (name.matches("integer|pls_integer|boolean|varchar2\\(\\d+\\)|varchar|string\\(\\d+\\)|string|number\\(\\d+\\)|binary_integer|long|clob")) {
+//				Plsql.Varchar2 anno = new Plsql.Varchar2() {
+//					@Override
+//					public int value() {
+//						return 1;
+//					}
+//
+//					@Override
+//					public Class<? extends Annotation> annotationType() {
+//						return Plsql.Varchar2.class;
+//					}
+//				};
+//				Utils.makeAnnotation(Plsql.Varchar2.class) // a la http://stackoverflow.com/a/16326389/653539
+//				a = Utils.annotation(Plsql.Varchar2.class)
+//				mock(a,a.value(),1);
+//				mock(a,Plsql.Varchar2::value,) // mock(T,Supplier<R>,R);
+				// TODO build Annotation from name string and pass to PrimitiveType ctor
 				result = new PrimitiveType(name);
 			} else {
 				XPathExpression<Element> xpath = XPathFactory.instance().compile("*[@name='" + name + "']", Filters.element());

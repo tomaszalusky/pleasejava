@@ -1,20 +1,26 @@
 /**
  * - rozmyslet anotace
  *   - smysl anotaci: pokryti PLSQL typu Java typy
- *   - vycet podporovanych typu
+ *     - pripojit anotaci k typu (u neprimitivnich je to trivialni a jednoznacne, u primitivnich se doda konstruktorem)
+ *     - definovat metaanotaci k primitivnim typum tak, aby z ni byl jasne zretelna struktura a atributy anotace a zpusob parsovani pro XML
+ *     - pouzit v TypeFactory seznam vsech anotaci odpovidajicich primitivnim typum, misto dosavadniho dlouheho regexu, sladit typy v regexu s typy v tride Plsql
+ *     - zrevidovat ucel TypeGraph (k cemu se data v nem ulozena budou vyuzivat, generovani kodu, rozliseni number a number(n) atd.)
+ *     - pak prizpusobit anotace reprezentujici PLSQL typy podobe struktury TypeGraph
+ *   - vycet podporovanych typu: stabilizovat shodu Plsql s typy v XML, pozdeji rozsirit na uplny vycet, pozdeji doplnit i odkladane typy (REF cursor, objekty, uzivatelske subtypy - pocitat s nimi jiz ted)
  *   - vyresit vnorovani pro kolekce
  *   - vyresit a zduvodnit zda konvence PlsqlFoo nebo Plsql.Foo, urcit package pro anotace
  *   - vyresit subtypy a zda bude treba metaanotace pro typ, pripadne moznost implementace vlastnich subtypu pomoci metaanotaci (napr. @Integer_(3) public @interface MyInteger) - jak by to pomohlo generovani?
+ *   - predek procedury a funkce = executable, zvazit oddeleni od hierarchie typu (neni to typ, spis tridu PlsqlConstruct)
+ * - J8
  * - mapovani anotaci na PLSQL/SQL konstrukty
  * - uprava typegraph.xml - popis java testu (trid a packagu, typu)
  * - vyresit overloading
  * - vygenerovat java tridy z xml
  * - vyresit zivotnost class vuci generatoru
- * - postavit graf z anotaci
+ * - postavit graf z anotovanych java trid, zvazit recyklaci TypeFactory
  * - update yEd schematu
  * 
  * later,technicke:
- * - J8
  * - guavu pryc
  * - zvazit zavedeni hierarchie pro TypeNode uzly podle typu (mozna by se tim zjednodusily visitory, nebylo potreba nejasne getChildren a vyresila i potreba dodatecne kvalifikovat potomky uzlu podle nejake vlastnosti (napr. konvence ze 1. je navratovy typ apod.))
  * 

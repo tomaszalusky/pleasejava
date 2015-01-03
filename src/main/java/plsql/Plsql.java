@@ -127,6 +127,7 @@ public class Plsql {
 	 */
 	@Target({ElementType.FIELD,ElementType.PARAMETER})
 	@Retention(RetentionPolicy.RUNTIME)
+	//@Type
 	public @interface Varray {
 		
 		/**
@@ -161,6 +162,7 @@ public class Plsql {
 	 */
 	@Target({ElementType.FIELD,ElementType.PARAMETER,ElementType.METHOD})
 	@Retention(RetentionPolicy.RUNTIME)
+	//@Type(name="varchar2",args={Varchar2::value})
 	public @interface Varchar2 {
 		
 		int value();
