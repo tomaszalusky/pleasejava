@@ -1,5 +1,7 @@
 package pleasejava.tools;
 
+import java.lang.annotation.Annotation;
+
 /**
  * Common ancestor of helper types which describe procedure and function signatures.
  * Despite they don't represent real PLSQL types, it's handy to model them as subclass of {@link Type}
@@ -8,8 +10,8 @@ package pleasejava.tools;
  */
 public abstract class AbstractSignature extends Type {
 
-	public AbstractSignature(String name) {
-		super(name,null);
+	public AbstractSignature(String name, Annotation annotation) {
+		super(name,annotation);
 	}
 
 }

@@ -135,7 +135,8 @@ class TypeFactory {
 							Parameter parameter = Parameter.create(mode, parameterType);
 							builder.put(parameterName,parameter);
 						}
-						result = new ProcedureSignature(name,builder.build());
+						plsql.Plsql.Procedure annotation = new Plsql.Procedure.StringConverter().fromString(name);
+						result = new ProcedureSignature(annotation,builder.build());
 						break;
 					} case "function" : {
 						ImmutableMap.Builder<String,Parameter> builder = ImmutableMap.builder();
@@ -149,7 +150,8 @@ class TypeFactory {
 						}
 						String returnTypeName = attr(typeElement,"returntype");
 						Type returnType = ensureType(returnTypeName);
-						result = new FunctionSignature(name,builder.build(),returnType);
+						plsql.Plsql.Function annotation = new Plsql.Function.StringConverter().fromString(name);
+						result = new FunctionSignature(annotation,builder.build(),returnType);
 						break;
 					} default : {
 						throw new InvalidPlsqlConstructException(typeElementName);

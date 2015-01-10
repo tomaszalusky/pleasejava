@@ -29,8 +29,8 @@ class FunctionSignature extends AbstractSignature {
 	 * @param parameters names and types of parameters (ordering of map matters)
 	 * @param returnType
 	 */
-	FunctionSignature(String name, Map<String,Parameter> parameters, Type returnType) {
-		super(name);
+	FunctionSignature(plsql.Plsql.Function annotation, Map<String,Parameter> parameters, Type returnType) {
+		super(null,annotation);
 		this.parameters = ImmutableMap.copyOf(checkNotNull(parameters));
 		this.returnType = returnType;
 	}

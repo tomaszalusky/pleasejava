@@ -3,6 +3,7 @@
  *   - smysl anotaci: pokryti PLSQL typu Java typy
  *     - pripojit anotaci k typu (u neprimitivnich je to trivialni a jednoznacne, u primitivnich se doda konstruktorem)
  *       - ostatni typy mimo Varray
+ *       - presun typu do pkg plsql, omezeni viditelnosti
  *     - definovat metaanotaci k primitivnim typum tak, aby z ni byl jasne zretelna struktura a atributy anotace a zpusob parsovani pro XML
  *     - pouzit v TypeFactory seznam vsech anotaci odpovidajicich primitivnim typum, misto dosavadniho dlouheho regexu, sladit typy v regexu s typy v tride Plsql
  *     - zrevidovat ucel TypeGraph (k cemu se data v nem ulozena budou vyuzivat, generovani kodu, rozliseni number a number(n) atd.)

@@ -63,6 +63,7 @@ public class Plsql {
 	 */
 	@Target(ElementType.METHOD)
 	@Retention(RetentionPolicy.RUNTIME)
+	@Type(nameConverter=Procedure.StringConverter.class)
 	public @interface Procedure {
 
 		/**
@@ -71,17 +72,41 @@ public class Plsql {
 		 */
 		String value();
 		
+		static class StringConverter extends TypeAnnotationStringConverter<Procedure> {
+
+			@Override
+			public String toString(Procedure a) {
+				return a.value();
+			}
+
+			@Override
+			public Procedure fromString(String input) {
+				return new Plsql.Procedure() {
+					@Override
+					public Class<? extends Annotation> annotationType() {
+						return Procedure.class;
+					}
+					@Override
+					public String value() {
+						return input;
+					}
+				};
+			}
+			
+		}
+
 	}
 	
 	/**
 	 * Method annotated with this annotation represents PLSQL function.
 	 * Each parameter must be annotated with corresponding PLSQL type annotation
 	 * (for describing return type use annotation just on method). TODO may be not, if default PLSQL can be inferred from Java type
-	 * Each OUT and IN OUT parametr must also be annotated with {@link Out} or {@link InOut} annotation, respectively.
+	 * Each OUT and IN OUT parameter must also be annotated with {@link Out} or {@link InOut} annotation, respectively.
 	 * @author Tomas Zalusky
 	 */
 	@Target(ElementType.METHOD)
 	@Retention(RetentionPolicy.RUNTIME)
+	@Type(nameConverter=Function.StringConverter.class)
 	public @interface Function {
 		
 		/**
@@ -90,6 +115,29 @@ public class Plsql {
 		 */
 		String value();
 		
+		static class StringConverter extends TypeAnnotationStringConverter<Function> {
+
+			@Override
+			public String toString(Function a) {
+				return a.value();
+			}
+
+			@Override
+			public Function fromString(String input) {
+				return new Plsql.Function() {
+					@Override
+					public Class<? extends Annotation> annotationType() {
+						return Function.class;
+					}
+					@Override
+					public String value() {
+						return input;
+					}
+				};
+			}
+			
+		}
+
 	}
 	
 	/**
@@ -165,6 +213,7 @@ public class Plsql {
 			}
 			
 		}
+
 	}
 	
 	/**
