@@ -2,13 +2,16 @@ package pleasejava.tools;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.lang.annotation.Annotation;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
 import pleasejava.Utils;
+import plsql.Plsql.TypeAnnotationStringConverter;
 
 import com.google.common.base.Function;
+import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 
@@ -21,8 +24,24 @@ abstract class Type {
 	
 	final String name;
 	
-	public Type(String name) {
-		this.name = checkNotNull(name);
+	final Annotation annotation;
+	
+	public Type(String name, Annotation annotation) {
+		this.annotation = annotation;
+		if (annotation == null) {
+			this.name = checkNotNull(name);
+		} else {
+			Class<? extends Annotation> annotationClass = annotation.getClass();
+			plsql.Plsql.Type typeAnnotation = (annotationClass.isAnnotation() ? annotationClass : annotationClass.getInterfaces()[0]).getAnnotation(plsql.Plsql.Type.class); // false for mocked annotations
+			Class<? extends TypeAnnotationStringConverter<? extends Annotation>> nameConverterClass = typeAnnotation.nameConverter();
+			TypeAnnotationStringConverter<? extends Annotation> nameConverter;
+			try {
+				nameConverter = nameConverterClass.newInstance();
+			} catch (InstantiationException | IllegalAccessException e) {
+				throw Throwables.propagate(e);
+			}
+			this.name = nameConverter.toStringErased(annotation);
+		}
 	}
 	
 	boolean isJdbcTransferrable() { // TODO temporary implementation - package types are not transferrable while toplevel and primitive type are

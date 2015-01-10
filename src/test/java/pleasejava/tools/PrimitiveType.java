@@ -10,7 +10,7 @@ import java.util.Objects;
 class PrimitiveType extends Type {
 	
 	PrimitiveType(String name) {
-		super(name);
+		super(name,null);
 	}
 	
 	<R> R accept(TypeVisitorR<R> visitor) {

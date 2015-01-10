@@ -1,5 +1,6 @@
 package plsql;
 
+import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -27,6 +28,12 @@ import java.lang.annotation.Target;
  */
 public class Plsql {
 
+	@Target(ElementType.ANNOTATION_TYPE)
+	@Retention(RetentionPolicy.RUNTIME)
+	public @interface Type {
+		Class<? extends TypeAnnotationStringConverter<? extends Annotation>> nameConverter();
+	}
+	
 	/**
 	 * Interface annotated with this annotation represents PLSQL package.
 	 * If Java construct (method or class) is directly or indirectly (via declaring class) placed in {@link Package_}-annotated interface,
@@ -127,7 +134,7 @@ public class Plsql {
 	 */
 	@Target({ElementType.FIELD,ElementType.PARAMETER})
 	@Retention(RetentionPolicy.RUNTIME)
-	//@Type
+	@Type(nameConverter=Varray.StringConverter.class)
 	public @interface Varray {
 		
 		/**
@@ -135,7 +142,29 @@ public class Plsql {
 		 * @return name in <a href="#plsql_names">top-level or package-level form</a>
 		 */
 		String value();
-		
+
+		static class StringConverter extends TypeAnnotationStringConverter<Varray> {
+
+			@Override
+			public String toString(Varray a) {
+				return a.value();
+			}
+
+			@Override
+			public Varray fromString(String input) {
+				return new Plsql.Varray() {
+					@Override
+					public Class<? extends Annotation> annotationType() {
+						return Varray.class;
+					}
+					@Override
+					public String value() {
+						return input;
+					}
+				};
+			}
+			
+		}
 	}
 	
 	/**
@@ -162,7 +191,7 @@ public class Plsql {
 	 */
 	@Target({ElementType.FIELD,ElementType.PARAMETER,ElementType.METHOD})
 	@Retention(RetentionPolicy.RUNTIME)
-	//@Type(name="varchar2",args={Varchar2::value})
+	//@Type(nameTemplate="varchar2($value)")
 	public @interface Varchar2 {
 		
 		int value();
@@ -297,6 +326,20 @@ public class Plsql {
 	@Target(ElementType.PARAMETER)
 	@Retention(RetentionPolicy.RUNTIME)
 	public @interface InOut {}
+	
+	
+	public static abstract class TypeAnnotationStringConverter<A extends Annotation> { //TODO make package visible after moving types into plsql package
+		
+		public abstract String toString(A input);
+		
+		@SuppressWarnings("unchecked")
+		public final String toStringErased(Annotation input) {
+			return toString((A)input);
+		}
+		
+		public abstract A fromString(String input);
+		
+	}
 	
 
 }

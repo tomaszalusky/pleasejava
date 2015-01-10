@@ -16,7 +16,7 @@ class NestedTable extends Type {
 	private final Type elementType;
 
 	NestedTable(String name, Type elementType) {
-		super(name);
+		super(name,null);
 		this.elementType = checkNotNull(elementType);
 	}
 	

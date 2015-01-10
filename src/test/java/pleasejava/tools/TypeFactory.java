@@ -110,7 +110,8 @@ class TypeFactory {
 					} case "varray" : {
 						String elementTypeName = attr(typeElement,"of");
 						Type elementType = ensureType(elementTypeName);
-						result = new Varray(name,elementType);
+						plsql.Plsql.Varray annotation = new Plsql.Varray.StringConverter().fromString(name);
+						result = new Varray(annotation,elementType);
 						break;
 					} case "nestedtable" : {
 						String elementTypeName = attr(typeElement,"of");

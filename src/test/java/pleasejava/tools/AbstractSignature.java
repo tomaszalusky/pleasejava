@@ -9,7 +9,7 @@ package pleasejava.tools;
 public abstract class AbstractSignature extends Type {
 
 	public AbstractSignature(String name) {
-		super(name);
+		super(name,null);
 	}
 
 }
