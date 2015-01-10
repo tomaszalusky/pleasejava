@@ -11,7 +11,6 @@
  *   - vyresit a zduvodnit zda konvence PlsqlFoo nebo Plsql.Foo, urcit package pro anotace
  *   - vyresit subtypy a zda bude treba metaanotace pro typ, pripadne moznost implementace vlastnich subtypu pomoci metaanotaci (napr. @Integer_(3) public @interface MyInteger) - jak by to pomohlo generovani?
  *   - predek procedury a funkce = executable, zvazit oddeleni od hierarchie typu (neni to typ, spis tridu PlsqlConstruct)
- * - J8
  * - mapovani anotaci na PLSQL/SQL konstrukty
  * - uprava typegraph.xml - popis java testu (trid a packagu, typu)
  * - vyresit overloading
