@@ -116,14 +116,16 @@ class TypeFactory {
 					} case "nestedtable" : {
 						String elementTypeName = attr(typeElement,"of");
 						Type elementType = ensureType(elementTypeName);
-						result = new NestedTable(name,elementType);
+						plsql.Plsql.NestedTable annotation = new Plsql.NestedTable.StringConverter().fromString(name);
+						result = new NestedTable(annotation,elementType);
 						break;
 					} case "indexbytable" : {
 						String elementTypeName = attr(typeElement,"of");
 						Type elementType = ensureType(elementTypeName);
 						String indexTypeName = attr(typeElement,"indexby");
 						PrimitiveType indexType = (PrimitiveType)ensureType(indexTypeName);
-						result = new IndexByTable(name,elementType,indexType);
+						plsql.Plsql.IndexByTable annotation = new Plsql.IndexByTable.StringConverter().fromString(name);
+						result = new IndexByTable(annotation,elementType,indexType);
 						break;
 					} case "procedure" : {
 						ImmutableMap.Builder<String,Parameter> builder = ImmutableMap.builder();

@@ -21,8 +21,8 @@ class IndexByTable extends Type {
 
 	private final PrimitiveType indexType;
 
-	IndexByTable(String name, Type elementType, PrimitiveType indexType) {
-		super(name,null);
+	IndexByTable(plsql.Plsql.IndexByTable annotation, Type elementType, PrimitiveType indexType) {
+		super(null,annotation);
 		Preconditions.checkArgument(indexType != null && indexType.getName().matches("(?i)binary_integer|pls_integer|varchar2\\(\\d+?\\)|varchar|string\\(\\d+?\\)|long"), "Illegal index type '%s'.", indexType == null ? null : indexType.getName()); // TODO: improve according to http://docs.oracle.com/cd/B10500_01/appdev.920/a96624/05_colls.htm#19661 - check index bounds etc.
 		this.indexType = indexType;
 		this.elementType = checkNotNull(elementType);

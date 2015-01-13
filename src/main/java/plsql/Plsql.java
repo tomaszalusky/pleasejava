@@ -166,6 +166,7 @@ public class Plsql {
 	 */
 	@Target({ElementType.FIELD,ElementType.PARAMETER})
 	@Retention(RetentionPolicy.RUNTIME)
+	@Type(nameConverter=NestedTable.StringConverter.class)
 	public @interface NestedTable {
 		
 		/**
@@ -174,6 +175,29 @@ public class Plsql {
 		 */
 		String value();
 		
+		static class StringConverter extends TypeAnnotationStringConverter<NestedTable> {
+
+			@Override
+			public String toString(NestedTable a) {
+				return a.value();
+			}
+
+			@Override
+			public NestedTable fromString(String input) {
+				return new Plsql.NestedTable() {
+					@Override
+					public Class<? extends Annotation> annotationType() {
+						return NestedTable.class;
+					}
+					@Override
+					public String value() {
+						return input;
+					}
+				};
+			}
+			
+		}
+
 	}
 	
 	/**
@@ -222,6 +246,7 @@ public class Plsql {
 	 */
 	@Target({ElementType.FIELD,ElementType.PARAMETER})
 	@Retention(RetentionPolicy.RUNTIME)
+	@Type(nameConverter=IndexByTable.StringConverter.class)
 	public @interface IndexByTable {
 		
 		/**
@@ -230,8 +255,29 @@ public class Plsql {
 		 */
 		String value();
 		
-		String indexType(); // TODO remove after migration to JDK8, will be replaced by Map<@... K,V>
-		
+		static class StringConverter extends TypeAnnotationStringConverter<IndexByTable> {
+
+			@Override
+			public String toString(IndexByTable a) {
+				return a.value();
+			}
+
+			@Override
+			public IndexByTable fromString(String input) {
+				return new Plsql.IndexByTable() {
+					@Override
+					public Class<? extends Annotation> annotationType() {
+						return IndexByTable.class;
+					}
+					@Override
+					public String value() {
+						return input;
+					}
+				};
+			}
+			
+		}
+
 	}
 	
 	/**
