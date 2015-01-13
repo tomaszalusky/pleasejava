@@ -1,6 +1,5 @@
 package pleasejava.tools;
 
-import java.lang.annotation.Annotation;
 import java.util.List;
 import java.util.Map;
 
@@ -10,7 +9,6 @@ import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 
 import plsql.Plsql;
-import plsql.Plsql.Varchar2;
 
 import com.google.common.base.Enums;
 import com.google.common.base.Optional;
@@ -105,7 +103,8 @@ class TypeFactory {
 							Type fieldType = ensureType(fieldTypeName);
 							builder.put(fieldName,fieldType);
 						}
-						result = new Record(name,builder.build());
+						plsql.Plsql.Record annotation = new Plsql.Record.StringConverter().fromString(name);
+						result = new Record(annotation,builder.build());
 						break;
 					} case "varray" : {
 						String elementTypeName = attr(typeElement,"of");

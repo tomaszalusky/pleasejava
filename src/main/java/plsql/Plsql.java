@@ -147,6 +147,7 @@ public class Plsql {
 	 */
 	@Target(ElementType.TYPE)
 	@Retention(RetentionPolicy.RUNTIME)
+	@Type(nameConverter=Record.StringConverter.class)
 	public @interface Record {
 		
 		/**
@@ -154,7 +155,30 @@ public class Plsql {
 		 * @return name in <a href="#plsql_names">top-level or package-level form</a>
 		 */
 		String value();
-		
+	
+		static class StringConverter extends TypeAnnotationStringConverter<Record> {
+
+			@Override
+			public String toString(Record a) {
+				return a.value();
+			}
+
+			@Override
+			public Record fromString(String input) {
+				return new Plsql.Record() {
+					@Override
+					public Class<? extends Annotation> annotationType() {
+						return Record.class;
+					}
+					@Override
+					public String value() {
+						return input;
+					}
+				};
+			}
+			
+		}
+
 	}
 	
 	/**
