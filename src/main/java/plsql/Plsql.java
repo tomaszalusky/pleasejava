@@ -304,6 +304,44 @@ public class Plsql {
 
 	}
 	
+	// primitive types
+	
+	/**
+	 * Represents PLSQL INTEGER type.
+	 * @author Tomas Zalusky
+	 */
+	@Target({ElementType.FIELD,ElementType.PARAMETER,ElementType.METHOD})
+	@Retention(RetentionPolicy.RUNTIME)
+	@Type(nameConverter=Integer_.StringConverter.class)
+	public @interface Integer_ {
+		
+		static class StringConverter extends TypeAnnotationStringConverter<Integer_> {
+
+			@Override
+			public String toString(Integer_ a) {
+				return "integer";
+			}
+
+			@Override
+			public Integer_ fromString(String input) {
+				if (!"integer".equals(input)) {
+					return null;
+				}
+				return new Plsql.Integer_() {
+					@Override
+					public Class<? extends Annotation> annotationType() {
+						return Integer_.class;
+					}
+				};
+			}
+			
+		}
+
+	}
+	
+	
+	// /primitive types
+	
 	/**
 	 * Represents PLSQL VARCHAR2 type.
 	 * @author Tomas Zalusky
@@ -405,14 +443,6 @@ public class Plsql {
 		int scale();
 		
 	}
-	
-	/**
-	 * Represents PLSQL INTEGER type.
-	 * @author Tomas Zalusky
-	 */
-	@Target({ElementType.FIELD,ElementType.PARAMETER,ElementType.METHOD})
-	@Retention(RetentionPolicy.RUNTIME)
-	public @interface Integer_ {}
 	
 	/**
 	 * Represents PLSQL PLS_INTEGER type.

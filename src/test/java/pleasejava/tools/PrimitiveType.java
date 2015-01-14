@@ -1,5 +1,6 @@
 package pleasejava.tools;
 
+import java.lang.annotation.Annotation;
 import java.util.Objects;
 
 /**
@@ -9,8 +10,8 @@ import java.util.Objects;
  */
 class PrimitiveType extends Type {
 	
-	PrimitiveType(String name) {
-		super(name,null);
+	PrimitiveType(String name, Annotation annotation) {
+		super(name,annotation);
 	}
 	
 	<R> R accept(TypeVisitorR<R> visitor) {
