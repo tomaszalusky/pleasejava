@@ -307,6 +307,39 @@ public class Plsql {
 	// primitive types
 	
 	/**
+	 * Represents PLSQL BOOLEAN type.
+	 * @author Tomas Zalusky
+	 */
+	@Target({ElementType.FIELD,ElementType.PARAMETER,ElementType.METHOD})
+	@Retention(RetentionPolicy.RUNTIME)
+	@Type(nameConverter=Boolean_.StringConverter.class)
+	public @interface Boolean_ {
+		
+		static class StringConverter extends TypeAnnotationStringConverter<Boolean_> {
+			
+			@Override
+			public String toString(Boolean_ a) {
+				return "boolean";
+			}
+			
+			@Override
+			public Boolean_ fromString(String input) {
+				if (!"boolean".equals(input)) {
+					return null;
+				}
+				return new Plsql.Boolean_() {
+					@Override
+					public Class<? extends Annotation> annotationType() {
+						return Boolean_.class;
+					}
+				};
+			}
+			
+		}
+		
+	}
+	
+	/**
 	 * Represents PLSQL INTEGER type.
 	 * @author Tomas Zalusky
 	 */
@@ -339,6 +372,38 @@ public class Plsql {
 
 	}
 	
+	/**
+	 * Represents PLSQL PLS_INTEGER type.
+	 * @author Tomas Zalusky
+	 */
+	@Target({ElementType.FIELD,ElementType.PARAMETER,ElementType.METHOD})
+	@Retention(RetentionPolicy.RUNTIME)
+	@Type(nameConverter=PlsInteger.StringConverter.class)
+	public @interface PlsInteger {
+		
+		static class StringConverter extends TypeAnnotationStringConverter<PlsInteger> {
+
+			@Override
+			public String toString(PlsInteger a) {
+				return "pls_integer";
+			}
+
+			@Override
+			public PlsInteger fromString(String input) {
+				if (!"pls_integer".equals(input)) {
+					return null;
+				}
+				return new Plsql.PlsInteger() {
+					@Override
+					public Class<? extends Annotation> annotationType() {
+						return PlsInteger.class;
+					}
+				};
+			}
+			
+		}
+
+	}
 	
 	// /primitive types
 	
@@ -444,14 +509,6 @@ public class Plsql {
 		
 	}
 	
-	/**
-	 * Represents PLSQL PLS_INTEGER type.
-	 * @author Tomas Zalusky
-	 */
-	@Target({ElementType.FIELD,ElementType.PARAMETER,ElementType.METHOD})
-	@Retention(RetentionPolicy.RUNTIME)
-	public @interface PlsInteger {}
-
 	/**
 	 * Represents PLSQL BINARY_INTEGER type.
 	 * @author Tomas Zalusky
