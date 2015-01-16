@@ -5,6 +5,8 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * <p>
@@ -404,45 +406,97 @@ public class Plsql {
 		}
 
 	}
-	
-	// /primitive types
-	
-	/**
-	 * Represents PLSQL VARCHAR2 type.
-	 * @author Tomas Zalusky
-	 */
-	@Target({ElementType.FIELD,ElementType.PARAMETER,ElementType.METHOD})
-	@Retention(RetentionPolicy.RUNTIME)
-	//@Type(nameTemplate="varchar2($value)")
-	public @interface Varchar2 {
-		
-		int value();
-		
-	}
-	
-	/**
-	 * Represents PLSQL VARCHAR type.
-	 * @author Tomas Zalusky
-	 */
-	@Target({ElementType.FIELD,ElementType.PARAMETER,ElementType.METHOD})
-	@Retention(RetentionPolicy.RUNTIME)
-	public @interface Varchar {
-		
-		int value();
-		
-	}
-	
+
 	/**
 	 * Represents PLSQL STRING type.
+	 * TODO public enum LengthSemantics {DEFAULT,BYTE,CHAR}, LengthSemantics lengthSemantics() default LengthSemantics.DEFAULT;
 	 * @author Tomas Zalusky
 	 */
 	@Target({ElementType.FIELD,ElementType.PARAMETER,ElementType.METHOD})
 	@Retention(RetentionPolicy.RUNTIME)
+	@Type(nameConverter=String_.StringConverter.class)
 	public @interface String_ {
 		
 		int value();
 		
+		static class StringConverter extends TypeAnnotationStringConverter<String_> {
+			
+			private static final Pattern PATTERN = Pattern.compile("string\\((\\d+)\\)");
+
+			@Override
+			public String toString(String_ a) {
+				return String.format("string(%d)",a.value());
+			}
+			
+			@Override
+			public String_ fromString(String input) {
+				Matcher matcher = PATTERN.matcher(input);
+				if (!matcher.matches()) {
+					return null;
+				}
+				final int size = Integer.parseInt(matcher.group(1));
+				return new Plsql.String_() {
+					@Override
+					public int value() {
+						return size;
+					}
+					@Override
+					public Class<? extends Annotation> annotationType() {
+						return String_.class;
+					}
+				};
+			}
+			
+		}
+
 	}
+
+	/**
+	 * Represents PLSQL VARCHAR2 type.
+	 * TODO public enum LengthSemantics {DEFAULT,BYTE,CHAR}, LengthSemantics lengthSemantics() default LengthSemantics.DEFAULT;
+	 * @author Tomas Zalusky
+	 */
+	@Target({ElementType.FIELD,ElementType.PARAMETER,ElementType.METHOD})
+	@Retention(RetentionPolicy.RUNTIME)
+	@Type(nameConverter=Varchar2.StringConverter.class)
+	public @interface Varchar2 {
+		
+		int value();
+		
+		static class StringConverter extends TypeAnnotationStringConverter<Varchar2> {
+			
+			private static final Pattern PATTERN = Pattern.compile("varchar2\\((\\d+)\\)");
+
+			@Override
+			public String toString(Varchar2 a) {
+				return String.format("varchar2(%d)",a.value());
+			}
+			
+			@Override
+			public Varchar2 fromString(String input) {
+				Matcher matcher = PATTERN.matcher(input);
+				if (!matcher.matches()) {
+					return null;
+				}
+				final int size = Integer.parseInt(matcher.group(1));
+				return new Plsql.Varchar2() {
+					@Override
+					public int value() {
+						return size;
+					}
+					@Override
+					public Class<? extends Annotation> annotationType() {
+						return Varchar2.class;
+					}
+				};
+			}
+			
+		}
+
+	}
+
+	// /primitive types
+	
 	
 	/**
 	 * Represents PLSQL BLOB type.
