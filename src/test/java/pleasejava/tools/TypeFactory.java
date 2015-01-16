@@ -59,11 +59,13 @@ class TypeFactory {
 	}
 
 	private static final List<PrimitiveTypeConverterHolder<?,?>> PRIMITIVES = ImmutableList.of(
-			new PrimitiveTypeConverterHolder<>(new Plsql.Boolean_  .StringConverter(), BooleanType   ::new),
-			new PrimitiveTypeConverterHolder<>(new Plsql.Integer_  .StringConverter(), IntegerType   ::new),
-			new PrimitiveTypeConverterHolder<>(new Plsql.PlsInteger.StringConverter(), PlsIntegerType::new),
-			new PrimitiveTypeConverterHolder<>(new Plsql.Varchar2  .StringConverter(), Varchar2Type  ::new),
-			new PrimitiveTypeConverterHolder<>(new Plsql.String_   .StringConverter(), StringType    ::new)
+			new PrimitiveTypeConverterHolder<>(new Plsql.BinaryInteger.StringConverter(), BinaryIntegerType::new),
+			new PrimitiveTypeConverterHolder<>(new Plsql.Boolean_     .StringConverter(), BooleanType      ::new),
+			new PrimitiveTypeConverterHolder<>(new Plsql.Integer_     .StringConverter(), IntegerType      ::new),
+			new PrimitiveTypeConverterHolder<>(new Plsql.Number_      .StringConverter(), NumberType       ::new),
+			new PrimitiveTypeConverterHolder<>(new Plsql.PlsInteger   .StringConverter(), PlsIntegerType   ::new),
+			new PrimitiveTypeConverterHolder<>(new Plsql.Varchar2     .StringConverter(), Varchar2Type     ::new),
+			new PrimitiveTypeConverterHolder<>(new Plsql.String_      .StringConverter(), StringType       ::new)
 	);
 	
 	static final class PrimitiveTypeConverterHolder <T extends Type,A extends Annotation> {
@@ -97,7 +99,7 @@ class TypeFactory {
 			}
 			if (result == null) {
 			
-			if (name.matches("number\\(\\d+\\)|binary_integer|long|clob")) {
+			if (name.matches("long|clob")) {
 				result = new PrimitiveType(name,null);
 			} else {
 				XPathExpression<Element> xpath = XPathFactory.instance().compile("*[@name='" + name + "']", Filters.element());

@@ -307,7 +307,40 @@ public class Plsql {
 	}
 	
 	// primitive types
-	
+
+	/**
+	 * Represents PLSQL BINARY_INTEGER type.
+	 * @author Tomas Zalusky
+	 */
+	@Target({ElementType.FIELD,ElementType.PARAMETER,ElementType.METHOD})
+	@Retention(RetentionPolicy.RUNTIME)
+	@Type(nameConverter=BinaryInteger.StringConverter.class)
+	public @interface BinaryInteger {
+		
+		static class StringConverter extends TypeAnnotationStringConverter<BinaryInteger> {
+
+			@Override
+			public String toString(BinaryInteger a) {
+				return "binary_integer";
+			}
+
+			@Override
+			public BinaryInteger fromString(String input) {
+				if (!"binary_integer".equals(input)) {
+					return null;
+				}
+				return new Plsql.BinaryInteger() {
+					@Override
+					public Class<? extends Annotation> annotationType() {
+						return BinaryInteger.class;
+					}
+				};
+			}
+			
+		}
+
+	}
+
 	/**
 	 * Represents PLSQL BOOLEAN type.
 	 * @author Tomas Zalusky
@@ -373,7 +406,60 @@ public class Plsql {
 		}
 
 	}
-	
+
+	/**
+	 * Represents PLSQL NUMBER type.
+	 * @author Tomas Zalusky
+	 */
+	@Target({ElementType.FIELD,ElementType.PARAMETER,ElementType.METHOD})
+	@Retention(RetentionPolicy.RUNTIME)
+	@Type(nameConverter=Number_.StringConverter.class)
+	public @interface Number_ {
+		
+		/**
+		 * @return precision (not named so in order not to complicate most common use case: <code>&#64;Number_(10)</code>)
+		 */
+		int value();
+		
+		int scale() default 0;
+		
+		static class StringConverter extends TypeAnnotationStringConverter<Number_> {
+			
+			private static final Pattern PATTERN = Pattern.compile("number\\((\\d+)(,(\\d+))?\\)");
+
+			@Override
+			public String toString(Number_ a) {
+				return String.format("number(%d%s)",a.value(),a.scale() == 0 ? "" : String.format(",%d",a.scale()));
+			}
+			
+			@Override
+			public Number_ fromString(String input) {
+				Matcher matcher = PATTERN.matcher(input);
+				if (!matcher.matches()) {
+					return null;
+				}
+				final int precision = Integer.parseInt(matcher.group(1));
+				final int scale = matcher.group(3) == null ? 0 : Integer.parseInt(matcher.group(3));
+				return new Plsql.Number_() {
+					@Override
+					public int value() {
+						return precision;
+					}
+					@Override
+					public int scale() {
+						return scale;
+					}
+					@Override
+					public Class<? extends Annotation> annotationType() {
+						return Number_.class;
+					}
+				};
+			}
+			
+		}
+
+	}
+
 	/**
 	 * Represents PLSQL PLS_INTEGER type.
 	 * @author Tomas Zalusky
@@ -545,31 +631,6 @@ public class Plsql {
 	@Target({ElementType.FIELD,ElementType.PARAMETER,ElementType.METHOD})
 	@Retention(RetentionPolicy.RUNTIME)
 	public @interface Long_ {}
-	
-	/**
-	 * Represents PLSQL NUMBER type.
-	 * @author Tomas Zalusky
-	 */
-	@Target({ElementType.FIELD,ElementType.PARAMETER,ElementType.METHOD})
-	@Retention(RetentionPolicy.RUNTIME)
-	public @interface Number_ {
-		
-		/**
-		 * @return precision
-		 */
-		int value();
-		
-		int scale();
-		
-	}
-	
-	/**
-	 * Represents PLSQL BINARY_INTEGER type.
-	 * @author Tomas Zalusky
-	 */
-	@Target({ElementType.FIELD,ElementType.PARAMETER,ElementType.METHOD})
-	@Retention(RetentionPolicy.RUNTIME)
-	public @interface BinaryInteger {}
 	
 	/**
 	 * Indicates that method parameter annotated with this annotation represents PLSQL OUT parameter.
