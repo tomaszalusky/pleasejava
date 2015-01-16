@@ -342,6 +342,39 @@ public class Plsql {
 	}
 
 	/**
+	 * Represents PLSQL BLOB type.
+	 * @author Tomas Zalusky
+	 */
+	@Target({ElementType.FIELD,ElementType.PARAMETER,ElementType.METHOD})
+	@Retention(RetentionPolicy.RUNTIME)
+	@Type(nameConverter=Blob.StringConverter.class)
+	public @interface Blob {
+		
+		static class StringConverter extends TypeAnnotationStringConverter<Blob> {
+
+			@Override
+			public String toString(Blob a) {
+				return "blob";
+			}
+
+			@Override
+			public Blob fromString(String input) {
+				if (!"blob".equals(input)) {
+					return null;
+				}
+				return new Plsql.Blob() {
+					@Override
+					public Class<? extends Annotation> annotationType() {
+						return Blob.class;
+					}
+				};
+			}
+			
+		}
+
+	}
+	
+	/**
 	 * Represents PLSQL BOOLEAN type.
 	 * @author Tomas Zalusky
 	 */
@@ -372,6 +405,39 @@ public class Plsql {
 			
 		}
 		
+	}
+
+	/**
+	 * Represents PLSQL CLOB type.
+	 * @author Tomas Zalusky
+	 */
+	@Target({ElementType.FIELD,ElementType.PARAMETER,ElementType.METHOD})
+	@Retention(RetentionPolicy.RUNTIME)
+	@Type(nameConverter=Clob.StringConverter.class)
+	public @interface Clob {
+		
+		static class StringConverter extends TypeAnnotationStringConverter<Clob> {
+
+			@Override
+			public String toString(Clob a) {
+				return "clob";
+			}
+
+			@Override
+			public Clob fromString(String input) {
+				if (!"clob".equals(input)) {
+					return null;
+				}
+				return new Plsql.Clob() {
+					@Override
+					public Class<? extends Annotation> annotationType() {
+						return Clob.class;
+					}
+				};
+			}
+			
+		}
+
 	}
 	
 	/**
@@ -407,6 +473,39 @@ public class Plsql {
 
 	}
 
+	/**
+	 * Represents PLSQL LONG type.
+	 * @author Tomas Zalusky
+	 */
+	@Target({ElementType.FIELD,ElementType.PARAMETER,ElementType.METHOD})
+	@Retention(RetentionPolicy.RUNTIME)
+	@Type(nameConverter=Long_.StringConverter.class)
+	public @interface Long_ {
+		
+		static class StringConverter extends TypeAnnotationStringConverter<Long_> {
+
+			@Override
+			public String toString(Long_ a) {
+				return "long";
+			}
+
+			@Override
+			public Long_ fromString(String input) {
+				if (!"long".equals(input)) {
+					return null;
+				}
+				return new Plsql.Long_() {
+					@Override
+					public Class<? extends Annotation> annotationType() {
+						return Long_.class;
+					}
+				};
+			}
+			
+		}
+
+	}
+	
 	/**
 	 * Represents PLSQL NUMBER type.
 	 * @author Tomas Zalusky
@@ -583,15 +682,6 @@ public class Plsql {
 
 	// /primitive types
 	
-	
-	/**
-	 * Represents PLSQL BLOB type.
-	 * @author Tomas Zalusky
-	 */
-	@Target({ElementType.FIELD,ElementType.PARAMETER,ElementType.METHOD})
-	@Retention(RetentionPolicy.RUNTIME)
-	public @interface Blob {}
-	
 	/**
 	 * Represents PLSQL CHAR type.
 	 * @author Tomas Zalusky
@@ -605,14 +695,6 @@ public class Plsql {
 	}
  	
 	/**
-	 * Represents PLSQL CLOB type.
-	 * @author Tomas Zalusky
-	 */
-	@Target({ElementType.FIELD,ElementType.PARAMETER,ElementType.METHOD})
-	@Retention(RetentionPolicy.RUNTIME)
-	public @interface Clob {}
-	
-	/**
 	 * Represents PLSQL DATE type.
 	 * @author Tomas Zalusky
 	 */
@@ -623,14 +705,6 @@ public class Plsql {
 		int value();
 		
 	}
-	
-	/**
-	 * Represents PLSQL LONG type.
-	 * @author Tomas Zalusky
-	 */
-	@Target({ElementType.FIELD,ElementType.PARAMETER,ElementType.METHOD})
-	@Retention(RetentionPolicy.RUNTIME)
-	public @interface Long_ {}
 	
 	/**
 	 * Indicates that method parameter annotated with this annotation represents PLSQL OUT parameter.
