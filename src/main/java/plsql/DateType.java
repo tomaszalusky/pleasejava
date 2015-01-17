@@ -3,9 +3,9 @@ package plsql;
 /**
  * @author Tomas Zalusky
  */
-public class DateType extends PrimitiveType {
+class DateType extends AbstractPrimitiveType {
 
-	public DateType(plsql.Plsql.Date annotation) {
+	DateType(plsql.Plsql.Date annotation) {
 		super(annotation);
 	}
 	

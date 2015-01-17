@@ -12,7 +12,7 @@ import org.jdom2.Element;
 import org.jdom2.input.SAXBuilder;
 
 import pleasejava.Utils;
-import plsql.Type.ToString;
+import plsql.AbstractType.ToString;
 
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableList;
@@ -41,35 +41,35 @@ public class TypeGraph {
 	/**
 	 * All nodes used in graph (including primitive types).
 	 */
-	private final Set<Type> allTypes;
+	private final Set<AbstractType> allTypes;
 	
-	private final Table<Class<? extends Type>,String,Type> allTypesIndex;
+	private final Table<Class<? extends AbstractType>,String,AbstractType> allTypesIndex;
 	
 	/**
 	 * Key = graph node, values = all types which key node depends on.
 	 * For example, for record of varchar2s, record is a key, varchar2 is a value.
 	 */
-	private final ListMultimap<Type,Type> children;
+	private final ListMultimap<AbstractType,AbstractType> children;
 	
-	private final List<Type> topologicalOrdering;
+	private final List<AbstractType> topologicalOrdering;
 	
-	private TypeGraph(Set<Type> allTypes, ListMultimap<Type,Type> children) {
+	private TypeGraph(Set<AbstractType> allTypes, ListMultimap<AbstractType,AbstractType> children) {
 		this.allTypes = ImmutableSet.copyOf(allTypes);
-		ImmutableTable.Builder<Class<? extends Type>,String,Type> allTypesIndexBuilder = ImmutableTable.builder();
-		for (Type type : allTypes) {
+		ImmutableTable.Builder<Class<? extends AbstractType>,String,AbstractType> allTypesIndexBuilder = ImmutableTable.builder();
+		for (AbstractType type : allTypes) {
 			allTypesIndexBuilder.put(type.getClass(), type.getName(), type);
 		}
 		this.allTypesIndex = allTypesIndexBuilder.build();
-		ImmutableListMultimap<Type,Type> immChildren = ImmutableListMultimap.copyOf(children);
+		ImmutableListMultimap<AbstractType,AbstractType> immChildren = ImmutableListMultimap.copyOf(children);
 		this.children = immChildren;
-		Multimap<Type,Type> predecessors = immChildren.inverse(); // for given key, values express which types is the key used in
-		Multimap<Type,Type> exhaust = LinkedHashMultimap.create(predecessors); // copy of predecessors multimap, its elements are removed during build in order to reveal another nodes
-		ImmutableList.Builder<Type> topologicalOrderingBuilder = ImmutableList.builder();
-		Set<Type> seeds = Sets.difference(allTypes,predecessors.keySet()); // initial set of nodes with no incoming edge
-		for (Deque<Type> queue = new ArrayDeque<Type>(seeds); !queue.isEmpty(); ) { // queue of nodes with no incoming edge
-			Type top = queue.pollFirst();
+		Multimap<AbstractType,AbstractType> predecessors = immChildren.inverse(); // for given key, values express which types is the key used in
+		Multimap<AbstractType,AbstractType> exhaust = LinkedHashMultimap.create(predecessors); // copy of predecessors multimap, its elements are removed during build in order to reveal another nodes
+		ImmutableList.Builder<AbstractType> topologicalOrderingBuilder = ImmutableList.builder();
+		Set<AbstractType> seeds = Sets.difference(allTypes,predecessors.keySet()); // initial set of nodes with no incoming edge
+		for (Deque<AbstractType> queue = new ArrayDeque<AbstractType>(seeds); !queue.isEmpty(); ) { // queue of nodes with no incoming edge
+			AbstractType top = queue.pollFirst();
 			topologicalOrderingBuilder.add(top); // queue invariant: polled node has no incoming edge -> it is safe to push it to output
-			for (Type child : from(top.getChildren().values()).toSet()) { // set prevents duplicate offer of child in case of duplicate children
+			for (AbstractType child : from(top.getChildren().values()).toSet()) { // set prevents duplicate offer of child in case of duplicate children
 				exhaust.get(child).remove(top); // removing edges to all children
 				if (exhaust.get(child).isEmpty()) { // if no edge remains, child becomes top 
 					queue.offerLast(child);
@@ -90,17 +90,17 @@ public class TypeGraph {
 			Document doc = builder.build(xml);
 			Element rootElement = doc.getRootElement();
 			TypeFactory typeFactory = new TypeFactory(rootElement);
-			ImmutableSet.Builder<Type> allTypesBuilder = ImmutableSet.builder();
-			ImmutableListMultimap.Builder<Type,Type> childrenBuilder = ImmutableListMultimap.builder();
+			ImmutableSet.Builder<AbstractType> allTypesBuilder = ImmutableSet.builder();
+			ImmutableListMultimap.Builder<AbstractType,AbstractType> childrenBuilder = ImmutableListMultimap.builder();
 			for (Element typeElement : rootElement.getChildren()) {
 				String name = typeElement.getAttributeValue("name");
-				Type type = typeFactory.ensureType(name);
-				Collection<Type> children = type.getChildren().values();
+				AbstractType type = typeFactory.ensureType(name);
+				Collection<AbstractType> children = type.getChildren().values();
 				allTypesBuilder.add(type).addAll(children);
 				childrenBuilder.putAll(type,children);
 			}
-			ImmutableListMultimap<Type,Type> children = childrenBuilder.build();
-			ImmutableSet<Type> allTypes = allTypesBuilder.build();
+			ImmutableListMultimap<AbstractType,AbstractType> children = childrenBuilder.build();
+			ImmutableSet<AbstractType> allTypes = allTypesBuilder.build();
 			return new TypeGraph(allTypes, children);
 		} catch (Exception e) {
 			throw Throwables.propagate(e);
@@ -113,7 +113,7 @@ public class TypeGraph {
 	 * indexOf(T1) &lt; indexOf(T2) for resulting list.
 	 * @return
 	 */
-	public List<Type> getTopologicalOrdering() {
+	public List<AbstractType> getTopologicalOrdering() {
 		return topologicalOrdering;
 	}
 	
@@ -125,8 +125,8 @@ public class TypeGraph {
 	 * @param typeName type name
 	 * @return type instance; null if no type found
 	 */
-	<T extends Type> T findType(Class<T> typeClass, String typeName) {
-		Type result = allTypesIndex.get(typeClass,typeName);
+	<T extends AbstractType> T findType(Class<T> typeClass, String typeName) {
+		AbstractType result = allTypesIndex.get(typeClass,typeName);
 		return typeClass.cast(result);
 	}
 
@@ -138,13 +138,13 @@ public class TypeGraph {
 	
 	@Override
 	public String toString() {
-		Set<Type> written = Sets.<Type>newHashSet();
-		Type.ToString visitor = new Type.ToString(written);
-		for (Set<Type> exhaust = Sets.newLinkedHashSet(getTopologicalOrdering()); !exhaust.isEmpty(); ) {
-			Type first = Iterables.getFirst(exhaust,null);
+		Set<AbstractType> written = Sets.<AbstractType>newHashSet();
+		AbstractType.ToString visitor = new AbstractType.ToString(written);
+		for (Set<AbstractType> exhaust = Sets.newLinkedHashSet(getTopologicalOrdering()); !exhaust.isEmpty(); ) {
+			AbstractType first = Iterables.getFirst(exhaust,null);
 			first.accept(visitor,0); // write top-level node and all its children
-			for (Deque<Type> q = Lists.newLinkedList(ImmutableSet.of(first)); !q.isEmpty(); ) { // remove top-level node and transitively all its children from set of waiting nodes
-				Type t = q.pollFirst();
+			for (Deque<AbstractType> q = Lists.newLinkedList(ImmutableSet.of(first)); !q.isEmpty(); ) { // remove top-level node and transitively all its children from set of waiting nodes
+				AbstractType t = q.pollFirst();
 				exhaust.remove(t);
 				q.addAll(children.get(t));
 			}

@@ -3,9 +3,9 @@ package plsql;
 /**
  * @author Tomas Zalusky
  */
-public class StringType extends PrimitiveType {
+class StringType extends AbstractPrimitiveType {
 
-	public StringType(plsql.Plsql.String_ annotation) {
+	StringType(plsql.Plsql.String_ annotation) {
 		super(annotation);
 	}
 	

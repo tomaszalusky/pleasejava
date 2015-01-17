@@ -11,11 +11,11 @@ import com.google.common.collect.Lists;
  */
 public class PrimitiveCollection extends PrimitiveHolder {
 
-	private final PrimitiveType type;
+	private final AbstractPrimitiveType type;
 	
 	private final List<Object> data = Lists.newArrayList();  // elements of type which is compatible with type
 
-	public PrimitiveCollection(PrimitiveType type, TransferObject parent, TypeNode typeNode) {
+	public PrimitiveCollection(AbstractPrimitiveType type, TransferObject parent, TypeNode typeNode) {
 		super(parent, typeNode, typeNode.id());
 		this.type = type;
 	}

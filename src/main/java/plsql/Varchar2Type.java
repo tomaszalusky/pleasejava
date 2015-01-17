@@ -3,9 +3,9 @@ package plsql;
 /**
  * @author Tomas Zalusky
  */
-public class Varchar2Type extends PrimitiveType {
+class Varchar2Type extends AbstractPrimitiveType {
 
-	public Varchar2Type(plsql.Plsql.Varchar2 annotation) {
+	Varchar2Type(plsql.Plsql.Varchar2 annotation) {
 		super(annotation);
 	}
 	

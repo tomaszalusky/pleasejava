@@ -3,9 +3,9 @@ package plsql;
 /**
  * @author Tomas Zalusky
  */
-public class LongType extends PrimitiveType {
+class LongType extends AbstractPrimitiveType {
 
-	public LongType(plsql.Plsql.Long_ annotation) {
+	LongType(plsql.Plsql.Long_ annotation) {
 		super(annotation);
 	}
 	

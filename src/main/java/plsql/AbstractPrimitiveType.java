@@ -8,9 +8,9 @@ import java.util.Objects;
  * 
  * @author Tomas Zalusky
  */
-class PrimitiveType extends Type {
+class AbstractPrimitiveType extends AbstractType {
 	
-	PrimitiveType(Annotation annotation) {
+	AbstractPrimitiveType(Annotation annotation) {
 		super(annotation);
 	}
 	
@@ -29,8 +29,8 @@ class PrimitiveType extends Type {
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) return true;
-		if (!(obj instanceof PrimitiveType)) return false;
-		PrimitiveType that = (PrimitiveType)obj;
+		if (!(obj instanceof AbstractPrimitiveType)) return false;
+		AbstractPrimitiveType that = (AbstractPrimitiveType)obj;
 		boolean result = Objects.equals(this.name,that.name);
 		return result;
 	}

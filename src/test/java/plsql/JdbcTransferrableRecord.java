@@ -8,7 +8,7 @@ package plsql;
  */
 public class JdbcTransferrableRecord extends TransferObject {
 
-	private Type type;
+	private AbstractType type;
 	
 	private Object data;
 
@@ -17,7 +17,7 @@ public class JdbcTransferrableRecord extends TransferObject {
 	 * @param parent
 	 * @param typeNode
 	 */
-	public JdbcTransferrableRecord(Type type, TransferObject parent, TypeNode typeNode) {
+	public JdbcTransferrableRecord(AbstractType type, TransferObject parent, TypeNode typeNode) {
 		super(parent, typeNode, typeNode.id() + "s"); // s for "struct" (java.sql.Struct)
 		this.type = type;
 	}

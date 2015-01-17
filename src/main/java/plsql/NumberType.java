@@ -3,9 +3,9 @@ package plsql;
 /**
  * @author Tomas Zalusky
  */
-public class NumberType extends PrimitiveType {
+class NumberType extends AbstractPrimitiveType {
 
-	public NumberType(plsql.Plsql.Number_ annotation) {
+	NumberType(plsql.Plsql.Number_ annotation) {
 		super(annotation);
 	}
 	

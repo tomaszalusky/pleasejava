@@ -14,15 +14,15 @@ import com.google.common.collect.ObjectArrays;
  * 
  * @author Tomas Zalusky
  */
-class Record extends Type {
+class RecordType extends AbstractType {
 	
-	private final ImmutableMap<String,Type> fields;
+	private final ImmutableMap<String,AbstractType> fields;
 	
 	/**
 	 * @param name
 	 * @param fields names and types of fields (ordering of map matters)
 	 */
-	Record(plsql.Plsql.Record annotation, Map<String,Type> fields) {
+	RecordType(plsql.Plsql.Record annotation, Map<String,AbstractType> fields) {
 		super(annotation);
 		this.fields = ImmutableMap.copyOf(checkNotNull(fields));
 	}
@@ -43,15 +43,15 @@ class Record extends Type {
 		visitor.visitRecord(this, arg1, arg2, arg3);
 	}
 
-	public Map<String,Type> getFields() {
+	Map<String,AbstractType> getFields() {
 		return fields;
 	}
 	
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) return true;
-		if (!(obj instanceof Record)) return false;
-		Record that = (Record)obj;
+		if (!(obj instanceof RecordType)) return false;
+		RecordType that = (RecordType)obj;
 		// cannot just use Objects.equals(this.fields,that.fields) because order matters
 		boolean result = Objects.equals(this.name,that.name) && Iterables.elementsEqual(this.fields.entrySet(),that.fields.entrySet());
 		return result;

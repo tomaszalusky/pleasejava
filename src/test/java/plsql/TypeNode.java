@@ -15,7 +15,7 @@ import com.google.common.collect.ImmutableMap;
  */
 class TypeNode {
 
-	private final Type type;
+	private final AbstractType type;
 	
 	/**
 	 * Points to type node representing type which depends on this type.
@@ -37,7 +37,7 @@ class TypeNode {
 	 * @param parent
 	 * @param orderInParent
 	 */
-	TypeNode(Type type, TypeNode parent, int orderInParent) {
+	TypeNode(AbstractType type, TypeNode parent, int orderInParent) {
 		this.type = type;
 		this.parent = parent;
 		this.depth = parent == null ? 0 : parent.depth + 1;
@@ -87,16 +87,16 @@ class TypeNode {
 			private String escapize(int value) {return value < 10 ? "" + value : "_" + value + "_";}
 			@Override public String visitProcedureSignature(ProcedureSignature type) {return escapize(orderInParent + 1);}
 			@Override public String visitFunctionSignature(FunctionSignature type) {return escapize(orderInParent);}
-			@Override public String visitRecord(Record type) {return escapize(orderInParent + 1);}
-			@Override public String visitVarray(Varray type) {return "e";}
-			@Override public String visitNestedTable(NestedTable type) {return "e";}
-			@Override public String visitIndexByTable(IndexByTable type) {return "e";}
-			@Override public String visitPrimitive(PrimitiveType type) {throw new IllegalStateException("primitive type is not expected to be parent of any type");}
+			@Override public String visitRecord(RecordType type) {return escapize(orderInParent + 1);}
+			@Override public String visitVarray(VarrayType type) {return "e";}
+			@Override public String visitNestedTable(NestedTableType type) {return "e";}
+			@Override public String visitIndexByTable(IndexByTableType type) {return "e";}
+			@Override public String visitPrimitive(AbstractPrimitiveType type) {throw new IllegalStateException("primitive type is not expected to be parent of any type");}
 		});
 		return result;
 	}
 
-	Type getType() {
+	AbstractType getType() {
 		return type;
 	}
 
@@ -187,7 +187,7 @@ class TypeNode {
 		}
 
 		@Override
-		public void visitRecord(Record type, Integer level, TypeNode typeNode) {
+		public void visitRecord(RecordType type, Integer level, TypeNode typeNode) {
 			appendToLastCell("record").append("\"" + type.getName() + "\"").append("#" + typeNode.id());
 			if (transferObjectTree != null) {
 				if (transferObjectTree.hasTransferObject(typeNode)) { // only JDBC-transferrable record needs TO, other records nodes never have associated TO due to decomposition
@@ -197,7 +197,7 @@ class TypeNode {
 					append("|");
 				}
 			}
-			for (Map.Entry<String,Type> entry : type.getFields().entrySet()) {
+			for (Map.Entry<String,AbstractType> entry : type.getFields().entrySet()) {
 				String key = entry.getKey();
 				newLine().append(indent(level + 1) + key + " ");
 				entry.getValue().accept(this,level + 1,typeNode.getChildren().get(key));
@@ -205,7 +205,7 @@ class TypeNode {
 		}
 
 		@Override
-		public void visitVarray(Varray type, Integer level, TypeNode typeNode) {
+		public void visitVarray(VarrayType type, Integer level, TypeNode typeNode) {
 			appendToLastCell("varray").append("\"" + type.getName() + "\"").append("#" + typeNode.id());
 			if (transferObjectTree != null) {
 				if (transferObjectTree.hasTransferObject(typeNode)) {
@@ -220,12 +220,12 @@ class TypeNode {
 					append("|");
 				}
 			}
-			newLine().append(indent(level + 1) + Varray.ELEMENT_LABEL + " ");
-			type.getElementType().accept(this,level + 1,typeNode.getChildren().get(Varray.ELEMENT_LABEL));
+			newLine().append(indent(level + 1) + VarrayType.ELEMENT_LABEL + " ");
+			type.getElementType().accept(this,level + 1,typeNode.getChildren().get(VarrayType.ELEMENT_LABEL));
 		}
 
 		@Override
-		public void visitNestedTable(NestedTable type, Integer level, TypeNode typeNode) {
+		public void visitNestedTable(NestedTableType type, Integer level, TypeNode typeNode) {
 			appendToLastCell("nestedtable").append("\"" + type.getName() + "\"").append("#" + typeNode.id());
 			if (transferObjectTree != null) {
 				if (transferObjectTree.hasTransferObject(typeNode)) {
@@ -246,12 +246,12 @@ class TypeNode {
 					append("|");
 				}
 			}
-			newLine().append(indent(level + 1) + NestedTable.ELEMENT_LABEL + " ");
-			type.getElementType().accept(this,level + 1,typeNode.getChildren().get(NestedTable.ELEMENT_LABEL));
+			newLine().append(indent(level + 1) + NestedTableType.ELEMENT_LABEL + " ");
+			type.getElementType().accept(this,level + 1,typeNode.getChildren().get(NestedTableType.ELEMENT_LABEL));
 		}
 
 		@Override
-		public void visitIndexByTable(IndexByTable type, Integer level, TypeNode typeNode) {
+		public void visitIndexByTable(IndexByTableType type, Integer level, TypeNode typeNode) {
 			appendToLastCell("indexbytable").append("\"" + type.getName() + "\"").append("#" + typeNode.id());
 			if (transferObjectTree != null) {
 				if (transferObjectTree.hasTransferObject(typeNode)) {
@@ -261,7 +261,7 @@ class TypeNode {
 					append("|");
 				}
 			}
-			newLine().append(indent(level + 1) + IndexByTable.KEY_LABEL).append(type.getIndexType().toString());
+			newLine().append(indent(level + 1) + IndexByTableType.KEY_LABEL).append(type.getIndexType().toString());
 			if (transferObjectTree != null) {
 				append(""); // skipping id column
 				if (transferObjectTree.hasTransferObject(typeNode)) {
@@ -271,12 +271,12 @@ class TypeNode {
 					append("|");
 				}
 			}
-			newLine().append(indent(level + 1) + IndexByTable.ELEMENT_LABEL + " ");
-			type.getElementType().accept(this,level + 1,typeNode.getChildren().get(IndexByTable.ELEMENT_LABEL));
+			newLine().append(indent(level + 1) + IndexByTableType.ELEMENT_LABEL + " ");
+			type.getElementType().accept(this,level + 1,typeNode.getChildren().get(IndexByTableType.ELEMENT_LABEL));
 		}
 
 		@Override
-		public void visitPrimitive(PrimitiveType type, Integer level, TypeNode typeNode) {
+		public void visitPrimitive(AbstractPrimitiveType type, Integer level, TypeNode typeNode) {
 			append("\"" + type.getName() + "\"").append("#" + typeNode.id());
 			if (transferObjectTree != null) {
 				if (transferObjectTree.hasTransferObject(typeNode)) { // decomposition reaches primitive node in which case it must have exactly one TO

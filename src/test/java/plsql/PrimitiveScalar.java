@@ -6,11 +6,11 @@ package plsql;
  */
 public class PrimitiveScalar extends PrimitiveHolder {
 
-	private final PrimitiveType type;
+	private final AbstractPrimitiveType type;
 	
 	private Object data;  // runtime type is compatible with type
 
-	public PrimitiveScalar(PrimitiveType type, TransferObject parent, TypeNode typeNode) {
+	public PrimitiveScalar(AbstractPrimitiveType type, TransferObject parent, TypeNode typeNode) {
 		super(parent, typeNode, typeNode.id());
 		this.type = type;
 	}

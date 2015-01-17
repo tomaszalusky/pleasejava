@@ -33,31 +33,31 @@ import com.google.common.collect.ImmutableSetMultimap;
  * Each child represents parameter of PLSQL procedure or function in order of declaration.
  * In the case of PLSQL function, extra child represents return type and occurs as the very first child.
  * </li>
- * <li>node for {@link PrimitiveType} is leaf of tree, which corresponds with intuitive fact that
+ * <li>node for {@link AbstractPrimitiveType} is leaf of tree, which corresponds with intuitive fact that
  * every complex type finally breaks down into primitive types.
  * (Note that type tree represents decomposition of all complex types, even those that are top-level
  * and can be sent via JDBC {@link Array} or {@link Struct}.
  * The ability of being transferred by JDBC is under responsibility of another classes and doesn't influence type tree.)
  * </li>
- * <li>node for {@link NestedTable} has one child which represents nested table element type.
+ * <li>node for {@link NestedTableType} has one child which represents nested table element type.
  * </li>
- * <li>node for {@link Varray} has one child which represents varray element type.
+ * <li>node for {@link VarrayType} has one child which represents varray element type.
  * </li>
- * <li>node for {@link IndexByTable} has one child which represents index-by table element type.
+ * <li>node for {@link IndexByTableType} has one child which represents index-by table element type.
  * Note that key type doesn't have {@link TypeNode} since it would complicate creation of subsequent structures.
  * (For convenience it is still written in indented manner in
- * {@link ToString#visitIndexByTable(IndexByTable, Integer, TypeNode) toString} anyway.)
+ * {@link ToString#visitIndexByTable(IndexByTableType, Integer, TypeNode) toString} anyway.)
  * </li>
- * <li>node for {@link Record} has at least one child, 
+ * <li>node for {@link RecordType} has at least one child, 
  * each child represents field of PLSQL record in order of declaration.
  * </li>
  * </ul>
  * <p>
- * Note that unlike {@link Type}, {@link TypeNode} represents occurence of type
+ * Note that unlike {@link AbstractType}, {@link TypeNode} represents occurence of type
  * at concrete point in procedure or function signature and cannot be shared.
  * For example, a procedure <code>foo(a1 tableofrecord, a2 tableofrecord)</code>
- * has two children of type {@link NestedTable},
- * where <em>each of them</em> has its <em>own</em> child of type {@link Record}.
+ * has two children of type {@link NestedTableType},
+ * where <em>each of them</em> has its <em>own</em> child of type {@link RecordType}.
  * </p>
  * @author Tomas Zalusky
  */
@@ -93,7 +93,7 @@ public class TypeNodeTree {
 	/**
 	 * <p>
 	 * Ensures adding appropriate transfer object to type node.
-	 * First generic argument is type node of visited {@link Type}.
+	 * First generic argument is type node of visited {@link AbstractType}.
 	 * The visit... methods generate transfer objects for this type node,
 	 * see concrete algorithms in javadoc of particular methods.
 	 * Second generic argument is parent in transfer object tree under which transfer objects are added.
@@ -142,12 +142,12 @@ public class TypeNodeTree {
 		 * (which is not JDBC-transferrable - otherwise it would be processed in its visitor method)
 		 * then it must be decomposed as if it wasn't transferrable
 		 * because there are no means how to send such a sequence to db.
-		 * @see plsql.TypeVisitorAAA#visitRecord(plsql.Record, java.lang.Object, java.lang.Object, java.lang.Object)
+		 * @see plsql.TypeVisitorAAA#visitRecord(plsql.RecordType, java.lang.Object, java.lang.Object, java.lang.Object)
 		 */
 		@Override
-		public void visitRecord(Record type, TypeNode typeNode, TransferObject parent, Boolean inCollection) {
+		public void visitRecord(RecordType type, TypeNode typeNode, TransferObject parent, Boolean inCollection) {
 			if (type.isJdbcTransferrable() && inCollection || !type.isJdbcTransferrable()) {
-				for (Map.Entry<String,Type> entry : type.getFields().entrySet()) {
+				for (Map.Entry<String,AbstractType> entry : type.getFields().entrySet()) {
 					TypeNode childTypeNode = typeNode.getChildren().get(entry.getKey());
 					childTypeNode.getType().accept(this,childTypeNode,parent,inCollection);
 				}
@@ -181,10 +181,10 @@ public class TypeNodeTree {
 		 * (the parent represents transfer object for the nearest outer collection
 		 * or {@link RootTransferObject} if such collection doesn't exist). 
 		 * </p>
-		 * @see plsql.TypeVisitorAAA#visitVarray(plsql.Varray, java.lang.Object, java.lang.Object, java.lang.Object)
+		 * @see plsql.TypeVisitorAAA#visitVarray(plsql.VarrayType, java.lang.Object, java.lang.Object, java.lang.Object)
 		 */
 		@Override
-		public void visitVarray(Varray type, TypeNode typeNode, TransferObject parent, Boolean inCollection) {
+		public void visitVarray(VarrayType type, TypeNode typeNode, TransferObject parent, Boolean inCollection) {
 			if (type.isJdbcTransferrable()) {
 				if (inCollection) {
 					TransferObject pointers = new DataPointers(false,parent,typeNode);
@@ -205,13 +205,13 @@ public class TypeNodeTree {
 				TransferObject pointers = new DataPointers(!inCollection,parent,typeNode);
 				associationsBuilder.put(typeNode, pointers);
 				parent.addChild(pointers);
-				TypeNode childTypeNode = typeNode.getChildren().get(Varray.ELEMENT_LABEL);
+				TypeNode childTypeNode = typeNode.getChildren().get(VarrayType.ELEMENT_LABEL);
 				childTypeNode.getType().accept(this,childTypeNode,pointers,true);
 			}
 		}
 
 		/**
-		 * Same as {@link #visitVarray(Varray, TypeNode, TransferObject, Boolean)},
+		 * Same as {@link #visitVarray(VarrayType, TypeNode, TransferObject, Boolean)},
 		 * enriched with deletion information.
 		 * Every collection is represented by two pointer collections:
 		 * first points into {@link Deletions} transfer object (q-pointers in toString),
@@ -222,10 +222,10 @@ public class TypeNodeTree {
 		 * and <code>p</code> be <code>[b,c,e]</code>.
 		 * Then <code>q</code> and <code>p</code> represent collection <code>[a,b,c,d,e]</code>
 		 * after performing <code>delete(1)</code> and <code>delete(4)</code>.
-		 * @see plsql.TypeVisitorAAA#visitNestedTable(plsql.NestedTable, java.lang.Object, java.lang.Object, java.lang.Object)
+		 * @see plsql.TypeVisitorAAA#visitNestedTable(plsql.NestedTableType, java.lang.Object, java.lang.Object, java.lang.Object)
 		 */
 		@Override
-		public void visitNestedTable(NestedTable type, TypeNode typeNode, TransferObject parent, Boolean inCollection) {
+		public void visitNestedTable(NestedTableType type, TypeNode typeNode, TransferObject parent, Boolean inCollection) {
 			if (type.isJdbcTransferrable()) {
 				if (inCollection) {
 					TransferObject pointersToDeletions = new DeletionsPointers(false,parent,typeNode);
@@ -264,30 +264,30 @@ public class TypeNodeTree {
 				TransferObject pointers = new DataPointers(!inCollection,parent,typeNode);
 				associationsBuilder.put(typeNode, pointers);
 				parent.addChild(pointers);
-				TypeNode childTypeNode = typeNode.getChildren().get(NestedTable.ELEMENT_LABEL);
+				TypeNode childTypeNode = typeNode.getChildren().get(NestedTableType.ELEMENT_LABEL);
 				childTypeNode.getType().accept(this,childTypeNode,pointers,true);
 			}
 		}
 
 		/**
-		 * Same as {@link #visitVarray(Varray, TypeNode, TransferObject, Boolean)},
+		 * Same as {@link #visitVarray(VarrayType, TypeNode, TransferObject, Boolean)},
 		 * except following exceptions:
 		 * <ul>
 		 * <li>only non-JDBC-transferrable types decomposition is considered (since index-by tables are never JDBC-transferrable)</li>
 		 * <li>type node tree is enriched with index information and {@link Indexes} transfer object is added as child of {@link Pointers}.
 		 * Pointers point not only into data collection(s) but also into collection of index values.</li>
 		 * </ul>
-		 * @see plsql.TypeVisitorAAA#visitNestedTable(plsql.NestedTable, java.lang.Object, java.lang.Object, java.lang.Object)
+		 * @see plsql.TypeVisitorAAA#visitNestedTable(plsql.NestedTableType, java.lang.Object, java.lang.Object, java.lang.Object)
 		 */
 		@Override
-		public void visitIndexByTable(IndexByTable type, TypeNode typeNode, TransferObject parent, Boolean inCollection) {
+		public void visitIndexByTable(IndexByTableType type, TypeNode typeNode, TransferObject parent, Boolean inCollection) {
 			TransferObject pointers = new DataPointers(!inCollection,parent,typeNode);
 			associationsBuilder.put(typeNode, pointers);
 			parent.addChild(pointers);
 			TransferObject indexes = new Indexes(type.getIndexType(), pointers, typeNode);
 			associationsBuilder.put(typeNode, indexes);
 			pointers.addChild(indexes);
-			TypeNode childTypeNode = typeNode.getChildren().get(IndexByTable.ELEMENT_LABEL);
+			TypeNode childTypeNode = typeNode.getChildren().get(IndexByTableType.ELEMENT_LABEL);
 			childTypeNode.getType().accept(this,childTypeNode,pointers,true);
 		}
 
@@ -301,10 +301,10 @@ public class TypeNodeTree {
 		 * (i.e. for example simple procedure parameters),
 		 * the {@link PrimitiveScalar} suffices.
 		 * </p>
-		 * @see plsql.TypeVisitorAAA#visitPrimitive(plsql.PrimitiveType, java.lang.Object, java.lang.Object, java.lang.Object)
+		 * @see plsql.TypeVisitorAAA#visitPrimitive(plsql.AbstractPrimitiveType, java.lang.Object, java.lang.Object, java.lang.Object)
 		 */
 		@Override
-		public void visitPrimitive(PrimitiveType type, TypeNode typeNode, TransferObject parent, Boolean inCollection) {
+		public void visitPrimitive(AbstractPrimitiveType type, TypeNode typeNode, TransferObject parent, Boolean inCollection) {
 			TransferObject child;
 			if (inCollection) {
 				child = new PrimitiveCollection(type, parent, typeNode);

@@ -11,17 +11,17 @@ import com.google.common.base.Preconditions;
  * 
  * @author Tomas Zalusky
  */
-class IndexByTable extends Type {
+class IndexByTableType extends AbstractType {
 	
-	public static final String KEY_LABEL = "(key)";
+	static final String KEY_LABEL = "(key)";
 	
-	public static final String ELEMENT_LABEL = "(element)";
+	static final String ELEMENT_LABEL = "(element)";
 	
-	private final Type elementType;
+	private final AbstractType elementType;
 
-	private final PrimitiveType indexType;
+	private final AbstractPrimitiveType indexType;
 
-	IndexByTable(plsql.Plsql.IndexByTable annotation, Type elementType, PrimitiveType indexType) {
+	IndexByTableType(plsql.Plsql.IndexByTable annotation, AbstractType elementType, AbstractPrimitiveType indexType) {
 		super(annotation);
 		Preconditions.checkArgument(indexType != null && indexType.getName().matches("(?i)binary_integer|pls_integer|varchar2\\(\\d+?\\)|varchar|string\\(\\d+?\\)|long"), "Illegal index type '%s'.", indexType == null ? null : indexType.getName()); // TODO: improve according to http://docs.oracle.com/cd/B10500_01/appdev.920/a96624/05_colls.htm#19661 - check index bounds etc.
 		this.indexType = indexType;
@@ -44,19 +44,19 @@ class IndexByTable extends Type {
 		visitor.visitIndexByTable(this, arg1, arg2, arg3);
 	}
 
-	public Type getElementType() {
+	AbstractType getElementType() {
 		return elementType;
 	}
 
-	public PrimitiveType getIndexType() {
+	AbstractPrimitiveType getIndexType() {
 		return indexType;
 	}
 
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) return true;
-		if (!(obj instanceof IndexByTable)) return false;
-		IndexByTable that = (IndexByTable)obj;
+		if (!(obj instanceof IndexByTableType)) return false;
+		IndexByTableType that = (IndexByTableType)obj;
 		boolean result = Objects.equals(this.name,that.name) && Objects.equals(this.elementType,that.elementType) && Objects.equals(this.indexType,that.indexType);
 		return result;
 	}
@@ -68,12 +68,12 @@ class IndexByTable extends Type {
 
 	/**
 	 * Index-by tables are never JDBC-transferrable because they are PLSQL types and not database types.
-	 * @see plsql.Type#isJdbcTransferrable()
+	 * @see plsql.AbstractType#isJdbcTransferrable()
 	 */
 	@Override
 	boolean isJdbcTransferrable() {
 		if (super.isJdbcTransferrable()) {
-			throw new Error("System error: wrong detection of JDBC-transferability for index-by table " + getName());
+			throw new Error("System error: wrong detection of JDBC-transferrability for index-by table " + getName());
 		}
 		return false;
 	}

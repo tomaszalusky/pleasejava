@@ -3,9 +3,9 @@ package plsql;
 /**
  * @author Tomas Zalusky
  */
-public class PlsIntegerType extends PrimitiveType {
+class PlsIntegerType extends AbstractPrimitiveType {
 
-	public PlsIntegerType(plsql.Plsql.PlsInteger annotation) {
+	PlsIntegerType(plsql.Plsql.PlsInteger annotation) {
 		super(annotation);
 	}
 	

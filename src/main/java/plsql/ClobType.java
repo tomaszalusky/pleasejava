@@ -3,9 +3,9 @@ package plsql;
 /**
  * @author Tomas Zalusky
  */
-public class ClobType extends PrimitiveType {
+class ClobType extends AbstractPrimitiveType {
 
-	public ClobType(plsql.Plsql.Clob annotation) {
+	ClobType(plsql.Plsql.Clob annotation) {
 		super(annotation);
 	}
 	

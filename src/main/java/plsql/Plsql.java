@@ -776,7 +776,7 @@ public class Plsql {
 	public @interface InOut {}
 	
 	
-	public static abstract class TypeAnnotationStringConverter<A extends Annotation> { //TODO make package visible after moving types into plsql package
+	static abstract class TypeAnnotationStringConverter<A extends Annotation> {
 		
 		public abstract String toString(A input);
 		

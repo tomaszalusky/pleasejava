@@ -18,9 +18,9 @@ import com.google.common.collect.ObjectArrays;
  */
 class FunctionSignature extends AbstractSignature {
 	
-	public static final String RETURN_LABEL = "(return)";
+	static final String RETURN_LABEL = "(return)";
 	
-	private final Type returnType;
+	private final AbstractType returnType;
 	
 	private final ImmutableMap<String,Parameter> parameters;
 
@@ -29,7 +29,7 @@ class FunctionSignature extends AbstractSignature {
 	 * @param parameters names and types of parameters (ordering of map matters)
 	 * @param returnType
 	 */
-	FunctionSignature(plsql.Plsql.Function annotation, Map<String,Parameter> parameters, Type returnType) {
+	FunctionSignature(plsql.Plsql.Function annotation, Map<String,Parameter> parameters, AbstractType returnType) {
 		super(annotation);
 		this.parameters = ImmutableMap.copyOf(checkNotNull(parameters));
 		this.returnType = returnType;
@@ -51,11 +51,11 @@ class FunctionSignature extends AbstractSignature {
 		visitor.visitFunctionSignature(this, arg1, arg2, arg3);
 	}
 	
-	public Type getReturnType() {
+	AbstractType getReturnType() {
 		return returnType;
 	}
 	
-	public Map<String,Parameter> getParameters() {
+	Map<String,Parameter> getParameters() {
 		return parameters;
 	}
 	

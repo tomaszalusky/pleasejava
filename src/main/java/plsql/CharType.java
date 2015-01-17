@@ -3,9 +3,9 @@ package plsql;
 /**
  * @author Tomas Zalusky
  */
-public class CharType extends PrimitiveType {
+class CharType extends AbstractPrimitiveType {
 
-	public CharType(plsql.Plsql.Char_ annotation) {
+	CharType(plsql.Plsql.Char_ annotation) {
 		super(annotation);
 	}
 	

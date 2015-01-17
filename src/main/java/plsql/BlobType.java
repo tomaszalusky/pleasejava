@@ -3,9 +3,9 @@ package plsql;
 /**
  * @author Tomas Zalusky
  */
-public class BlobType extends PrimitiveType {
+class BlobType extends AbstractPrimitiveType {
 
-	public BlobType(plsql.Plsql.Blob annotation) {
+	BlobType(plsql.Plsql.Blob annotation) {
 		super(annotation);
 	}
 	

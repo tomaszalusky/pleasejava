@@ -16,26 +16,26 @@ final class Parameter {
 	
 	private final ParameterMode parameterMode;
 	
-	private final Type type;
+	private final AbstractType type;
 	
-	private Parameter(ParameterMode parameterMode, Type type) {
+	private Parameter(ParameterMode parameterMode, AbstractType type) {
 		this.parameterMode = parameterMode;
 		this.type = type;
 	}
 	
-	public static Parameter create(ParameterMode mode, Type type) {
+	public static Parameter create(ParameterMode mode, AbstractType type) {
 		return new Parameter(mode, type);
 	}
 	
-	public static Parameter in(Type type) {
+	public static Parameter in(AbstractType type) {
 		return new Parameter(ParameterMode.IN, type);
 	}
 	
-	public static Parameter out(Type type) {
+	public static Parameter out(AbstractType type) {
 		return new Parameter(ParameterMode.OUT, type);
 	}
 	
-	public static Parameter inout(Type type) {
+	public static Parameter inout(AbstractType type) {
 		return new Parameter(ParameterMode.INOUT, type);
 	}
 
@@ -43,12 +43,12 @@ final class Parameter {
 		return parameterMode;
 	}
 	
-	public Type getType() {
+	public AbstractType getType() {
 		return type;
 	}
 	
-	public static final Function<Parameter,Type> _getType = new Function<Parameter,Type>() {
-		public Type apply(Parameter input) {
+	public static final Function<Parameter,AbstractType> _getType = new Function<Parameter,AbstractType>() {
+		public AbstractType apply(Parameter input) {
 			return input.getType();
 		}
 	};

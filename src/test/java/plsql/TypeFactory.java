@@ -35,7 +35,7 @@ class TypeFactory {
 	 * the {@link Optional#absent()} serves as map value.
 	 * Encountering {@link Optional#absent()} value during construction indicates circular dependency.
 	 */
-	private final Map<String,Optional<Type>> typeByName = Maps.newLinkedHashMap();
+	private final Map<String,Optional<AbstractType>> typeByName = Maps.newLinkedHashMap();
 
 	TypeFactory(Element rootElement) {
 		this.rootElement = rootElement;
@@ -73,7 +73,7 @@ class TypeFactory {
 			new PrimitiveTypeConverterHolder<>(new Plsql.String_      .StringConverter(), StringType       ::new)
 	);
 	
-	static final class PrimitiveTypeConverterHolder <T extends Type,A extends Annotation> {
+	static final class PrimitiveTypeConverterHolder <T extends AbstractType,A extends Annotation> {
 		private final TypeAnnotationStringConverter<A> converter;
 		private Function<A,T> typeConstructor;
 		PrimitiveTypeConverterHolder(TypeAnnotationStringConverter<A> converter, Function<A,T> typeConstructor) {
@@ -93,11 +93,11 @@ class TypeFactory {
 	 * @param name
 	 * @return
 	 */
-	Type ensureType(String name) {
-		Optional<Type> optionalType = typeByName.get(name);
+	AbstractType ensureType(String name) {
+		Optional<AbstractType> optionalType = typeByName.get(name);
 		if (optionalType == null) { // type node has not been constructed yet
-			typeByName.put(name, Optional.<Type>absent()); // marked as being built
-			Type result = null;
+			typeByName.put(name, Optional.<AbstractType>absent()); // marked as being built
+			AbstractType result = null;
 			for (PrimitiveTypeConverterHolder<?,?> h : PRIMITIVES) {
 				result = h.toType(name);
 				if (result != null) break;
@@ -111,7 +111,7 @@ class TypeFactory {
 				String typeElementName = typeElement.getName();
 				switch (typeElementName) {
 					case "record" : {
-						ImmutableMap.Builder<String,Type> builder = ImmutableMap.builder();
+						ImmutableMap.Builder<String,AbstractType> builder = ImmutableMap.builder();
 						List<Element> children = typeElement.getChildren("field");
 						if (children.isEmpty()) {
 							throw new InvalidXmlException("empty record");
@@ -119,31 +119,31 @@ class TypeFactory {
 						for (Element fieldElement : children) {
 							String fieldName = attr(fieldElement,"name");
 							String fieldTypeName = attr(fieldElement,"type");
-							Type fieldType = ensureType(fieldTypeName);
+							AbstractType fieldType = ensureType(fieldTypeName);
 							builder.put(fieldName,fieldType);
 						}
 						plsql.Plsql.Record annotation = new Plsql.Record.StringConverter().fromString(name);
-						result = new Record(annotation,builder.build());
+						result = new RecordType(annotation,builder.build());
 						break;
 					} case "varray" : {
 						String elementTypeName = attr(typeElement,"of");
-						Type elementType = ensureType(elementTypeName);
+						AbstractType elementType = ensureType(elementTypeName);
 						plsql.Plsql.Varray annotation = new Plsql.Varray.StringConverter().fromString(name);
-						result = new Varray(annotation,elementType);
+						result = new VarrayType(annotation,elementType);
 						break;
 					} case "nestedtable" : {
 						String elementTypeName = attr(typeElement,"of");
-						Type elementType = ensureType(elementTypeName);
+						AbstractType elementType = ensureType(elementTypeName);
 						plsql.Plsql.NestedTable annotation = new Plsql.NestedTable.StringConverter().fromString(name);
-						result = new NestedTable(annotation,elementType);
+						result = new NestedTableType(annotation,elementType);
 						break;
 					} case "indexbytable" : {
 						String elementTypeName = attr(typeElement,"of");
-						Type elementType = ensureType(elementTypeName);
+						AbstractType elementType = ensureType(elementTypeName);
 						String indexTypeName = attr(typeElement,"indexby");
-						PrimitiveType indexType = (PrimitiveType)ensureType(indexTypeName);
+						AbstractPrimitiveType indexType = (AbstractPrimitiveType)ensureType(indexTypeName);
 						plsql.Plsql.IndexByTable annotation = new Plsql.IndexByTable.StringConverter().fromString(name);
-						result = new IndexByTable(annotation,elementType,indexType);
+						result = new IndexByTableType(annotation,elementType,indexType);
 						break;
 					} case "procedure" : {
 						ImmutableMap.Builder<String,Parameter> builder = ImmutableMap.builder();
@@ -151,7 +151,7 @@ class TypeFactory {
 							ParameterMode mode = parameterMode(parameterElement);
 							String parameterName = attr(parameterElement,"name");
 							String parameterTypeName = attr(parameterElement,"type");
-							Type parameterType = ensureType(parameterTypeName);
+							AbstractType parameterType = ensureType(parameterTypeName);
 							Parameter parameter = Parameter.create(mode, parameterType);
 							builder.put(parameterName,parameter);
 						}
@@ -164,12 +164,12 @@ class TypeFactory {
 							ParameterMode mode = parameterMode(parameterElement);
 							String parameterName = attr(parameterElement,"name");
 							String parameterTypeName = attr(parameterElement,"type");
-							Type parameterType = ensureType(parameterTypeName);
+							AbstractType parameterType = ensureType(parameterTypeName);
 							Parameter parameter = Parameter.create(mode, parameterType);
 							builder.put(parameterName,parameter);
 						}
 						String returnTypeName = attr(typeElement,"returntype");
-						Type returnType = ensureType(returnTypeName);
+						AbstractType returnType = ensureType(returnTypeName);
 						plsql.Plsql.Function annotation = new Plsql.Function.StringConverter().fromString(name);
 						result = new FunctionSignature(annotation,builder.build(),returnType);
 						break;

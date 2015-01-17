@@ -1,7 +1,5 @@
 package plsql;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import java.lang.annotation.Annotation;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -20,13 +18,13 @@ import com.google.common.collect.Maps;
  * 
  * @author Tomas Zalusky
  */
-abstract class Type {
+abstract class AbstractType {
 	
 	final String name;
 	
 	final Annotation annotation;
 	
-	public Type(Annotation annotation) {
+	AbstractType(Annotation annotation) {
 		this.annotation = annotation;
 		Class<? extends Annotation> annotationClass = annotation.getClass();
 		plsql.Plsql.Type typeAnnotation = (annotationClass.isAnnotation() ? annotationClass : annotationClass.getInterfaces()[0]).getAnnotation(plsql.Plsql.Type.class); // false for mocked annotations
@@ -51,7 +49,7 @@ abstract class Type {
 	 * @see GetChildren
 	 * @return set of entries, entry key is name identifying child type in parent type (or symbolic name), entry value is child type
 	 */
-	final Map<String,Type> getChildren() {
+	final Map<String,AbstractType> getChildren() {
 		return accept(new GetChildren());
 	}
 
@@ -71,12 +69,12 @@ abstract class Type {
 	
 	abstract <A1,A2,A3> void accept(TypeVisitorAAA<A1,A2,A3> visitor, A1 arg1, A2 arg2, A3 arg3);
 	
-	public String getName() {
+	String getName() {
 		return name;
 	}
 	
-	public static Function<Type,String> _getName = new Function<Type,String>() {
-		public String apply(Type input) {
+	static Function<AbstractType,String> _getName = new Function<AbstractType,String>() {
+		public String apply(AbstractType input) {
 			return input.getName();
 		}
 	};
@@ -85,7 +83,7 @@ abstract class Type {
 		TypeNode result = new TypeNode(this,parent,orderInParent);
 		ImmutableMap.Builder<String,TypeNode> children = ImmutableMap.builder();
 		int o = 0;
-		for (Map.Entry<String,Type> e : this.getChildren().entrySet()) {
+		for (Map.Entry<String,AbstractType> e : this.getChildren().entrySet()) {
 			children.put(e.getKey(), e.getValue().toTypeNode(result, o++));
 		}
 		result.setChildren(children.build());
@@ -100,43 +98,43 @@ abstract class Type {
 		return result;
 	}
 
-	private static class GetChildren implements TypeVisitorR<Map<String,Type>> {
+	private static class GetChildren implements TypeVisitorR<Map<String,AbstractType>> {
 
 		@Override
-		public Map<String,Type> visitProcedureSignature(ProcedureSignature type) {
+		public Map<String,AbstractType> visitProcedureSignature(ProcedureSignature type) {
 			return ImmutableMap.copyOf(Maps.transformValues(type.getParameters(),Parameter._getType));
 		}
 
 		@Override
-		public Map<String,Type> visitFunctionSignature(FunctionSignature type) {
-			ImmutableMap.Builder<String,Type> builder = ImmutableMap.builder();
+		public Map<String,AbstractType> visitFunctionSignature(FunctionSignature type) {
+			ImmutableMap.Builder<String,AbstractType> builder = ImmutableMap.builder();
 			builder.put(FunctionSignature.RETURN_LABEL, type.getReturnType());
 			builder.putAll(Maps.transformValues(type.getParameters(),Parameter._getType));
 			return builder.build();
 		}
 
 		@Override
-		public Map<String,Type> visitRecord(Record type) {
+		public Map<String,AbstractType> visitRecord(RecordType type) {
 			return ImmutableMap.copyOf(type.getFields());
 		}
 
 		@Override
-		public Map<String,Type> visitVarray(Varray type) {
-			return ImmutableMap.of(Varray.ELEMENT_LABEL, type.getElementType());
+		public Map<String,AbstractType> visitVarray(VarrayType type) {
+			return ImmutableMap.of(VarrayType.ELEMENT_LABEL, type.getElementType());
 		}
 
 		@Override
-		public Map<String,Type> visitNestedTable(NestedTable type) {
-			return ImmutableMap.of(NestedTable.ELEMENT_LABEL, type.getElementType());
+		public Map<String,AbstractType> visitNestedTable(NestedTableType type) {
+			return ImmutableMap.of(NestedTableType.ELEMENT_LABEL, type.getElementType());
 		}
 
 		@Override
-		public Map<String,Type> visitIndexByTable(IndexByTable type) {
-			return ImmutableMap.of(IndexByTable.ELEMENT_LABEL, type.getElementType());
+		public Map<String,AbstractType> visitIndexByTable(IndexByTableType type) {
+			return ImmutableMap.of(IndexByTableType.ELEMENT_LABEL, type.getElementType());
 		}
 
 		@Override
-		public Map<String,Type> visitPrimitive(PrimitiveType type) {
+		public Map<String,AbstractType> visitPrimitive(AbstractPrimitiveType type) {
 			return ImmutableMap.of();
 		}
 		
@@ -148,7 +146,7 @@ abstract class Type {
 	 */
 	static class ToString extends Utils.ToStringSupport implements TypeVisitorA<Integer> {
 
-		private final Set<Type> written;
+		private final Set<AbstractType> written;
 		
 		/**
 		 * @param written guard set of type which have already been written in full format.
@@ -156,11 +154,11 @@ abstract class Type {
 		 * remaining occurences are listed only in concise format.
 		 * Can be <code>null</code> for always using full format (guard disabled).
 		 */
-		ToString(Set<Type> written) {
+		ToString(Set<AbstractType> written) {
 			this.written = written;
 		}
 
-		private boolean checkWritten(Type type) {
+		private boolean checkWritten(AbstractType type) {
 			if (written == null) {
 				return false;
 			}
@@ -198,10 +196,10 @@ abstract class Type {
 		}
 
 		@Override
-		public void visitRecord(Record type, Integer level) {
+		public void visitRecord(RecordType type, Integer level) {
 			appendToLastCell("record").append("\"" + type.getName() + "\"");
 			if (!checkWritten(type)) {
-				for (Map.Entry<String,Type> entry : type.getFields().entrySet()) {
+				for (Map.Entry<String,AbstractType> entry : type.getFields().entrySet()) {
 					newLine().append(indent(level + 1) + entry.getKey() + " ");
 					entry.getValue().accept(this,level + 1);
 				}
@@ -209,35 +207,35 @@ abstract class Type {
 		}
 
 		@Override
-		public void visitVarray(Varray type, Integer level) {
+		public void visitVarray(VarrayType type, Integer level) {
 			appendToLastCell("varray").append("\"" + type.getName() + "\"");
 			if (!checkWritten(type)) {
-				newLine().append(indent(level + 1) + Varray.ELEMENT_LABEL + " ");
+				newLine().append(indent(level + 1) + VarrayType.ELEMENT_LABEL + " ");
 				type.getElementType().accept(this,level + 1);
 			}
 		}
 
 		@Override
-		public void visitNestedTable(NestedTable type, Integer level) {
+		public void visitNestedTable(NestedTableType type, Integer level) {
 			appendToLastCell("nestedtable").append("\"" + type.getName() + "\"");
 			if (!checkWritten(type)) {
-				newLine().append(indent(level + 1) + NestedTable.ELEMENT_LABEL + " ");
+				newLine().append(indent(level + 1) + NestedTableType.ELEMENT_LABEL + " ");
 				type.getElementType().accept(this,level + 1);
 			}
 		}
 
 		@Override
-		public void visitIndexByTable(IndexByTable type, Integer level) {
+		public void visitIndexByTable(IndexByTableType type, Integer level) {
 			appendToLastCell("indexbytable").append("\"" + type.getName() + "\"");
 			if (!checkWritten(type)) {
-				newLine().append(indent(level + 1) + IndexByTable.KEY_LABEL).append(type.getIndexType().toString())
-				.newLine().append(indent(level + 1) + IndexByTable.ELEMENT_LABEL + " ");
+				newLine().append(indent(level + 1) + IndexByTableType.KEY_LABEL).append(type.getIndexType().toString())
+				.newLine().append(indent(level + 1) + IndexByTableType.ELEMENT_LABEL + " ");
 				type.getElementType().accept(this,level + 1);
 			}
 		}
 
 		@Override
-		public void visitPrimitive(PrimitiveType type, Integer level) {
+		public void visitPrimitive(AbstractPrimitiveType type, Integer level) {
 			append("\"" + type.getName() + "\""); // always written regardless guard set
 		}
 		

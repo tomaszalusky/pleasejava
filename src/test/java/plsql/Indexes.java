@@ -13,11 +13,11 @@ import com.google.common.collect.Lists;
  */
 public class Indexes extends TransferObject {
 
-	private final PrimitiveType indexType;
+	private final AbstractPrimitiveType indexType;
 	
 	private final List<Object> data = Lists.newArrayList();  // elements of type which is compatible with indexType
 
-	public Indexes(PrimitiveType indexType, TransferObject parent, TypeNode typeNode) {
+	public Indexes(AbstractPrimitiveType indexType, TransferObject parent, TypeNode typeNode) {
 		super(parent, typeNode, typeNode.id() + "i");
 		this.indexType = indexType;
 	}

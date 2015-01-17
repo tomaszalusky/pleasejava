@@ -3,9 +3,9 @@ package plsql;
 /**
  * @author Tomas Zalusky
  */
-public class BooleanType extends PrimitiveType {
+class BooleanType extends AbstractPrimitiveType {
 
-	public BooleanType(plsql.Plsql.Boolean_ annotation) {
+	BooleanType(plsql.Plsql.Boolean_ annotation) {
 		super(annotation);
 	}
 	

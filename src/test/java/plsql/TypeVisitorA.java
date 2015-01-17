@@ -2,7 +2,7 @@ package plsql;
 
 /**
  * Represents method called on particular type instance.
- * @see Type#accept(TypeVisitorA, Object)
+ * @see AbstractType#accept(TypeVisitorA, Object)
  * 
  * @author Tomas Zalusky
  */
@@ -12,14 +12,14 @@ interface TypeVisitorA<A> {
 	
 	void visitFunctionSignature(FunctionSignature type, A arg);
 	
-	void visitRecord(Record type, A arg);
+	void visitRecord(RecordType type, A arg);
 
-	void visitVarray(Varray type, A arg);
+	void visitVarray(VarrayType type, A arg);
 	
-	void visitNestedTable(NestedTable type, A arg);
+	void visitNestedTable(NestedTableType type, A arg);
 	
-	void visitIndexByTable(IndexByTable type, A arg);
+	void visitIndexByTable(IndexByTableType type, A arg);
 	
-	void visitPrimitive(PrimitiveType type, A arg);
+	void visitPrimitive(AbstractPrimitiveType type, A arg);
 
 }

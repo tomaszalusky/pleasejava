@@ -2,24 +2,24 @@ package plsql;
 
 /**
  * Represents method called on particular type instance.
- * @see Type#accept(TypeVisitorR)
+ * @see AbstractType#accept(TypeVisitorR)
  * 
  * @author Tomas Zalusky
  */
 interface TypeVisitorR<R> {
 	
-	R visitRecord(Record type);
+	R visitRecord(RecordType type);
 	
-	R visitVarray(Varray type);
+	R visitVarray(VarrayType type);
 	
-	R visitNestedTable(NestedTable type);
+	R visitNestedTable(NestedTableType type);
 	
-	R visitIndexByTable(IndexByTable type);
+	R visitIndexByTable(IndexByTableType type);
 	
 	R visitProcedureSignature(ProcedureSignature type);
 	
 	R visitFunctionSignature(FunctionSignature type);
 	
-	R visitPrimitive(PrimitiveType type);
+	R visitPrimitive(AbstractPrimitiveType type);
 
 }

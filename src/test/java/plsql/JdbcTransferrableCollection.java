@@ -11,7 +11,7 @@ import com.google.common.collect.Lists;
  */
 public class JdbcTransferrableCollection extends TransferObject {
 
-	private final Type type;
+	private final AbstractType type;
 	
 	private final Collection<?> data = Lists.newArrayList();
 
@@ -20,7 +20,7 @@ public class JdbcTransferrableCollection extends TransferObject {
 	 * @param parent
 	 * @param typeNode
 	 */
-	public JdbcTransferrableCollection(Type type, TransferObject parent, TypeNode typeNode) {
+	public JdbcTransferrableCollection(AbstractType type, TransferObject parent, TypeNode typeNode) {
 		super(parent, typeNode, typeNode.id() + "a"); // a for "array" (java.sql.Array)
 		this.type = type;
 	}

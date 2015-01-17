@@ -3,9 +3,9 @@ package plsql;
 /**
  * @author Tomas Zalusky
  */
-public class BinaryIntegerType extends PrimitiveType {
+class BinaryIntegerType extends AbstractPrimitiveType {
 
-	public BinaryIntegerType(plsql.Plsql.BinaryInteger annotation) {
+	BinaryIntegerType(plsql.Plsql.BinaryInteger annotation) {
 		super(annotation);
 	}
 	
