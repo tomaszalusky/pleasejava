@@ -16,7 +16,7 @@ class NestedTable extends Type {
 	private final Type elementType;
 
 	NestedTable(plsql.Plsql.NestedTable annotation, Type elementType) {
-		super(null,annotation);
+		super(annotation);
 		this.elementType = checkNotNull(elementType);
 	}
 	

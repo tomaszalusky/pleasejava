@@ -103,10 +103,6 @@ class TypeFactory {
 				if (result != null) break;
 			}
 			if (result == null) {
-			
-			if (name.matches("")) {
-				result = new PrimitiveType(name,null);
-			} else {
 				XPathExpression<Element> xpath = XPathFactory.instance().compile("*[@name='" + name + "']", Filters.element());
 				Element typeElement = Iterables.getOnlyElement(xpath.evaluate(rootElement),null);
 				if (typeElement == null) {
@@ -181,7 +177,6 @@ class TypeFactory {
 						throw new InvalidPlsqlConstructException(typeElementName);
 					}
 				}
-			}
 			}
 			typeByName.put(name, Optional.of(result));
 			return result;

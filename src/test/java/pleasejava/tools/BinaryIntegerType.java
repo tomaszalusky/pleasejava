@@ -6,7 +6,7 @@ package pleasejava.tools;
 public class BinaryIntegerType extends PrimitiveType {
 
 	public BinaryIntegerType(plsql.Plsql.BinaryInteger annotation) {
-		super(null,annotation);
+		super(annotation);
 	}
 	
 }

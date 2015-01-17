@@ -6,7 +6,7 @@ package pleasejava.tools;
 public class StringType extends PrimitiveType {
 
 	public StringType(plsql.Plsql.String_ annotation) {
-		super(null,annotation);
+		super(annotation);
 	}
 	
 }

@@ -10,8 +10,8 @@ import java.lang.annotation.Annotation;
  */
 public abstract class AbstractSignature extends Type {
 
-	public AbstractSignature(String name, Annotation annotation) {
-		super(name,annotation);
+	public AbstractSignature(Annotation annotation) {
+		super(annotation);
 	}
 
 }

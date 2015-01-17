@@ -6,7 +6,7 @@ package pleasejava.tools;
 public class BooleanType extends PrimitiveType {
 
 	public BooleanType(plsql.Plsql.Boolean_ annotation) {
-		super(null,annotation);
+		super(annotation);
 	}
 	
 }

@@ -6,7 +6,7 @@ package pleasejava.tools;
 public class BlobType extends PrimitiveType {
 
 	public BlobType(plsql.Plsql.Blob annotation) {
-		super(null,annotation);
+		super(annotation);
 	}
 	
 }

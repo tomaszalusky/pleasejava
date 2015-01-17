@@ -24,7 +24,7 @@ class ProcedureSignature extends AbstractSignature {
 	 * @param parameters names and types of parameters (ordering of map matters)
 	 */
 	ProcedureSignature(plsql.Plsql.Procedure annotation, Map<String,Parameter> parameters) {
-		super(null,annotation);
+		super(annotation);
 		this.parameters = ImmutableMap.copyOf(checkNotNull(parameters));
 	}
 	

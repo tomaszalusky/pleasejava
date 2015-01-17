@@ -16,7 +16,7 @@ class Varray extends Type {
 	private final Type elementType;
 
 	Varray(plsql.Plsql.Varray annotation, Type elementType) {
-		super(null,annotation);
+		super(annotation);
 		this.elementType = checkNotNull(elementType);
 	}
 	

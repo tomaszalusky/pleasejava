@@ -6,7 +6,7 @@ package pleasejava.tools;
 public class IntegerType extends PrimitiveType {
 
 	public IntegerType(plsql.Plsql.Integer_ annotation) {
-		super(null,annotation);
+		super(annotation);
 	}
 	
 }

@@ -6,7 +6,7 @@ package pleasejava.tools;
 public class LongType extends PrimitiveType {
 
 	public LongType(plsql.Plsql.Long_ annotation) {
-		super(null,annotation);
+		super(annotation);
 	}
 	
 }

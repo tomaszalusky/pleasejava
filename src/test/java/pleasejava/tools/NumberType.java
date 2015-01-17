@@ -6,7 +6,7 @@ package pleasejava.tools;
 public class NumberType extends PrimitiveType {
 
 	public NumberType(plsql.Plsql.Number_ annotation) {
-		super(null,annotation);
+		super(annotation);
 	}
 	
 }

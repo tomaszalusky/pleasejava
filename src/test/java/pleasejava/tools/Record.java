@@ -23,7 +23,7 @@ class Record extends Type {
 	 * @param fields names and types of fields (ordering of map matters)
 	 */
 	Record(plsql.Plsql.Record annotation, Map<String,Type> fields) {
-		super(null,annotation);
+		super(annotation);
 		this.fields = ImmutableMap.copyOf(checkNotNull(fields));
 	}
 

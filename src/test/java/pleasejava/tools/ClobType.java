@@ -6,7 +6,7 @@ package pleasejava.tools;
 public class ClobType extends PrimitiveType {
 
 	public ClobType(plsql.Plsql.Clob annotation) {
-		super(null,annotation);
+		super(annotation);
 	}
 	
 }

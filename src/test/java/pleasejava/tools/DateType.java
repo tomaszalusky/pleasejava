@@ -6,7 +6,7 @@ package pleasejava.tools;
 public class DateType extends PrimitiveType {
 
 	public DateType(plsql.Plsql.Date annotation) {
-		super(null,annotation);
+		super(annotation);
 	}
 	
 }

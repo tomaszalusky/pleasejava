@@ -10,8 +10,8 @@ import java.util.Objects;
  */
 class PrimitiveType extends Type {
 	
-	PrimitiveType(String name, Annotation annotation) {
-		super(name,annotation);
+	PrimitiveType(Annotation annotation) {
+		super(annotation);
 	}
 	
 	<R> R accept(TypeVisitorR<R> visitor) {
