@@ -408,6 +408,50 @@ public class Plsql {
 	}
 
 	/**
+	 * Represents PLSQL CHAR type.
+	 * TODO public enum LengthSemantics {DEFAULT,BYTE,CHAR}, LengthSemantics lengthSemantics() default LengthSemantics.DEFAULT;
+	 * @author Tomas Zalusky
+	 */
+	@Target({ElementType.FIELD,ElementType.PARAMETER,ElementType.METHOD})
+	@Retention(RetentionPolicy.RUNTIME)
+	@Type(nameConverter=Char_.StringConverter.class)
+	public @interface Char_ {
+		
+		int value();
+		
+		static class StringConverter extends TypeAnnotationStringConverter<Char_> {
+			
+			private static final Pattern PATTERN = Pattern.compile("char\\((\\d+)\\)");
+
+			@Override
+			public String toString(Char_ a) {
+				return String.format("char(%d)",a.value());
+			}
+			
+			@Override
+			public Char_ fromString(String input) {
+				Matcher matcher = PATTERN.matcher(input);
+				if (!matcher.matches()) {
+					return null;
+				}
+				final int size = Integer.parseInt(matcher.group(1));
+				return new Plsql.Char_() {
+					@Override
+					public int value() {
+						return size;
+					}
+					@Override
+					public Class<? extends Annotation> annotationType() {
+						return Char_.class;
+					}
+				};
+			}
+			
+		}
+		
+	}
+
+	/**
 	 * Represents PLSQL CLOB type.
 	 * @author Tomas Zalusky
 	 */
@@ -439,7 +483,40 @@ public class Plsql {
 		}
 
 	}
-	
+
+	/**
+	 * Represents PLSQL DATE type.
+	 * @author Tomas Zalusky
+	 */
+	@Target({ElementType.FIELD,ElementType.PARAMETER,ElementType.METHOD})
+	@Retention(RetentionPolicy.RUNTIME)
+	@Type(nameConverter=Date.StringConverter.class)
+	public @interface Date {
+		
+		static class StringConverter extends TypeAnnotationStringConverter<Date> {
+
+			@Override
+			public String toString(Date a) {
+				return "date";
+			}
+
+			@Override
+			public Date fromString(String input) {
+				if (!"date".equals(input)) {
+					return null;
+				}
+				return new Plsql.Date() {
+					@Override
+					public Class<? extends Annotation> annotationType() {
+						return Date.class;
+					}
+				};
+			}
+			
+		}
+
+	}
+
 	/**
 	 * Represents PLSQL INTEGER type.
 	 * @author Tomas Zalusky
@@ -681,30 +758,6 @@ public class Plsql {
 	}
 
 	// /primitive types
-	
-	/**
-	 * Represents PLSQL CHAR type.
-	 * @author Tomas Zalusky
-	 */
-	@Target({ElementType.FIELD,ElementType.PARAMETER,ElementType.METHOD})
-	@Retention(RetentionPolicy.RUNTIME)
-	public @interface Char_ {
-		
-		int value();
-		
-	}
- 	
-	/**
-	 * Represents PLSQL DATE type.
-	 * @author Tomas Zalusky
-	 */
-	@Target({ElementType.FIELD,ElementType.PARAMETER,ElementType.METHOD})
-	@Retention(RetentionPolicy.RUNTIME)
-	public @interface Date {
-		
-		int value();
-		
-	}
 	
 	/**
 	 * Indicates that method parameter annotated with this annotation represents PLSQL OUT parameter.
