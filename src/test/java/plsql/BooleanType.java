@@ -1,0 +1,12 @@
+package plsql;
+
+/**
+ * @author Tomas Zalusky
+ */
+public class BooleanType extends PrimitiveType {
+
+	public BooleanType(plsql.Plsql.Boolean_ annotation) {
+		super(annotation);
+	}
+	
+}
