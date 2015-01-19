@@ -5,8 +5,8 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
+import plsql.AbstractType.TypeAnnotationStringConverter;
 
 /**
  * <p>
@@ -65,7 +65,7 @@ public class Plsql {
 	 */
 	@Target(ElementType.METHOD)
 	@Retention(RetentionPolicy.RUNTIME)
-	@Type(nameConverter=Procedure.StringConverter.class)
+	@Type(nameConverter=ProcedureSignature.StringConverter.class)
 	public @interface Procedure {
 
 		/**
@@ -74,29 +74,6 @@ public class Plsql {
 		 */
 		String value();
 		
-		static class StringConverter extends TypeAnnotationStringConverter<Procedure> {
-
-			@Override
-			public String toString(Procedure a) {
-				return a.value();
-			}
-
-			@Override
-			public Procedure fromString(String input) {
-				return new Plsql.Procedure() {
-					@Override
-					public Class<? extends Annotation> annotationType() {
-						return Procedure.class;
-					}
-					@Override
-					public String value() {
-						return input;
-					}
-				};
-			}
-			
-		}
-
 	}
 	
 	/**
@@ -108,7 +85,7 @@ public class Plsql {
 	 */
 	@Target(ElementType.METHOD)
 	@Retention(RetentionPolicy.RUNTIME)
-	@Type(nameConverter=Function.StringConverter.class)
+	@Type(nameConverter=FunctionSignature.StringConverter.class)
 	public @interface Function {
 		
 		/**
@@ -116,29 +93,6 @@ public class Plsql {
 		 * @return name in <a href="#plsql_names">top-level or package-level form</a>
 		 */
 		String value();
-		
-		static class StringConverter extends TypeAnnotationStringConverter<Function> {
-
-			@Override
-			public String toString(Function a) {
-				return a.value();
-			}
-
-			@Override
-			public Function fromString(String input) {
-				return new Plsql.Function() {
-					@Override
-					public Class<? extends Annotation> annotationType() {
-						return Function.class;
-					}
-					@Override
-					public String value() {
-						return input;
-					}
-				};
-			}
-			
-		}
 
 	}
 	
@@ -149,7 +103,7 @@ public class Plsql {
 	 */
 	@Target(ElementType.TYPE)
 	@Retention(RetentionPolicy.RUNTIME)
-	@Type(nameConverter=Record.StringConverter.class)
+	@Type(nameConverter=RecordType.StringConverter.class)
 	public @interface Record {
 		
 		/**
@@ -157,29 +111,6 @@ public class Plsql {
 		 * @return name in <a href="#plsql_names">top-level or package-level form</a>
 		 */
 		String value();
-	
-		static class StringConverter extends TypeAnnotationStringConverter<Record> {
-
-			@Override
-			public String toString(Record a) {
-				return a.value();
-			}
-
-			@Override
-			public Record fromString(String input) {
-				return new Plsql.Record() {
-					@Override
-					public Class<? extends Annotation> annotationType() {
-						return Record.class;
-					}
-					@Override
-					public String value() {
-						return input;
-					}
-				};
-			}
-			
-		}
 
 	}
 	
@@ -192,7 +123,7 @@ public class Plsql {
 	 */
 	@Target({ElementType.FIELD,ElementType.PARAMETER})
 	@Retention(RetentionPolicy.RUNTIME)
-	@Type(nameConverter=NestedTable.StringConverter.class)
+	@Type(nameConverter=NestedTableType.StringConverter.class)
 	public @interface NestedTable {
 		
 		/**
@@ -200,29 +131,6 @@ public class Plsql {
 		 * @return name in <a href="#plsql_names">top-level or package-level form</a>
 		 */
 		String value();
-		
-		static class StringConverter extends TypeAnnotationStringConverter<NestedTable> {
-
-			@Override
-			public String toString(NestedTable a) {
-				return a.value();
-			}
-
-			@Override
-			public NestedTable fromString(String input) {
-				return new Plsql.NestedTable() {
-					@Override
-					public Class<? extends Annotation> annotationType() {
-						return NestedTable.class;
-					}
-					@Override
-					public String value() {
-						return input;
-					}
-				};
-			}
-			
-		}
 
 	}
 	
@@ -232,7 +140,7 @@ public class Plsql {
 	 */
 	@Target({ElementType.FIELD,ElementType.PARAMETER})
 	@Retention(RetentionPolicy.RUNTIME)
-	@Type(nameConverter=Varray.StringConverter.class)
+	@Type(nameConverter=VarrayType.StringConverter.class)
 	public @interface Varray {
 		
 		/**
@@ -241,29 +149,6 @@ public class Plsql {
 		 */
 		String value();
 
-		static class StringConverter extends TypeAnnotationStringConverter<Varray> {
-
-			@Override
-			public String toString(Varray a) {
-				return a.value();
-			}
-
-			@Override
-			public Varray fromString(String input) {
-				return new Plsql.Varray() {
-					@Override
-					public Class<? extends Annotation> annotationType() {
-						return Varray.class;
-					}
-					@Override
-					public String value() {
-						return input;
-					}
-				};
-			}
-			
-		}
-
 	}
 	
 	/**
@@ -272,7 +157,7 @@ public class Plsql {
 	 */
 	@Target({ElementType.FIELD,ElementType.PARAMETER})
 	@Retention(RetentionPolicy.RUNTIME)
-	@Type(nameConverter=IndexByTable.StringConverter.class)
+	@Type(nameConverter=IndexByTableType.StringConverter.class)
 	public @interface IndexByTable {
 		
 		/**
@@ -280,29 +165,6 @@ public class Plsql {
 		 * @return name in <a href="#plsql_names">top-level or package-level form</a>
 		 */
 		String value();
-		
-		static class StringConverter extends TypeAnnotationStringConverter<IndexByTable> {
-
-			@Override
-			public String toString(IndexByTable a) {
-				return a.value();
-			}
-
-			@Override
-			public IndexByTable fromString(String input) {
-				return new Plsql.IndexByTable() {
-					@Override
-					public Class<? extends Annotation> annotationType() {
-						return IndexByTable.class;
-					}
-					@Override
-					public String value() {
-						return input;
-					}
-				};
-			}
-			
-		}
 
 	}
 	
@@ -314,30 +176,8 @@ public class Plsql {
 	 */
 	@Target({ElementType.FIELD,ElementType.PARAMETER,ElementType.METHOD})
 	@Retention(RetentionPolicy.RUNTIME)
-	@Type(nameConverter=BinaryInteger.StringConverter.class)
+	@Type(nameConverter=BinaryIntegerType.StringConverter.class)
 	public @interface BinaryInteger {
-		
-		static class StringConverter extends TypeAnnotationStringConverter<BinaryInteger> {
-
-			@Override
-			public String toString(BinaryInteger a) {
-				return "binary_integer";
-			}
-
-			@Override
-			public BinaryInteger fromString(String input) {
-				if (!"binary_integer".equals(input)) {
-					return null;
-				}
-				return new Plsql.BinaryInteger() {
-					@Override
-					public Class<? extends Annotation> annotationType() {
-						return BinaryInteger.class;
-					}
-				};
-			}
-			
-		}
 
 	}
 
@@ -347,30 +187,8 @@ public class Plsql {
 	 */
 	@Target({ElementType.FIELD,ElementType.PARAMETER,ElementType.METHOD})
 	@Retention(RetentionPolicy.RUNTIME)
-	@Type(nameConverter=Blob.StringConverter.class)
+	@Type(nameConverter=BlobType.StringConverter.class)
 	public @interface Blob {
-		
-		static class StringConverter extends TypeAnnotationStringConverter<Blob> {
-
-			@Override
-			public String toString(Blob a) {
-				return "blob";
-			}
-
-			@Override
-			public Blob fromString(String input) {
-				if (!"blob".equals(input)) {
-					return null;
-				}
-				return new Plsql.Blob() {
-					@Override
-					public Class<? extends Annotation> annotationType() {
-						return Blob.class;
-					}
-				};
-			}
-			
-		}
 
 	}
 	
@@ -380,30 +198,8 @@ public class Plsql {
 	 */
 	@Target({ElementType.FIELD,ElementType.PARAMETER,ElementType.METHOD})
 	@Retention(RetentionPolicy.RUNTIME)
-	@Type(nameConverter=Boolean_.StringConverter.class)
+	@Type(nameConverter=BooleanType.StringConverter.class)
 	public @interface Boolean_ {
-		
-		static class StringConverter extends TypeAnnotationStringConverter<Boolean_> {
-			
-			@Override
-			public String toString(Boolean_ a) {
-				return "boolean";
-			}
-			
-			@Override
-			public Boolean_ fromString(String input) {
-				if (!"boolean".equals(input)) {
-					return null;
-				}
-				return new Plsql.Boolean_() {
-					@Override
-					public Class<? extends Annotation> annotationType() {
-						return Boolean_.class;
-					}
-				};
-			}
-			
-		}
 		
 	}
 
@@ -414,40 +210,10 @@ public class Plsql {
 	 */
 	@Target({ElementType.FIELD,ElementType.PARAMETER,ElementType.METHOD})
 	@Retention(RetentionPolicy.RUNTIME)
-	@Type(nameConverter=Char_.StringConverter.class)
+	@Type(nameConverter=CharType.StringConverter.class)
 	public @interface Char_ {
 		
 		int value();
-		
-		static class StringConverter extends TypeAnnotationStringConverter<Char_> {
-			
-			private static final Pattern PATTERN = Pattern.compile("char\\((\\d+)\\)");
-
-			@Override
-			public String toString(Char_ a) {
-				return String.format("char(%d)",a.value());
-			}
-			
-			@Override
-			public Char_ fromString(String input) {
-				Matcher matcher = PATTERN.matcher(input);
-				if (!matcher.matches()) {
-					return null;
-				}
-				final int size = Integer.parseInt(matcher.group(1));
-				return new Plsql.Char_() {
-					@Override
-					public int value() {
-						return size;
-					}
-					@Override
-					public Class<? extends Annotation> annotationType() {
-						return Char_.class;
-					}
-				};
-			}
-			
-		}
 		
 	}
 
@@ -457,30 +223,8 @@ public class Plsql {
 	 */
 	@Target({ElementType.FIELD,ElementType.PARAMETER,ElementType.METHOD})
 	@Retention(RetentionPolicy.RUNTIME)
-	@Type(nameConverter=Clob.StringConverter.class)
+	@Type(nameConverter=ClobType.StringConverter.class)
 	public @interface Clob {
-		
-		static class StringConverter extends TypeAnnotationStringConverter<Clob> {
-
-			@Override
-			public String toString(Clob a) {
-				return "clob";
-			}
-
-			@Override
-			public Clob fromString(String input) {
-				if (!"clob".equals(input)) {
-					return null;
-				}
-				return new Plsql.Clob() {
-					@Override
-					public Class<? extends Annotation> annotationType() {
-						return Clob.class;
-					}
-				};
-			}
-			
-		}
 
 	}
 
@@ -490,30 +234,8 @@ public class Plsql {
 	 */
 	@Target({ElementType.FIELD,ElementType.PARAMETER,ElementType.METHOD})
 	@Retention(RetentionPolicy.RUNTIME)
-	@Type(nameConverter=Date.StringConverter.class)
+	@Type(nameConverter=DateType.StringConverter.class)
 	public @interface Date {
-		
-		static class StringConverter extends TypeAnnotationStringConverter<Date> {
-
-			@Override
-			public String toString(Date a) {
-				return "date";
-			}
-
-			@Override
-			public Date fromString(String input) {
-				if (!"date".equals(input)) {
-					return null;
-				}
-				return new Plsql.Date() {
-					@Override
-					public Class<? extends Annotation> annotationType() {
-						return Date.class;
-					}
-				};
-			}
-			
-		}
 
 	}
 
@@ -523,30 +245,8 @@ public class Plsql {
 	 */
 	@Target({ElementType.FIELD,ElementType.PARAMETER,ElementType.METHOD})
 	@Retention(RetentionPolicy.RUNTIME)
-	@Type(nameConverter=Integer_.StringConverter.class)
+	@Type(nameConverter=IntegerType.StringConverter.class)
 	public @interface Integer_ {
-		
-		static class StringConverter extends TypeAnnotationStringConverter<Integer_> {
-
-			@Override
-			public String toString(Integer_ a) {
-				return "integer";
-			}
-
-			@Override
-			public Integer_ fromString(String input) {
-				if (!"integer".equals(input)) {
-					return null;
-				}
-				return new Plsql.Integer_() {
-					@Override
-					public Class<? extends Annotation> annotationType() {
-						return Integer_.class;
-					}
-				};
-			}
-			
-		}
 
 	}
 
@@ -556,30 +256,8 @@ public class Plsql {
 	 */
 	@Target({ElementType.FIELD,ElementType.PARAMETER,ElementType.METHOD})
 	@Retention(RetentionPolicy.RUNTIME)
-	@Type(nameConverter=Long_.StringConverter.class)
+	@Type(nameConverter=LongType.StringConverter.class)
 	public @interface Long_ {
-		
-		static class StringConverter extends TypeAnnotationStringConverter<Long_> {
-
-			@Override
-			public String toString(Long_ a) {
-				return "long";
-			}
-
-			@Override
-			public Long_ fromString(String input) {
-				if (!"long".equals(input)) {
-					return null;
-				}
-				return new Plsql.Long_() {
-					@Override
-					public Class<? extends Annotation> annotationType() {
-						return Long_.class;
-					}
-				};
-			}
-			
-		}
 
 	}
 	
@@ -589,7 +267,7 @@ public class Plsql {
 	 */
 	@Target({ElementType.FIELD,ElementType.PARAMETER,ElementType.METHOD})
 	@Retention(RetentionPolicy.RUNTIME)
-	@Type(nameConverter=Number_.StringConverter.class)
+	@Type(nameConverter=NumberType.StringConverter.class)
 	public @interface Number_ {
 		
 		/**
@@ -598,41 +276,6 @@ public class Plsql {
 		int value();
 		
 		int scale() default 0;
-		
-		static class StringConverter extends TypeAnnotationStringConverter<Number_> {
-			
-			private static final Pattern PATTERN = Pattern.compile("number\\((\\d+)(,(\\d+))?\\)");
-
-			@Override
-			public String toString(Number_ a) {
-				return String.format("number(%d%s)",a.value(),a.scale() == 0 ? "" : String.format(",%d",a.scale()));
-			}
-			
-			@Override
-			public Number_ fromString(String input) {
-				Matcher matcher = PATTERN.matcher(input);
-				if (!matcher.matches()) {
-					return null;
-				}
-				final int precision = Integer.parseInt(matcher.group(1));
-				final int scale = matcher.group(3) == null ? 0 : Integer.parseInt(matcher.group(3));
-				return new Plsql.Number_() {
-					@Override
-					public int value() {
-						return precision;
-					}
-					@Override
-					public int scale() {
-						return scale;
-					}
-					@Override
-					public Class<? extends Annotation> annotationType() {
-						return Number_.class;
-					}
-				};
-			}
-			
-		}
 
 	}
 
@@ -642,30 +285,8 @@ public class Plsql {
 	 */
 	@Target({ElementType.FIELD,ElementType.PARAMETER,ElementType.METHOD})
 	@Retention(RetentionPolicy.RUNTIME)
-	@Type(nameConverter=PlsInteger.StringConverter.class)
+	@Type(nameConverter=PlsIntegerType.StringConverter.class)
 	public @interface PlsInteger {
-		
-		static class StringConverter extends TypeAnnotationStringConverter<PlsInteger> {
-
-			@Override
-			public String toString(PlsInteger a) {
-				return "pls_integer";
-			}
-
-			@Override
-			public PlsInteger fromString(String input) {
-				if (!"pls_integer".equals(input)) {
-					return null;
-				}
-				return new Plsql.PlsInteger() {
-					@Override
-					public Class<? extends Annotation> annotationType() {
-						return PlsInteger.class;
-					}
-				};
-			}
-			
-		}
 
 	}
 
@@ -676,40 +297,10 @@ public class Plsql {
 	 */
 	@Target({ElementType.FIELD,ElementType.PARAMETER,ElementType.METHOD})
 	@Retention(RetentionPolicy.RUNTIME)
-	@Type(nameConverter=String_.StringConverter.class)
+	@Type(nameConverter=StringType.StringConverter.class)
 	public @interface String_ {
 		
 		int value();
-		
-		static class StringConverter extends TypeAnnotationStringConverter<String_> {
-			
-			private static final Pattern PATTERN = Pattern.compile("string\\((\\d+)\\)");
-
-			@Override
-			public String toString(String_ a) {
-				return String.format("string(%d)",a.value());
-			}
-			
-			@Override
-			public String_ fromString(String input) {
-				Matcher matcher = PATTERN.matcher(input);
-				if (!matcher.matches()) {
-					return null;
-				}
-				final int size = Integer.parseInt(matcher.group(1));
-				return new Plsql.String_() {
-					@Override
-					public int value() {
-						return size;
-					}
-					@Override
-					public Class<? extends Annotation> annotationType() {
-						return String_.class;
-					}
-				};
-			}
-			
-		}
 
 	}
 
@@ -720,40 +311,10 @@ public class Plsql {
 	 */
 	@Target({ElementType.FIELD,ElementType.PARAMETER,ElementType.METHOD})
 	@Retention(RetentionPolicy.RUNTIME)
-	@Type(nameConverter=Varchar2.StringConverter.class)
+	@Type(nameConverter=Varchar2Type.StringConverter.class)
 	public @interface Varchar2 {
 		
 		int value();
-		
-		static class StringConverter extends TypeAnnotationStringConverter<Varchar2> {
-			
-			private static final Pattern PATTERN = Pattern.compile("varchar2\\((\\d+)\\)");
-
-			@Override
-			public String toString(Varchar2 a) {
-				return String.format("varchar2(%d)",a.value());
-			}
-			
-			@Override
-			public Varchar2 fromString(String input) {
-				Matcher matcher = PATTERN.matcher(input);
-				if (!matcher.matches()) {
-					return null;
-				}
-				final int size = Integer.parseInt(matcher.group(1));
-				return new Plsql.Varchar2() {
-					@Override
-					public int value() {
-						return size;
-					}
-					@Override
-					public Class<? extends Annotation> annotationType() {
-						return Varchar2.class;
-					}
-				};
-			}
-			
-		}
 
 	}
 
@@ -776,20 +337,6 @@ public class Plsql {
 	public @interface InOut {}
 	
 	
-	static abstract class TypeAnnotationStringConverter<A extends Annotation> {
-		
-		public abstract String toString(A input);
-		
-		@SuppressWarnings("unchecked")
-		public final String toStringErased(Annotation input) {
-			return toString((A)input);
-		}
-		
-		public abstract A fromString(String input);
-		
-	}
-	
-
 }
 
 

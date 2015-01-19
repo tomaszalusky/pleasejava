@@ -2,7 +2,10 @@ package plsql;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.lang.annotation.Annotation;
 import java.util.Objects;
+
+import plsql.Plsql.IndexByTable;
 
 import com.google.common.base.Preconditions;
 
@@ -13,6 +16,29 @@ import com.google.common.base.Preconditions;
  */
 class IndexByTableType extends AbstractType {
 	
+	public static class StringConverter extends TypeAnnotationStringConverter<IndexByTable> {
+	
+		@Override
+		public String toString(IndexByTable a) {
+			return a.value();
+		}
+	
+		@Override
+		public IndexByTable fromString(String input) {
+			return new Plsql.IndexByTable() {
+				@Override
+				public Class<? extends Annotation> annotationType() {
+					return IndexByTable.class;
+				}
+				@Override
+				public String value() {
+					return input;
+				}
+			};
+		}
+		
+	}
+
 	static final String KEY_LABEL = "(key)";
 	
 	static final String ELEMENT_LABEL = "(element)";

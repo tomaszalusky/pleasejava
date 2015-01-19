@@ -2,8 +2,11 @@ package plsql;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.lang.annotation.Annotation;
 import java.util.Map;
 import java.util.Objects;
+
+import plsql.Plsql.Record;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
@@ -16,6 +19,29 @@ import com.google.common.collect.ObjectArrays;
  */
 class RecordType extends AbstractType {
 	
+	public static class StringConverter extends TypeAnnotationStringConverter<Record> {
+	
+		@Override
+		public String toString(Record a) {
+			return a.value();
+		}
+	
+		@Override
+		public Record fromString(String input) {
+			return new Plsql.Record() {
+				@Override
+				public Class<? extends Annotation> annotationType() {
+					return Record.class;
+				}
+				@Override
+				public String value() {
+					return input;
+				}
+			};
+		}
+		
+	}
+
 	private final ImmutableMap<String,AbstractType> fields;
 	
 	/**

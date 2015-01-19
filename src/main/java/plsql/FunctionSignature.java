@@ -2,9 +2,13 @@ package plsql;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.lang.annotation.Annotation;
 import java.util.Map;
 import java.util.Objects;
 
+
+
+import plsql.Plsql.Function;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
@@ -18,6 +22,29 @@ import com.google.common.collect.ObjectArrays;
  */
 class FunctionSignature extends AbstractSignature {
 	
+	public static class StringConverter extends TypeAnnotationStringConverter<Function> {
+	
+		@Override
+		public String toString(Function a) {
+			return a.value();
+		}
+	
+		@Override
+		public Function fromString(String input) {
+			return new Plsql.Function() {
+				@Override
+				public Class<? extends Annotation> annotationType() {
+					return Function.class;
+				}
+				@Override
+				public String value() {
+					return input;
+				}
+			};
+		}
+		
+	}
+
 	static final String RETURN_LABEL = "(return)";
 	
 	private final AbstractType returnType;

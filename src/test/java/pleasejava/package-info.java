@@ -1,9 +1,10 @@
 /**
  * - rozmyslet anotace
  *   - smysl anotaci: pokryti PLSQL typu Java typy
- *     - definovat metaanotaci k primitivnim typum tak, aby z ni byl jasne zretelna struktura a atributy anotace a zpusob parsovani pro XML
+ *     - definovat metaanotaci k primitivnim typum tak, aby z ni byla jasne zretelna struktura a atributy anotace a zpusob parsovani pro XML
  *       - rfct StringConverter a Holder na TypeHandler
  *     - pouzit v TypeFactory seznam vsech anotaci odpovidajicich primitivnim typum, misto dosavadniho dlouheho regexu, sladit typy v regexu s typy v tride Plsql
+ *     - regex u IBT nahradit za vycet typu/handleru/anotaci
  *     - zrevidovat ucel TypeGraph (k cemu se data v nem ulozena budou vyuzivat, generovani kodu, rozliseni number a number(n) atd.)
  *     - pak prizpusobit anotace reprezentujici PLSQL typy podobe struktury TypeGraph
  *   - vycet podporovanych typu: stabilizovat shodu Plsql s typy v XML, pozdeji rozsirit na uplny vycet, pozdeji doplnit i odkladane typy (REF cursor, objekty, uzivatelske subtypy - pocitat s nimi jiz ted)

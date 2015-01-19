@@ -10,9 +10,6 @@ import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 
-import plsql.Plsql;
-import plsql.Plsql.TypeAnnotationStringConverter;
-
 import com.google.common.base.Enums;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
@@ -59,24 +56,24 @@ class TypeFactory {
 	}
 
 	private static final List<PrimitiveTypeConverterHolder<?,?>> PRIMITIVES = ImmutableList.of(
-			new PrimitiveTypeConverterHolder<>(new Plsql.BinaryInteger.StringConverter(), BinaryIntegerType::new),
-			new PrimitiveTypeConverterHolder<>(new Plsql.Blob         .StringConverter(), BlobType         ::new),
-			new PrimitiveTypeConverterHolder<>(new Plsql.Boolean_     .StringConverter(), BooleanType      ::new),
-			new PrimitiveTypeConverterHolder<>(new Plsql.Char_        .StringConverter(), CharType         ::new),
-			new PrimitiveTypeConverterHolder<>(new Plsql.Clob         .StringConverter(), ClobType         ::new),
-			new PrimitiveTypeConverterHolder<>(new Plsql.Date         .StringConverter(), DateType         ::new),
-			new PrimitiveTypeConverterHolder<>(new Plsql.Integer_     .StringConverter(), IntegerType      ::new),
-			new PrimitiveTypeConverterHolder<>(new Plsql.Long_        .StringConverter(), LongType         ::new),
-			new PrimitiveTypeConverterHolder<>(new Plsql.Number_      .StringConverter(), NumberType       ::new),
-			new PrimitiveTypeConverterHolder<>(new Plsql.PlsInteger   .StringConverter(), PlsIntegerType   ::new),
-			new PrimitiveTypeConverterHolder<>(new Plsql.Varchar2     .StringConverter(), Varchar2Type     ::new),
-			new PrimitiveTypeConverterHolder<>(new Plsql.String_      .StringConverter(), StringType       ::new)
+			new PrimitiveTypeConverterHolder<>(new BinaryIntegerType.StringConverter(), BinaryIntegerType::new),
+			new PrimitiveTypeConverterHolder<>(new BlobType         .StringConverter(), BlobType         ::new),
+			new PrimitiveTypeConverterHolder<>(new BooleanType      .StringConverter(), BooleanType      ::new),
+			new PrimitiveTypeConverterHolder<>(new CharType         .StringConverter(), CharType         ::new),
+			new PrimitiveTypeConverterHolder<>(new ClobType         .StringConverter(), ClobType         ::new),
+			new PrimitiveTypeConverterHolder<>(new DateType         .StringConverter(), DateType         ::new),
+			new PrimitiveTypeConverterHolder<>(new IntegerType      .StringConverter(), IntegerType      ::new),
+			new PrimitiveTypeConverterHolder<>(new LongType         .StringConverter(), LongType         ::new),
+			new PrimitiveTypeConverterHolder<>(new NumberType       .StringConverter(), NumberType       ::new),
+			new PrimitiveTypeConverterHolder<>(new PlsIntegerType   .StringConverter(), PlsIntegerType   ::new),
+			new PrimitiveTypeConverterHolder<>(new Varchar2Type     .StringConverter(), Varchar2Type     ::new),
+			new PrimitiveTypeConverterHolder<>(new StringType       .StringConverter(), StringType       ::new)
 	);
 	
 	static final class PrimitiveTypeConverterHolder <T extends AbstractType,A extends Annotation> {
-		private final TypeAnnotationStringConverter<A> converter;
+		private final AbstractType.TypeAnnotationStringConverter<A> converter;
 		private Function<A,T> typeConstructor;
-		PrimitiveTypeConverterHolder(TypeAnnotationStringConverter<A> converter, Function<A,T> typeConstructor) {
+		PrimitiveTypeConverterHolder(AbstractType.TypeAnnotationStringConverter<A> converter, Function<A,T> typeConstructor) {
 			this.converter = converter;
 			this.typeConstructor = typeConstructor;
 		}
@@ -122,19 +119,19 @@ class TypeFactory {
 							AbstractType fieldType = ensureType(fieldTypeName);
 							builder.put(fieldName,fieldType);
 						}
-						plsql.Plsql.Record annotation = new Plsql.Record.StringConverter().fromString(name);
+						plsql.Plsql.Record annotation = new RecordType.StringConverter().fromString(name);
 						result = new RecordType(annotation,builder.build());
 						break;
 					} case "varray" : {
 						String elementTypeName = attr(typeElement,"of");
 						AbstractType elementType = ensureType(elementTypeName);
-						plsql.Plsql.Varray annotation = new Plsql.Varray.StringConverter().fromString(name);
+						plsql.Plsql.Varray annotation = new VarrayType.StringConverter().fromString(name);
 						result = new VarrayType(annotation,elementType);
 						break;
 					} case "nestedtable" : {
 						String elementTypeName = attr(typeElement,"of");
 						AbstractType elementType = ensureType(elementTypeName);
-						plsql.Plsql.NestedTable annotation = new Plsql.NestedTable.StringConverter().fromString(name);
+						plsql.Plsql.NestedTable annotation = new NestedTableType.StringConverter().fromString(name);
 						result = new NestedTableType(annotation,elementType);
 						break;
 					} case "indexbytable" : {
@@ -142,7 +139,7 @@ class TypeFactory {
 						AbstractType elementType = ensureType(elementTypeName);
 						String indexTypeName = attr(typeElement,"indexby");
 						AbstractPrimitiveType indexType = (AbstractPrimitiveType)ensureType(indexTypeName);
-						plsql.Plsql.IndexByTable annotation = new Plsql.IndexByTable.StringConverter().fromString(name);
+						plsql.Plsql.IndexByTable annotation = new IndexByTableType.StringConverter().fromString(name);
 						result = new IndexByTableType(annotation,elementType,indexType);
 						break;
 					} case "procedure" : {
@@ -155,7 +152,7 @@ class TypeFactory {
 							Parameter parameter = Parameter.create(mode, parameterType);
 							builder.put(parameterName,parameter);
 						}
-						plsql.Plsql.Procedure annotation = new Plsql.Procedure.StringConverter().fromString(name);
+						plsql.Plsql.Procedure annotation = new ProcedureSignature.StringConverter().fromString(name);
 						result = new ProcedureSignature(annotation,builder.build());
 						break;
 					} case "function" : {
@@ -170,7 +167,7 @@ class TypeFactory {
 						}
 						String returnTypeName = attr(typeElement,"returntype");
 						AbstractType returnType = ensureType(returnTypeName);
-						plsql.Plsql.Function annotation = new Plsql.Function.StringConverter().fromString(name);
+						plsql.Plsql.Function annotation = new FunctionSignature.StringConverter().fromString(name);
 						result = new FunctionSignature(annotation,builder.build(),returnType);
 						break;
 					} default : {

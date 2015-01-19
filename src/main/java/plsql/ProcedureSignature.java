@@ -2,8 +2,11 @@ package plsql;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.lang.annotation.Annotation;
 import java.util.Map;
 import java.util.Objects;
+
+import plsql.Plsql.Procedure;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
@@ -18,6 +21,29 @@ import com.google.common.collect.ObjectArrays;
 class ProcedureSignature extends AbstractSignature {
 	
 	private final ImmutableMap<String,Parameter> parameters;
+
+	static class StringConverter extends TypeAnnotationStringConverter<Procedure> {
+
+		@Override
+		public String toString(Procedure a) {
+			return a.value();
+		}
+
+		@Override
+		public Procedure fromString(String input) {
+			return new Plsql.Procedure() {
+				@Override
+				public Class<? extends Annotation> annotationType() {
+					return Procedure.class;
+				}
+				@Override
+				public String value() {
+					return input;
+				}
+			};
+		}
+		
+	}
 
 	/**
 	 * @param name

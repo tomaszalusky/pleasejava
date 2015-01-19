@@ -2,7 +2,10 @@ package plsql;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.lang.annotation.Annotation;
 import java.util.Objects;
+
+import plsql.Plsql.NestedTable;
 
 /**
  * Represents nested table type.
@@ -11,6 +14,29 @@ import java.util.Objects;
  */
 class NestedTableType extends AbstractType {
 	
+	public static class StringConverter extends TypeAnnotationStringConverter<NestedTable> {
+	
+		@Override
+		public String toString(NestedTable a) {
+			return a.value();
+		}
+	
+		@Override
+		public NestedTable fromString(String input) {
+			return new Plsql.NestedTable() {
+				@Override
+				public Class<? extends Annotation> annotationType() {
+					return NestedTable.class;
+				}
+				@Override
+				public String value() {
+					return input;
+				}
+			};
+		}
+		
+	}
+
 	static final String ELEMENT_LABEL = "(element)";
 	
 	private final AbstractType elementType;

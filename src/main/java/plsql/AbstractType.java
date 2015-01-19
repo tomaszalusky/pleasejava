@@ -6,7 +6,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import pleasejava.Utils;
-import plsql.Plsql.TypeAnnotationStringConverter;
 
 import com.google.common.base.Function;
 import com.google.common.base.Throwables;
@@ -23,6 +22,19 @@ abstract class AbstractType {
 	final String name;
 	
 	final Annotation annotation;
+	
+	static abstract class TypeAnnotationStringConverter<A extends Annotation> {
+		
+		public abstract String toString(A input);
+		
+		@SuppressWarnings("unchecked")
+		public final String toStringErased(Annotation input) {
+			return toString((A)input);
+		}
+		
+		public abstract A fromString(String input);
+		
+	}
 	
 	AbstractType(Annotation annotation) {
 		this.annotation = annotation;

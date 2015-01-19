@@ -2,7 +2,10 @@ package plsql;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.lang.annotation.Annotation;
 import java.util.Objects;
+
+import plsql.Plsql.Varray;
 
 /**
  * Represents varray (varying array) type.
@@ -10,6 +13,29 @@ import java.util.Objects;
  * @author Tomas Zalusky
  */
 class VarrayType extends AbstractType {
+
+	public static class StringConverter extends TypeAnnotationStringConverter<Varray> {
+	
+		@Override
+		public String toString(Varray a) {
+			return a.value();
+		}
+	
+		@Override
+		public Varray fromString(String input) {
+			return new Plsql.Varray() {
+				@Override
+				public Class<? extends Annotation> annotationType() {
+					return Varray.class;
+				}
+				@Override
+				public String value() {
+					return input;
+				}
+			};
+		}
+		
+	}
 
 	static final String ELEMENT_LABEL = "(element)";
 	
