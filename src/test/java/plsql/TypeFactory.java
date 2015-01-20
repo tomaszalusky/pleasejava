@@ -55,35 +55,6 @@ class TypeFactory {
 		return result.get();
 	}
 
-	private static final List<PrimitiveTypeConverterHolder<?,?>> PRIMITIVES = ImmutableList.of(
-			new PrimitiveTypeConverterHolder<>(new BinaryIntegerType.StringConverter(), BinaryIntegerType::new),
-			new PrimitiveTypeConverterHolder<>(new BlobType         .StringConverter(), BlobType         ::new),
-			new PrimitiveTypeConverterHolder<>(new BooleanType      .StringConverter(), BooleanType      ::new),
-			new PrimitiveTypeConverterHolder<>(new CharType         .StringConverter(), CharType         ::new),
-			new PrimitiveTypeConverterHolder<>(new ClobType         .StringConverter(), ClobType         ::new),
-			new PrimitiveTypeConverterHolder<>(new DateType         .StringConverter(), DateType         ::new),
-			new PrimitiveTypeConverterHolder<>(new IntegerType      .StringConverter(), IntegerType      ::new),
-			new PrimitiveTypeConverterHolder<>(new LongType         .StringConverter(), LongType         ::new),
-			new PrimitiveTypeConverterHolder<>(new NumberType       .StringConverter(), NumberType       ::new),
-			new PrimitiveTypeConverterHolder<>(new PlsIntegerType   .StringConverter(), PlsIntegerType   ::new),
-			new PrimitiveTypeConverterHolder<>(new Varchar2Type     .StringConverter(), Varchar2Type     ::new),
-			new PrimitiveTypeConverterHolder<>(new StringType       .StringConverter(), StringType       ::new)
-	);
-	
-	static final class PrimitiveTypeConverterHolder <T extends AbstractType,A extends Annotation> {
-		private final AbstractType.TypeAnnotationStringConverter<A> converter;
-		private Function<A,T> typeConstructor;
-		PrimitiveTypeConverterHolder(AbstractType.TypeAnnotationStringConverter<A> converter, Function<A,T> typeConstructor) {
-			this.converter = converter;
-			this.typeConstructor = typeConstructor;
-		}
-		T toType(String name) {
-			A a = converter.fromString(name);
-			T result = a == null ? null : typeConstructor.apply(a);
-			return result;
-		}
-	}
-	
 	/**
 	 * Returns instance of type for given name.
 	 * If such an instance does not exist, it is recursively created.
@@ -94,11 +65,7 @@ class TypeFactory {
 		Optional<AbstractType> optionalType = typeByName.get(name);
 		if (optionalType == null) { // type node has not been constructed yet
 			typeByName.put(name, Optional.<AbstractType>absent()); // marked as being built
-			AbstractType result = null;
-			for (PrimitiveTypeConverterHolder<?,?> h : PRIMITIVES) {
-				result = h.toType(name);
-				if (result != null) break;
-			}
+			AbstractType result = AbstractPrimitiveType.recognizePrimitiveType(name);
 			if (result == null) {
 				XPathExpression<Element> xpath = XPathFactory.instance().compile("*[@name='" + name + "']", Filters.element());
 				Element typeElement = Iterables.getOnlyElement(xpath.evaluate(rootElement),null);
