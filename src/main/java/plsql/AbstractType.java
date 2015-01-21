@@ -39,7 +39,7 @@ abstract class AbstractType {
 	AbstractType(Annotation annotation) {
 		this.annotation = annotation;
 		Class<? extends Annotation> annotationClass = annotation.getClass();
-		plsql.Plsql.Type typeAnnotation = (annotationClass.isAnnotation() ? annotationClass : annotationClass.getInterfaces()[0]).getAnnotation(plsql.Plsql.Type.class); // false for mocked annotations
+		plsql.Type typeAnnotation = (annotationClass.isAnnotation() ? annotationClass : annotationClass.getInterfaces()[0]).getAnnotation(plsql.Type.class); // false for mocked annotations
 		Class<? extends TypeAnnotationStringConverter<? extends Annotation>> nameConverterClass = typeAnnotation.nameConverter();
 		TypeAnnotationStringConverter<? extends Annotation> nameConverter;
 		try {

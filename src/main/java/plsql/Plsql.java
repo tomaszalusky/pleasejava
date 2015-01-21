@@ -1,12 +1,9 @@
 package plsql;
 
-import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-
-import plsql.AbstractType.TypeAnnotationStringConverter;
 
 /**
  * <p>
@@ -30,12 +27,6 @@ import plsql.AbstractType.TypeAnnotationStringConverter;
  */
 public class Plsql {
 
-	@Target(ElementType.ANNOTATION_TYPE)
-	@Retention(RetentionPolicy.RUNTIME)
-	public @interface Type {
-		Class<? extends TypeAnnotationStringConverter<? extends Annotation>> nameConverter();
-	}
-	
 	/**
 	 * Interface annotated with this annotation represents PLSQL package.
 	 * If Java construct (method or class) is directly or indirectly (via declaring class) placed in {@link Package_}-annotated interface,
@@ -458,6 +449,10 @@ interface IpmgPortBl {
 	@Function
 	@Boolean_
 	boolean f_over(@Out IpmtPortDsData port, @NestedTable("...") List<IpmtPort> propojeniList);
+
+	@function
+	@pls_integer
+	int f_over(@out IpmtPortDsData port, @table("...") List<IpmtPort> propojeniList);
 
 	@Record
 	class IpmtPortDsData {

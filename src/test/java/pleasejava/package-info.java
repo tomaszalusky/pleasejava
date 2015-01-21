@@ -1,14 +1,12 @@
 /**
  * - rozmyslet anotace
  *   - smysl anotaci: pokryti PLSQL typu Java typy
- *     - pouzit v TypeFactory seznam vsech anotaci odpovidajicich primitivnim typum, misto dosavadniho dlouheho regexu, sladit typy v regexu s typy v tride Plsql
  *     - regex u IBT nahradit za vycet typu/handleru/anotaci
  *     - zrevidovat ucel TypeGraph (k cemu se data v nem ulozena budou vyuzivat, generovani kodu, rozliseni number a number(n) atd.)
  *     - pak prizpusobit anotace reprezentujici PLSQL typy podobe struktury TypeGraph
  *   - vycet podporovanych typu: stabilizovat shodu Plsql s typy v XML, pozdeji rozsirit na uplny vycet, pozdeji doplnit i odkladane typy (REF cursor, objekty, uzivatelske subtypy - pocitat s nimi jiz ted)
  *   - vyresit vnorovani pro kolekce
  *   - vyresit a zduvodnit zda konvence PlsqlFoo nebo Plsql.Foo, urcit package pro anotace
- *   - vyresit subtypy a zda bude treba metaanotace pro typ, pripadne moznost implementace vlastnich subtypu pomoci metaanotaci (napr. @Integer_(3) public @interface MyInteger) - jak by to pomohlo generovani?
  *   - predek procedury a funkce = executable, zvazit oddeleni od hierarchie typu (neni to typ, spis tridu PlsqlConstruct)
  * - mapovani anotaci na PLSQL/SQL konstrukty
  * - uprava typegraph.xml - popis java testu (trid a packagu, typu)
@@ -32,5 +30,12 @@
  * - zvazit odstraneni param. testu - puvodni poznamka kvuli nemoznosti volat test pro oddeleny parametr, ale dle http://blog.moritz.eysholdt.de/2014/11/new-eclipse-junit-feature-run-subtrees.html to od Eclipse Mars pujde a stejne to takto nuti volat vse -> zatim pockat
  * - nepovinne value u anotaci (odvodit z nazvu Java konstruktu) - osemetne kvuli kolekcim, ktere nemaji ekvivalentni Java typ a musi se uvadet vzdy s celym nazvem package. To by pak bylo v nesouladu (princip jednotnosti a minimalniho prekvapeni) u metod. Priklady: 1. anotace Procedure("foo") znamena foo v packagi (anotovany interface) nebo toplevel? 2. Procedure s default value znamena prebrat nazev z Java identifikatoru i s packagem nebo top level? I kdyby se pravidla urcila, nebyla by intuitivni.
  * - reseni kanonickeho tvaru identifikatoru, pokud sam nazev v SQL je v uvozovkach 
+ * - vyresit subtypy
+ *   - xml definice	<subtype name="xxx">varchar2(10)</subtype>, <subtype name="xxx"><record name="a_test_package.rec2" /></subtype>
+ *   - uzivatel smi definovat vlastni anotaci, oanotuje ji metaanotaci z pleasejava
+ *   - priklad z http://docs.oracle.com/cd/B10501_01/appdev.920/a96624/03_types.htm#45633:
+ *     @NestedTable("NameList") public @interface DutyRoster {}
+ *   - dalsi priklad @Integer_(3) public @interface MyInteger
+ *   - metaanotaci Type nebude treba zverejnovat
  */
 package pleasejava;
