@@ -49,7 +49,7 @@ class IndexByTableType extends AbstractType {
 
 	IndexByTableType(plsql.Plsql.IndexByTable annotation, AbstractType elementType, AbstractPrimitiveType indexType) {
 		super(annotation);
-		Preconditions.checkArgument(indexType != null && indexType.getName().matches("(?i)binary_integer|pls_integer|varchar2\\(\\d+?\\)|varchar|string\\(\\d+?\\)|long"), "Illegal index type '%s'.", indexType == null ? null : indexType.getName()); // TODO: improve according to http://docs.oracle.com/cd/B10500_01/appdev.920/a96624/05_colls.htm#19661 - check index bounds etc.
+		Preconditions.checkArgument(indexType instanceof BinaryIntegerType || indexType instanceof PlsIntegerType || indexType instanceof Varchar2Type || indexType instanceof StringType || indexType instanceof LongType, "Illegal index type '%s'.", indexType == null ? null : indexType.getName()); // TODO: improve according to http://docs.oracle.com/cd/B10500_01/appdev.920/a96624/05_colls.htm#19661 - check index bounds etc.
 		this.indexType = indexType;
 		this.elementType = checkNotNull(elementType);
 	}

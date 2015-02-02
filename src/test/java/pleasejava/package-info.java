@@ -1,8 +1,8 @@
 /**
  * - rozmyslet anotace
  *   - smysl anotaci: pokryti PLSQL typu Java typy
- *     - regex u IBT nahradit za vycet typu/handleru/anotaci
- *     - zrevidovat ucel TypeGraph (k cemu se data v nem ulozena budou vyuzivat, generovani kodu, rozliseni number a number(n) atd.)
+ *     - rozlisit TypeGraph (k cemu se data v nem ulozena budou vyuzivat, a data XML pro Java model)
+ *       - typeGraph.toJavaModel(xml);
  *     - pak prizpusobit anotace reprezentujici PLSQL typy podobe struktury TypeGraph
  *   - vycet podporovanych typu: stabilizovat shodu Plsql s typy v XML, pozdeji rozsirit na uplny vycet, pozdeji doplnit i odkladane typy (REF cursor, objekty, uzivatelske subtypy - pocitat s nimi jiz ted)
  *   - vyresit vnorovani pro kolekce
@@ -16,6 +16,7 @@
  * - postavit graf z anotovanych java trid, zvazit recyklaci TypeFactory
  *   - rfct StringConverter na TypeHandler
  * - update yEd schematu
+ * - rozliseni number a number(n) 
  * 
  * later,technicke:
  * - guavu pryc
