@@ -48,8 +48,9 @@ public class TypeGraphLoadTest extends AbstractTypeGraphTest {
 		return Arrays.asList(new Object[][] {
 				{"simple"               , null                                , null},
 				{"dag1"                 , null                                , null},
-				{"allTypes"             , null                                , null},
-				{"topLevel"             , null                                , null},
+				{"alltypes"             , null                                , null},
+				{"toplevel"             , null                                , null},
+				{"javatype"             , null                                , null},
 				{"invalidType"          , UndeclaredTypeException.class       , "'nonexisting'"},
 				{"invalidPlsqlConstruct", InvalidPlsqlConstructException.class, "'nonexisting'"},
 				{"invalidDependencies"  , TypeCircularityException.class      , "'nst1'"},

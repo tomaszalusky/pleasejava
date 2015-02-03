@@ -1,0 +1,6 @@
+procedure                "a_test_package.foo"
+    a in nestedtable     "a_test_package.tableofrec"
+        (element) record "a_test_package.rec"
+            fi           "integer"
+            fs           "varchar2(200)"
+    b in nestedtable     "a_test_package.tableofrec" ...

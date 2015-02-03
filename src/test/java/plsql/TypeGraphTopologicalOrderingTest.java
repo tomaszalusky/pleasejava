@@ -74,11 +74,12 @@ public class TypeGraphTopologicalOrderingTest extends AbstractTypeGraphTest {
 				varchar2(100)          pls_integer  boolean             integer      number(30)                         varchar2(200)  
 				 */
 				)},
-				{"topLevel",ImmutableList.of(
+				{"toplevel",ImmutableList.of(
 						"pn_pn_tn_tr","pn_tn_tr","pv_tn_tr","tn_tr","pv_pv_tv_tr","pv_tv_tr","pn_tv_tr","tv_tr","pr_tr","tr",
 						"pkg.nst3","pkg.varn","pkg.var3","pkg.nstv","pkg.rec2","pkg.nst2","pkg.var2",
 						"varchar2(10)","nst1","var1","rec","boolean","integer"
 				)},
+				{"javatype",ImmutableList.of("a_test_package.foo","a_test_package.tableofrec","a_test_package.rec","integer","varchar2(200)")}
 		});
 	}
 
