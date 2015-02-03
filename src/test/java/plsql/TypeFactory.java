@@ -125,6 +125,9 @@ class TypeFactory {
 					} case "function" : {
 						ImmutableMap.Builder<String,Parameter> builder = ImmutableMap.builder();
 						for (Element parameterElement : typeElement.getChildren()) {
+							if ("return".equals(parameterElement.getName())) {
+								continue;
+							}
 							ParameterMode mode = parameterMode(parameterElement);
 							String parameterName = attr(parameterElement,"name");
 							String parameterTypeName = attr(parameterElement,"type");
@@ -132,7 +135,11 @@ class TypeFactory {
 							Parameter parameter = Parameter.create(mode, parameterType);
 							builder.put(parameterName,parameter);
 						}
-						String returnTypeName = attr(typeElement,"returntype");
+						Element returnElement = typeElement.getChild("return");
+						if (returnElement == null) {
+							throw new InvalidXmlException("missing return element for function " + name);
+						}
+						String returnTypeName = attr(returnElement,"type");
 						AbstractType returnType = ensureType(returnTypeName);
 						plsql.Plsql.Function annotation = new FunctionSignature.StringConverter().fromString(name);
 						result = new FunctionSignature(annotation,builder.build(),returnType);
