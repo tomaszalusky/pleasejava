@@ -3,6 +3,8 @@
  *   - smysl anotaci: pokryti PLSQL typu Java typy
  *     - rozlisit TypeGraph (k cemu se data v nem ulozena budou vyuzivat, a data XML pro Java model)
  *       - typeGraph.toJavaModel(xml);
+ *         - co nejdrive element z input streamu
+ *         - je nutna kontrola na xmlns:java1="stejnahodnota" xmlns:java2="stejnahodnota" ? 
  *     - pak prizpusobit anotace reprezentujici PLSQL typy podobe struktury TypeGraph
  *   - vycet podporovanych typu: stabilizovat shodu Plsql s typy v XML, pozdeji rozsirit na uplny vycet, pozdeji doplnit i odkladane typy (REF cursor, objekty, uzivatelske subtypy - pocitat s nimi jiz ted)
  *   - vyresit vnorovani pro kolekce
