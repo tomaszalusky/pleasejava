@@ -5,6 +5,7 @@ import static java.util.stream.Collectors.toSet;
 
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -55,6 +56,11 @@ class JavaModel {
 			for (Map.Entry<String,String> entry : prefixToRepresentation.entrySet()) {
 				String prefix = entry.getKey();
 				String representation = entry.getValue();
+				String className = representation.substring(0,representation.lastIndexOf('.'));
+				String methodName = representation.substring(representation.lastIndexOf('.') + 1);
+				ClassModel classModel = javaModel.ensureClassModel(className);
+				classModel.isInterface = true;
+				MethodModel methodModel = classModel.ensureMethodModel(methodName);
 				System.out.printf("%s = %s%n",prefix,representation);
 			}
 			return null;
@@ -98,19 +104,31 @@ class JavaModel {
 		
 	}
 	
-	private Map<String,ClassModel> classes;
-	
+	private Map<String,ClassModel> classes = new LinkedHashMap<>();
+
+	ClassModel ensureClassModel(String className) {
+		return classes.computeIfAbsent(className, cn -> new ClassModel(cn));
+	}
+
 	private static class ClassModel {
 		
-		private String name;
+		private final String name;
 		
 		private ImportMapper importMapper;
 		
 		private boolean isInterface;
 		
-		private Map<String,FieldModel> fields;
+		private Map<String,FieldModel> fields = new LinkedHashMap<>();
 		
-		private Map<String,MethodModel> methods;
+		private Map<String,MethodModel> methods = new LinkedHashMap<>();
+		
+		ClassModel(String name) {
+			this.name = name;
+		}
+
+		MethodModel ensureMethodModel(String methodName) {
+			return methods.computeIfAbsent(methodName, mn -> new MethodModel(mn));
+		}
 		
 	}
 	
@@ -126,7 +144,7 @@ class JavaModel {
 
 	private static class MethodModel {
 
-		private String name;
+		private final String name;
 		
 		private TypeToken<?> returnType;
 		
@@ -135,7 +153,11 @@ class JavaModel {
 		private Map<String,ParameterModel> parameters;
 
 		private String body;
-		
+
+		private MethodModel(String name) {
+			this.name = name;
+		}
+
 	}
 	
 	private static class ParameterModel {
@@ -147,5 +169,5 @@ class JavaModel {
 		private List<Annotation> annotations;
 		
 	}
-	
+
 }

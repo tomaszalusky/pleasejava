@@ -3,6 +3,7 @@
  *   - smysl anotaci: pokryti PLSQL typu Java typy
  *     - rozlisit TypeGraph (k cemu se data v nem ulozena budou vyuzivat, a data XML pro Java model)
  *       - typeGraph.toJavaModel(xml);
+ *         - JavaModel.toString
  *         - co nejdrive element z input streamu
  *         - je nutna kontrola na xmlns:java1="stejnahodnota" xmlns:java2="stejnahodnota" ? 
  *     - pak prizpusobit anotace reprezentujici PLSQL typy podobe struktury TypeGraph
