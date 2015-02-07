@@ -22,6 +22,7 @@ public class JavaModelTest extends AbstractTypeGraphTest {
 			Document doc = builder.build(is);
 			Element rootElement = doc.getRootElement();
 			JavaModel javaModel = JavaModel.from(typeGraph, rootElement);
+			System.out.println(javaModel);
 		}
 	}
 

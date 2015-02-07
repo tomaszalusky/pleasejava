@@ -17,6 +17,8 @@ import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 
+import pleasejava.Utils;
+
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
 import com.google.common.reflect.TypeToken;
@@ -98,14 +100,21 @@ class JavaModel {
 		
 	}
 	
-	private String packageName;
-	
 	private static class ImportMapper {
 		
 	}
 	
 	private Map<String,ClassModel> classes = new LinkedHashMap<>();
 
+	public String toString() {
+		StringBuilder result = new StringBuilder();
+		Utils.appendf(result, "JAVA CODE MODEL%n");
+		for (Map.Entry<String,ClassModel> e : classes.entrySet()) {
+			Utils.appendf(result, "\t%s:%n%s%n", e.getKey(), e.getValue());
+		}
+		return result.toString();
+	}
+	
 	ClassModel ensureClassModel(String className) {
 		return classes.computeIfAbsent(className, cn -> new ClassModel(cn));
 	}
