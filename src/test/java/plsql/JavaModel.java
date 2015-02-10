@@ -5,14 +5,18 @@ import static java.util.stream.Collectors.toSet;
 
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.jdom2.Attribute;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
+import org.jdom2.Text;
 import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
@@ -64,6 +68,21 @@ class JavaModel {
 				classModel.isInterface = true;
 				MethodModel methodModel = classModel.ensureMethodModel(methodName);
 				System.out.printf("%s = %s%n",prefix,representation);
+				for (Map.Entry<String,Parameter> parameterEntry : type.getParameters().entrySet()) {
+					String parameterName = parameterEntry.getKey();
+					Parameter parameter = parameterEntry.getValue();
+					XPathExpression<Attribute> parameterXPath = XPathFactory.instance().compile("*[@name='" + parameterName + "']/@ns:type",
+							Filters.attribute(),Collections.emptyMap(),
+							new Namespace[] {Namespace.getNamespace("ns",representation)}
+					);
+					String attrValue = parameterXPath.evaluateFirst(typeElement).getValue().replace('[','<').replace(']','>');
+					int spc = attrValue.indexOf(' ');
+					String typeString = attrValue.substring(0, spc == -1 ? attrValue.length() : spc);
+					String variableName = spc == -1 ? parameterName : attrValue.substring(spc + 1);
+					System.out.printf("\t%s = %s,%s%n",parameterName,typeString,variableName);
+					ParameterModel parameterModel = methodModel.ensureParameterModel(variableName);
+					//parameterModel.type = TypeToken.
+				}
 			}
 			return null;
 		}
@@ -139,6 +158,15 @@ class JavaModel {
 			return methods.computeIfAbsent(methodName, mn -> new MethodModel(mn));
 		}
 		
+		public String toString() {
+			StringBuilder result = new StringBuilder();
+			Utils.appendf(result, "\tCLASS MODEL (%s %s)", isInterface ? "interface" : "class", name);
+			for (Map.Entry<String,MethodModel> e : methods.entrySet()) {
+				Utils.appendf(result, "%n\t\t%s:%n%s", e.getKey(), e.getValue());
+			}
+			return result.toString();
+		}
+		
 	}
 	
 	private static class FieldModel {
@@ -159,12 +187,25 @@ class JavaModel {
 		
 		private List<Annotation> annotations;
 		
-		private Map<String,ParameterModel> parameters;
+		private Map<String,ParameterModel> parameters = new LinkedHashMap<>();
 
 		private String body;
 
 		private MethodModel(String name) {
 			this.name = name;
+		}
+
+		ParameterModel ensureParameterModel(String parameterName) {
+			return parameters.computeIfAbsent(parameterName, pn -> new ParameterModel(pn));
+		}
+
+		public String toString() {
+			StringBuilder result = new StringBuilder();
+			Utils.appendf(result, "\t\tMETHOD MODEL (%s)", name);
+			for (Map.Entry<String,ParameterModel> e : parameters.entrySet()) {
+				Utils.appendf(result, "%n\t\t\t%s:%n%s", e.getKey(), e.getValue());
+			}
+			return result.toString();
 		}
 
 	}
@@ -177,6 +218,16 @@ class JavaModel {
 		
 		private List<Annotation> annotations;
 		
+		public ParameterModel(String name) {
+			this.name = name;
+		}
+
+		public String toString() {
+			StringBuilder result = new StringBuilder();
+			Utils.appendf(result, "\t\t\tPARAMETER MODEL (%s)", name);
+			return result.toString();
+		}
+
 	}
 
 }
