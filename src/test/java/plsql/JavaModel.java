@@ -10,13 +10,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.jdom2.Attribute;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
-import org.jdom2.Text;
 import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
@@ -34,7 +32,7 @@ class JavaModel {
 
 	static JavaModel from(TypeGraph typeGraph, Element rootElement) {
 		JavaModel javaModel = new JavaModel();
-		Generator generator = new Generator(javaModel,rootElement);
+		Generator generator = new Generator(javaModel,typeGraph,rootElement);
 		for (AbstractType type : typeGraph.getTopologicalOrdering()) {
 			type.accept(generator);
 		}
@@ -45,9 +43,11 @@ class JavaModel {
 
 		private final JavaModel javaModel;
 		private final Element rootElement;
+		private TypeGraph typeGraph;
 
-		private Generator(JavaModel javaModel, Element rootElement) {
+		private Generator(JavaModel javaModel, TypeGraph typeGraph, Element rootElement) {
 			this.javaModel = javaModel;
+			this.typeGraph = typeGraph;
 			this.rootElement = rootElement;
 		}
 
@@ -81,7 +81,17 @@ class JavaModel {
 					String variableName = spc == -1 ? parameterName : attrValue.substring(spc + 1);
 					System.out.printf("\t%s = %s,%s%n",parameterName,typeString,variableName);
 					ParameterModel parameterModel = methodModel.ensureParameterModel(variableName);
-					//parameterModel.type = TypeToken.
+					if (parameter.getParameterMode() == ParameterMode.OUT) {
+						parameterModel.annotations.add("@" + Plsql.Out.class.getName());
+					}
+					if (parameter.getParameterMode() == ParameterMode.INOUT) {
+						parameterModel.annotations.add("@" + Plsql.InOut.class.getName());
+					}
+					String typeAnnotation = parameter.getType().accept(new AnnotateType());
+					parameterModel.annotations.add(typeAnnotation);
+					// TODO primitive types
+					// TODO generate type
+					// TODO sanitize null for records
 				}
 			}
 			return null;
@@ -114,6 +124,46 @@ class JavaModel {
 
 		@Override
 		public Void visitPrimitive(AbstractPrimitiveType type) {
+			return null;
+		}
+		
+	}
+
+	static class AnnotateType implements TypeVisitorR<String> {
+
+		@Override
+		public String visitProcedureSignature(ProcedureSignature type) {
+			throw new UnsupportedOperationException();
+		}
+		
+		@Override
+		public String visitFunctionSignature(FunctionSignature type) {
+			throw new UnsupportedOperationException();
+		}
+		
+		@Override
+		public String visitRecord(RecordType type) {
+			return null;
+		}
+
+		@Override
+		public String visitVarray(VarrayType type) {
+			return "@" + Plsql.Varray.class.getName() + "(\"" + type.getName() + "\")";
+		}
+
+		@Override
+		public String visitNestedTable(NestedTableType type) {
+			return "@" + Plsql.NestedTable.class.getName() + "(\"" + type.getName() + "\")";
+		}
+
+		@Override
+		public String visitIndexByTable(IndexByTableType type) {
+			return "@" + Plsql.IndexByTable.class.getName() + "(\"" + type.getName() + "\")";
+		}
+
+		@Override
+		public String visitPrimitive(AbstractPrimitiveType type) {
+			// TODO
 			return null;
 		}
 		
@@ -214,9 +264,9 @@ class JavaModel {
 		
 		private String name;
 		
-		private TypeToken<?> type;
+		private String type;
 		
-		private List<Annotation> annotations;
+		private List<String> annotations = new ArrayList<>();
 		
 		public ParameterModel(String name) {
 			this.name = name;
@@ -225,6 +275,9 @@ class JavaModel {
 		public String toString() {
 			StringBuilder result = new StringBuilder();
 			Utils.appendf(result, "\t\t\tPARAMETER MODEL (%s)", name);
+			for (String annotation : annotations) {
+				Utils.appendf(result, "%n\t\t\t\t%s",annotation);
+			}
 			return result.toString();
 		}
 
