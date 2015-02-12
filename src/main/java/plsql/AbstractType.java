@@ -90,7 +90,11 @@ abstract class AbstractType {
 			return input.getName();
 		}
 	};
-	
+
+	Annotation getAnnotation() {
+		return annotation;
+	}
+
 	TypeNode toTypeNode(TypeNode parent, int orderInParent) {
 		TypeNode result = new TypeNode(this,parent,orderInParent);
 		ImmutableMap.Builder<String,TypeNode> children = ImmutableMap.builder();

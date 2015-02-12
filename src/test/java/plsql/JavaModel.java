@@ -4,6 +4,8 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -11,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.jdom2.Attribute;
 import org.jdom2.Element;
@@ -22,6 +25,7 @@ import org.jdom2.xpath.XPathFactory;
 import pleasejava.Utils;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Throwables;
 import com.google.common.collect.Iterables;
 import com.google.common.reflect.TypeToken;
 
@@ -89,9 +93,9 @@ class JavaModel {
 					}
 					String typeAnnotation = parameter.getType().accept(new AnnotateType());
 					parameterModel.annotations.add(typeAnnotation);
-					// TODO primitive types
 					// TODO generate type
 					// TODO sanitize null for records
+					// TODO sanitize imports
 				}
 			}
 			return null;
@@ -163,10 +167,40 @@ class JavaModel {
 
 		@Override
 		public String visitPrimitive(AbstractPrimitiveType type) {
-			// TODO
-			return null;
+			Annotation annotation = type.getAnnotation();
+			return "@" + annotation.annotationType().getName() + annotationStateToString(annotation);
 		}
 		
+	}
+	
+	public static String annotationStateToString(Annotation a) {
+		StringBuilder result = new StringBuilder();
+		try {
+			Class<? extends Annotation> annotationType = a.annotationType();
+			Method[] declaredMethods = annotationType.getDeclaredMethods();
+			if (declaredMethods.length != 0) {
+				result.append("(");
+				if (declaredMethods.length == 1 && "value".equals(declaredMethods[0].getName())) {
+					Object value = declaredMethods[0].invoke(a);
+					result.append(value);
+				} else {
+					String s = Stream.of(annotationType.getDeclaredMethods())
+							.map(m -> {
+									try {
+										return m.getName() + "=" + m.invoke(a);
+									} catch (Exception e) {
+										throw Throwables.propagate(e);
+									}
+							})
+							.collect(Collectors.joining(", "));
+					result.append(s);
+				}
+				result.append(")");
+			}
+		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+			throw Throwables.propagate(e);
+		}
+		return result.toString();
 	}
 	
 	private static class ImportMapper {
