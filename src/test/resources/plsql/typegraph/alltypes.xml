@@ -1,52 +1,52 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <typegraph>
-	<function name="echo">
+	<function name="echo" xmlns:java="pleasejava.test.alltypes.TestInterface.echo">
 		<return type="integer" />
-		<in name="pi_ibt1" type="a_test_package.ibt1" />
-		<in name="pi_var1" type="a_test_package.var1" />
-		<in name="pi_nst2" type="a_test_package.nst2" />
-		<in name="pi_nst3" type="a_test_package.nst3" />
-		<in name="pi_rec1" type="a_test_package.rec1" />
-		<in name="pi_var3" type="a_test_package.var3" />
-		<in name="pi_ibt2" type="a_test_package.ibt2" />
-		<in name="pi_nst1" type="a_test_package.nst1" />
-		<in name="pi_ibt3" type="a_test_package.ibt3" />
-		<in name="pi_var2" type="a_test_package.var2" />
-		<in name="pi_clob" type="clob" />
-		<out name="po_ibt1" type="a_test_package.ibt1" />
-		<out name="po_var1" type="a_test_package.var1" />
-		<out name="po_nst2" type="a_test_package.nst2" />
-		<out name="po_nst3" type="a_test_package.nst3" />
-		<out name="po_rec1" type="a_test_package.rec1" />
-		<out name="po_var3" type="a_test_package.var3" />
-		<out name="po_ibt2" type="a_test_package.ibt2" />
-		<out name="po_nst1" type="a_test_package.nst1" />
-		<out name="po_ibt3" type="a_test_package.ibt3" />
-		<out name="po_var2" type="a_test_package.var2" />
-		<out name="po_clob" type="clob" />
+		<in name="pi_ibt1" type="a_test_package.ibt1" java:type="java.util.Map[java.lang.Integer,pleasejava.test.alltypes.Record2] inputIbt1" />
+		<in name="pi_var1" type="a_test_package.var1" java:type="java.util.List[java.util.List[pleasejava.test.alltypes.Record3]] inputVar1" />
+		<in name="pi_nst2" type="a_test_package.nst2" java:type="java.util.List[java.lang.Array[pleasejava.test.alltypes.Record3]] inputNst2" />
+		<in name="pi_nst3" type="a_test_package.nst3" java:type="java.util.Map[java.lang.Integer,java.util.List[pleasejava.test.alltypes.Record3]] inputNst3" />
+		<in name="pi_rec1" type="a_test_package.rec1" java:type="pleasejava.test.alltypes.Record1 inputRec1" />
+		<in name="pi_var3" type="a_test_package.var3" java:type="java.util.List[java.util.SortedMap[java.lang.String,java.util.List[java.lang.String]]] inputVar3" />
+		<in name="pi_ibt2" type="a_test_package.ibt2" java:type="java.util.Map[java.math.BigInteger,java.util.Map[java.lang.String,java.util.List[java.lang.String]]] inputIbt2" />
+		<in name="pi_nst1" type="a_test_package.nst1" java:type="java.util.List[java.util.Map[java.lang.String,java.util.List[java.lang.String]]] inputNst1" />
+		<in name="pi_ibt3" type="a_test_package.ibt3" java:type="java.util.Map[java.lang.String,java.lang.Array[java.lang.String]] inputIbt3" />
+		<in name="pi_var2" type="a_test_package.var2" java:type="java.util.List[java.lang.Array[java.lang.String]] inputVar2" />
+		<in name="pi_clob" type="clob" java:type="java.lang.String inputClob" />
+		<out name="po_ibt1" type="a_test_package.ibt1" java:type="java.util.Map[java.lang.Integer,pleasejava.test.alltypes.Record2] outputIbt1" />                                   
+		<out name="po_var1" type="a_test_package.var1" java:type="java.util.List[java.util.List[pleasejava.test.alltypes.Record3]] outputVar1" />                                    
+		<out name="po_nst2" type="a_test_package.nst2" java:type="java.util.List[java.lang.Array[pleasejava.test.alltypes.Record3]] outputNst2" />                                   
+		<out name="po_nst3" type="a_test_package.nst3" java:type="java.util.Map[java.lang.Integer,java.util.List[pleasejava.test.alltypes.Record3]] outputNst3" />                   
+		<out name="po_rec1" type="a_test_package.rec1" java:type="pleasejava.test.alltypes.Record1 outputRec1" />                                                                     
+		<out name="po_var3" type="a_test_package.var3" java:type="java.util.List[java.util.SortedMap[java.lang.String,java.util.List[java.lang.String]]] outputVar3" />              
+		<out name="po_ibt2" type="a_test_package.ibt2" java:type="java.util.Map[java.math.BigInteger,java.util.Map[java.lang.String,java.util.List[java.lang.String]]] outputIbt2" />
+		<out name="po_nst1" type="a_test_package.nst1" java:type="java.util.List[java.util.Map[java.lang.String,java.util.List[java.lang.String]]] outputNst1" />                    
+		<out name="po_ibt3" type="a_test_package.ibt3" java:type="java.util.Map[java.lang.String,java.lang.Array[java.lang.String]] outputIbt3" />                                   
+		<out name="po_var2" type="a_test_package.var2" java:type="java.util.List[java.lang.Array[java.lang.String]] outputVar2" />                                                   
+		<out name="po_clob" type="clob" java:type="java.lang.StringBuilder outputClob" />
 	</function>
 	<indexbytable name="a_test_package.ibt1" of="a_test_package.rec2" indexby="pls_integer" />
-	<record name="a_test_package.rec2">
-		<field name="f_var5" type="a_test_package.var5" />
-		<field name="f1_rec3" type="a_test_package.rec3" />
-		<field name="f_pls_integer" type="pls_integer" />
-		<field name="f2_rec3" type="a_test_package.rec3" />
+	<record name="a_test_package.rec2" xmlns:java="pleasejava.test.alltypes.Record2">
+		<field name="f_var5" type="a_test_package.var5" java:type="java.util.List[java.lang.String] var5" />
+		<field name="f1_rec3" type="a_test_package.rec3" java:type="pleasejava.test.alltypes.Record3 firstRec3" />
+		<field name="f_pls_integer" type="pls_integer" java:type="java.math.BigInteger pls" />
+		<field name="f2_rec3" type="a_test_package.rec3" java:type="pleasejava.test.alltypes.Record3 secondRec3" />
 	</record>
 	<varray name="a_test_package.var5" of="varchar2(100)" />
-	<record name="a_test_package.rec3">
-		<field name="f_boolean" type="boolean" />
-		<field name="f_integer" type="integer" />
+	<record name="a_test_package.rec3" xmlns:java="pleasejava.test.alltypes.Record3">
+		<field name="f_boolean" type="boolean" java:type="boolean theBoolean" />
+		<field name="f_integer" type="integer" java:type="int theInt" />
 	</record>
 	<varray name="a_test_package.var1" of="a_test_package.var4" />
 	<varray name="a_test_package.var4" of="a_test_package.rec3" />
 	<nestedtable name="a_test_package.nst2" of="a_test_package.var4" />
 	<nestedtable name="a_test_package.nst3" of="a_test_package.nst4" />
 	<nestedtable name="a_test_package.nst4" of="a_test_package.rec3" />
-	<record name="a_test_package.rec1">
-		<field name="f_nst4" type="a_test_package.nst4" />
-		<field name="f_ibt4" type="a_test_package.ibt4" />
-		<field name="f_binary_integer" type="binary_integer" />
-		<field name="f_ibt5" type="a_test_package.ibt5" />
+	<record name="a_test_package.rec1" xmlns:java="pleasejava.test.alltypes.Record1">
+		<field name="f_nst4" type="a_test_package.nst4" java:type="java.util.List[pleasejava.test.alltypes.Record3] nst4" />
+		<field name="f_ibt4" type="a_test_package.ibt4" java:type="java.util.Map[java.lang.String,java.math.BigInteger] ibt4" />
+		<field name="f_binary_integer" type="binary_integer" java:type="java.lang.Integer binary" />
+		<field name="f_ibt5" type="a_test_package.ibt5" java:type="java.util.Map[java.lang.String,java.lang.Array[java.lang.String]] ibt5" />
 	</record>
 	<varray name="a_test_package.var3" of="a_test_package.ibt5" />
 	<indexbytable name="a_test_package.ibt5" of="a_test_package.var5" indexby="string(20)" />
