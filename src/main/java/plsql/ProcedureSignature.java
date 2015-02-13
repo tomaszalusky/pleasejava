@@ -58,6 +58,14 @@ class ProcedureSignature extends AbstractSignature {
 		return visitor.visitProcedureSignature(this);
 	}
 	
+	<A,R> R accept(TypeVisitorAR<A,R> visitor, A arg) {
+		return visitor.visitProcedureSignature(this, arg);
+	}
+	
+	void accept(TypeVisitor visitor) {
+		visitor.visitProcedureSignature(this);
+	}
+	
 	<A> void accept(TypeVisitorA<A> visitor, A arg) {
 		visitor.visitProcedureSignature(this, arg);
 	}

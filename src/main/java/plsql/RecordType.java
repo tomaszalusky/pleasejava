@@ -57,6 +57,14 @@ class RecordType extends AbstractType {
 		return visitor.visitRecord(this);
 	}
 	
+	<A,R> R accept(TypeVisitorAR<A,R> visitor, A arg) {
+		return visitor.visitRecord(this, arg);
+	}
+	
+	void accept(TypeVisitor visitor) {
+		visitor.visitRecord(this);
+	}
+	
 	<A> void accept(TypeVisitorA<A> visitor, A arg) {
 		visitor.visitRecord(this, arg);
 	}

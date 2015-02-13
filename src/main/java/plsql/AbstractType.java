@@ -75,6 +75,10 @@ abstract class AbstractType {
 	 */
 	abstract <R> R accept(TypeVisitorR<R> visitor);
 	
+	abstract <A,R> R accept(TypeVisitorAR<A,R> visitor, A arg);
+	
+	abstract void accept(TypeVisitor visitor);
+	
 	abstract <A> void accept(TypeVisitorA<A> visitor, A arg);
 	
 	abstract <A1,A2> void accept(TypeVisitorAA<A1,A2> visitor, A1 arg1, A2 arg2);

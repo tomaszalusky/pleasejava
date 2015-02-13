@@ -50,6 +50,14 @@ class NestedTableType extends AbstractType {
 		return visitor.visitNestedTable(this);
 	}
 	
+	<A,R> R accept(TypeVisitorAR<A,R> visitor, A arg) {
+		return visitor.visitNestedTable(this, arg);
+	}
+	
+	void accept(TypeVisitor visitor) {
+		visitor.visitNestedTable(this);
+	}
+	
 	<A> void accept(TypeVisitorA<A> visitor, A arg) {
 		visitor.visitNestedTable(this, arg);
 	}
