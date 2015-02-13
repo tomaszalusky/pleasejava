@@ -43,7 +43,7 @@ class JavaModel {
 		return javaModel;
 	}
 	
-	static class Generator implements TypeVisitorR<Void> {
+	static class Generator implements TypeVisitor {
 
 		private final JavaModel javaModel;
 		private final Element rootElement;
@@ -56,7 +56,7 @@ class JavaModel {
 		}
 
 		@Override
-		public Void visitProcedureSignature(ProcedureSignature type) {
+		public void visitProcedureSignature(ProcedureSignature type) {
 			String name = type.getName();
 			XPathExpression<Element> xpath = XPathFactory.instance().compile("procedure[@name='" + name + "']", Filters.element());
 			Element typeElement = Iterables.getOnlyElement(xpath.evaluate(rootElement),null);
@@ -95,15 +95,15 @@ class JavaModel {
 					if (typeAnnotation != null) {
 						parameterModel.annotations.add(typeAnnotation);
 					}
+					String javaType = parameter.getType().accept(new ComputeJavaType(),typeString);
 					// TODO generate type with annotated type arguments
 					// TODO sanitize imports
 				}
 			}
-			return null;
 		}
 		
 		@Override
-		public Void visitFunctionSignature(FunctionSignature type) {
+		public void visitFunctionSignature(FunctionSignature type) {
 			String name = type.getName();
 			XPathExpression<Element> xpath = XPathFactory.instance().compile("function[@name='" + name + "']", Filters.element());
 			Element typeElement = Iterables.getOnlyElement(xpath.evaluate(rootElement),null);
@@ -144,34 +144,32 @@ class JavaModel {
 					}
 					// TODO generate type with annotated type arguments
 					// TODO sanitize imports
+					// TODO return type
+					// TODO ensure, isInterface - opravit
+					// TODO DRY
+					// TODO overit nutnost kontroly ruznosti NS
 				}
 			}
-			return null;
 		}
 		
 		@Override
-		public Void visitRecord(RecordType type) {
-			return null;
+		public void visitRecord(RecordType type) {
 		}
 
 		@Override
-		public Void visitVarray(VarrayType type) {
-			return null;
+		public void visitVarray(VarrayType type) {
 		}
 
 		@Override
-		public Void visitNestedTable(NestedTableType type) {
-			return null;
+		public void visitNestedTable(NestedTableType type) {
 		}
 
 		@Override
-		public Void visitIndexByTable(IndexByTableType type) {
-			return null;
+		public void visitIndexByTable(IndexByTableType type) {
 		}
 
 		@Override
-		public Void visitPrimitive(AbstractPrimitiveType type) {
-			return null;
+		public void visitPrimitive(AbstractPrimitiveType type) {
 		}
 		
 	}
@@ -245,7 +243,61 @@ class JavaModel {
 		}
 		return result.toString();
 	}
-	
+
+	/**
+	 * For given PLSQL type (acceptor) and Java representation (visitor argument), as declared in XML,
+	 * verifies if Java representation is legal for PLSQL type
+	 * and returns String describing Java representation in generated code.
+	 * Resulting String is similar to visitor argument, though not the same,
+	 * it may contain annotations on inner types, also the auxiliary construct java.lang.Array<T>
+	 * is translated into Java-legal T[].
+	 * @author Tomas Zalusky
+	 */
+	static class ComputeJavaType implements TypeVisitorAR<String,String> {
+
+		@Override
+		public String visitProcedureSignature(ProcedureSignature type, String typeString) {
+			throw new IllegalStateException();
+		}
+
+		@Override
+		public String visitFunctionSignature(FunctionSignature type, String typeString) {
+			throw new IllegalStateException();
+		}
+
+		@Override
+		public String visitRecord(RecordType type, String typeString) {
+			System.out.println("computing java type for PLSQL record " + type.getName() + " and proposed representation " + typeString);
+			return null;
+		}
+
+		@Override
+		public String visitVarray(VarrayType type, String typeString) {
+			System.out.println("computing java type for PLSQL varray " + type.getName() + " and proposed representation " + typeString);
+			return null;
+		}
+
+		@Override
+		public String visitNestedTable(NestedTableType type, String typeString) {
+			System.out.println("computing java type for PLSQL table " + type.getName() + " and proposed representation " + typeString);
+			return null;
+		}
+
+		@Override
+		public String visitIndexByTable(IndexByTableType type, String typeString) {
+			System.out.println("computing java type for PLSQL indexbytable " + type.getName() + " and proposed representation " + typeString);
+			return null;
+		}
+
+		@Override
+		public String visitPrimitive(AbstractPrimitiveType type, String typeString) {
+			System.out.println("computing java type for PLSQL primitive " + type.getName() + " and proposed representation " + typeString);
+			return null;
+		}
+
+		
+	}	
+
 	private static class ImportMapper {
 		
 	}
