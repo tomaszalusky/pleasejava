@@ -14,9 +14,18 @@ import org.junit.Test;
 public class JavaModelTest extends AbstractTypeGraphTest {
 
 	@Test
-	public void test() throws IOException, JDOMException {
-		TypeGraph typeGraph = loadGraph("javatype");
-		String fileSubpath = String.format("typegraph/%s.xml","javatype");
+	public void javatype() throws IOException, JDOMException {
+		t("javatype");
+	}
+
+	@Test
+	public void alltypes() throws IOException, JDOMException {
+		t("alltypes");
+	}
+	
+	private void t(String graphName) throws IOException, JDOMException {
+		TypeGraph typeGraph = loadGraph(graphName);
+		String fileSubpath = String.format("typegraph/%s.xml",graphName);
 		try (InputStream is = TypeGraphTopologicalOrderingTest.class.getResourceAsStream(fileSubpath)) {
 			SAXBuilder builder = new SAXBuilder();
 			Document doc = builder.build(is);

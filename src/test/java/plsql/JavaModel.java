@@ -92,9 +92,10 @@ class JavaModel {
 						parameterModel.annotations.add("@" + Plsql.InOut.class.getName());
 					}
 					String typeAnnotation = parameter.getType().accept(new AnnotateType());
-					parameterModel.annotations.add(typeAnnotation);
-					// TODO generate type
-					// TODO sanitize null for records
+					if (typeAnnotation != null) {
+						parameterModel.annotations.add(typeAnnotation);
+					}
+					// TODO generate type with annotated type arguments
 					// TODO sanitize imports
 				}
 			}
@@ -103,6 +104,48 @@ class JavaModel {
 		
 		@Override
 		public Void visitFunctionSignature(FunctionSignature type) {
+			String name = type.getName();
+			XPathExpression<Element> xpath = XPathFactory.instance().compile("function[@name='" + name + "']", Filters.element());
+			Element typeElement = Iterables.getOnlyElement(xpath.evaluate(rootElement),null);
+			List<Namespace> javaNs = typeElement.getAdditionalNamespaces().stream().filter(n -> n.getPrefix().startsWith("java")).collect(toList());
+			Map<String,String> prefixToRepresentation = javaNs.stream().collect(Collectors.toMap(n -> n.getPrefix(), n -> n.getURI()));
+			Preconditions.checkState(Objects.equals(javaNs.size(),prefixToRepresentation.values().stream().collect(toSet()).size()),"Duplicit representation of procedure %s.",type.getName());
+			for (Map.Entry<String,String> entry : prefixToRepresentation.entrySet()) {
+				String prefix = entry.getKey();
+				String representation = entry.getValue();
+				String className = representation.substring(0,representation.lastIndexOf('.'));
+				String methodName = representation.substring(representation.lastIndexOf('.') + 1);
+				ClassModel classModel = javaModel.ensureClassModel(className);
+				classModel.isInterface = true;
+				MethodModel methodModel = classModel.ensureMethodModel(methodName);
+				System.out.printf("%s = %s%n",prefix,representation);
+				for (Map.Entry<String,Parameter> parameterEntry : type.getParameters().entrySet()) {
+					String parameterName = parameterEntry.getKey();
+					Parameter parameter = parameterEntry.getValue();
+					XPathExpression<Attribute> parameterXPath = XPathFactory.instance().compile("*[@name='" + parameterName + "']/@ns:type",
+							Filters.attribute(),Collections.emptyMap(),
+							new Namespace[] {Namespace.getNamespace("ns",representation)}
+					);
+					String attrValue = parameterXPath.evaluateFirst(typeElement).getValue().replace('[','<').replace(']','>');
+					int spc = attrValue.indexOf(' ');
+					String typeString = attrValue.substring(0, spc == -1 ? attrValue.length() : spc);
+					String variableName = spc == -1 ? parameterName : attrValue.substring(spc + 1);
+					System.out.printf("\t%s = %s,%s%n",parameterName,typeString,variableName);
+					ParameterModel parameterModel = methodModel.ensureParameterModel(variableName);
+					if (parameter.getParameterMode() == ParameterMode.OUT) {
+						parameterModel.annotations.add("@" + Plsql.Out.class.getName());
+					}
+					if (parameter.getParameterMode() == ParameterMode.INOUT) {
+						parameterModel.annotations.add("@" + Plsql.InOut.class.getName());
+					}
+					String typeAnnotation = parameter.getType().accept(new AnnotateType());
+					if (typeAnnotation != null) {
+						parameterModel.annotations.add(typeAnnotation);
+					}
+					// TODO generate type with annotated type arguments
+					// TODO sanitize imports
+				}
+			}
 			return null;
 		}
 		
