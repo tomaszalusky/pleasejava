@@ -246,7 +246,7 @@ class JavaModel {
 
 	/**
 	 * For given PLSQL type (acceptor) and Java representation (visitor argument), as declared in XML,
-	 * verifies if Java representation is legal for PLSQL type
+	 * TODO(not true: "verifies if Java representation is legal for PLSQL type" - verification will be done during reading java code, not during generation)
 	 * and returns String describing Java representation in generated code.
 	 * Resulting String is similar to visitor argument, though not the same,
 	 * it may contain annotations on inner types, also the auxiliary construct java.lang.Array<T>
@@ -279,6 +279,30 @@ class JavaModel {
 
 		@Override
 		public String visitNestedTable(NestedTableType type, String typeString) {
+			StringBuilder result = new StringBuilder();
+			int l = typeString.indexOf('<');
+			int r = typeString.lastIndexOf('>');
+			Preconditions.checkArgument(l != -1 && r != -1);
+			String typeName = typeString.substring(0,l);
+			AbstractType elementType = type.getElementType();
+			String elementTypeAnnotation = elementType.accept(new AnnotateType());
+			switch (typeName) {
+				case "java.util.Map" : {
+					int c = typeString.indexOf(',',l);
+					Preconditions.checkArgument(c != -1);
+					String keyTypeName = typeString.substring(l + 1,c);
+					String elementTypeString = typeString.substring(c + 1,r);
+					String elementJavaType = elementType.accept(this,elementTypeString);
+					Utils.appendf(result, "%s<%s,%s %s>",typeName,keyTypeName,elementTypeAnnotation,elementJavaType);
+					break;
+				} case "java.lang.Array" : {
+					// TODO transform according to https://gist.github.com/tomaszalusky/b623c240f2049bf0777b
+				}
+			}
+			//String typeName;
+			//String elementAnnotation;
+			
+			
 			System.out.println("computing java type for PLSQL table " + type.getName() + " and proposed representation " + typeString);
 			return null;
 		}
