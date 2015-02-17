@@ -255,6 +255,31 @@ class JavaModel {
 	 */
 	static class ComputeJavaType implements TypeVisitorAR<String,String> {
 
+		/**
+		 * Compute insertion point of array declaration into array element declaration.
+		 * Unlike composite collection types where source code representing collection type just wraps
+		 * the source code representing element type
+		 * (for example, <code>List</code> of <code>List&lt;String></code> is <code>List&lt;List&lt;String>></code>),
+		 * composite array types are built "from the middle".
+		 * For example, array of <code>String[]</code> is <code>String<b>[]</b>[]</code>.
+		 * The outer array is denoted by first pair of brackets, which is important for proper annotating.
+		 * @param elementJavaType source code declaration of annotated type of array element
+		 * @return valid index into elementJavaType string which the source code declaration
+		 * of annotated array type will be inserted at.
+		 * Separating space is part of inserted string.
+		 */
+		private static int findJavaArrayElementDeclarationInsertionPoint(String elementJavaType) {
+			int firstBrackets = elementJavaType.indexOf("[]");
+			int result;
+			if (firstBrackets == -1) { // no inner array (for example @Varchar2 String) -> insertion will be performed at the end
+				result = elementJavaType.length();
+			} else { // find leftmost bracket pair (TODO doesn't cope well with alternating nesting of array and list, for example List<String[]>[] but suffices for testing purposes)
+				int lastAtsign = elementJavaType.substring(0,firstBrackets).lastIndexOf('@');
+				for (result = lastAtsign; elementJavaType.charAt(result - 1) == ' '; result--);
+			}
+			return result;
+		}
+		
 		@Override
 		public String visitProcedureSignature(ProcedureSignature type, String typeString) {
 			throw new IllegalStateException();
@@ -296,7 +321,11 @@ class JavaModel {
 					Utils.appendf(result, "%s<%s,%s %s>",typeName,keyTypeName,elementTypeAnnotation,elementJavaType);
 					break;
 				} case "java.lang.Array" : {
-					// TODO transform according to https://gist.github.com/tomaszalusky/b623c240f2049bf0777b
+					String elementTypeString = typeString.substring(l + 1,r);
+					String elementJavaType = elementType.accept(this,elementTypeString);
+					int splitPoint = findJavaArrayElementDeclarationInsertionPoint(elementJavaType);
+					String before = elementJavaType.substring(0,splitPoint), after = elementJavaType.substring(splitPoint);
+					Utils.appendf(result, "%s %s [] %s>",before,elementTypeAnnotation,after);
 				}
 			}
 			//String typeName;
