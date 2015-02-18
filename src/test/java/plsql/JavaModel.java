@@ -96,6 +96,7 @@ class JavaModel {
 						parameterModel.annotations.add(typeAnnotation);
 					}
 					String javaType = parameter.getType().accept(new ComputeJavaType(),typeString);
+					System.out.println(typeString + " -> " + javaType);
 					// TODO generate type with annotated type arguments
 					// TODO sanitize imports
 				}
@@ -188,28 +189,28 @@ class JavaModel {
 		
 		@Override
 		public String visitRecord(RecordType type) {
-			return null;
+			return "";
 		}
 
 		@Override
 		public String visitVarray(VarrayType type) {
-			return "@" + Plsql.Varray.class.getName() + "(\"" + type.getName() + "\")";
+			return "@" + Plsql.Varray.class.getName() + "(\"" + type.getName() + "\") ";
 		}
 
 		@Override
 		public String visitNestedTable(NestedTableType type) {
-			return "@" + Plsql.NestedTable.class.getName() + "(\"" + type.getName() + "\")";
+			return "@" + Plsql.NestedTable.class.getName() + "(\"" + type.getName() + "\") ";
 		}
 
 		@Override
 		public String visitIndexByTable(IndexByTableType type) {
-			return "@" + Plsql.IndexByTable.class.getName() + "(\"" + type.getName() + "\")";
+			return "@" + Plsql.IndexByTable.class.getName() + "(\"" + type.getName() + "\") ";
 		}
 
 		@Override
 		public String visitPrimitive(AbstractPrimitiveType type) {
 			Annotation annotation = type.getAnnotation();
-			return "@" + annotation.annotationType().getName() + annotationStateToString(annotation);
+			return "@" + annotation.annotationType().getName() + annotationStateToString(annotation) + " ";
 		}
 		
 	}
@@ -269,11 +270,11 @@ class JavaModel {
 		 * Separating space is part of inserted string.
 		 */
 		private static int findJavaArrayElementDeclarationInsertionPoint(String elementJavaType) {
-			int firstBrackets = elementJavaType.indexOf("[]");
+			int firstBrackets = elementJavaType.indexOf("[]"); // find leftmost bracket pair  (TODO bug: for alternating nesting of array and list, for example List<String[]>[], doesn't work, finds wrong index, but for testing purposes simple algorithm is sufficient)
 			int result;
 			if (firstBrackets == -1) { // no inner array (for example @Varchar2 String) -> insertion will be performed at the end
 				result = elementJavaType.length();
-			} else { // find leftmost bracket pair (TODO doesn't cope well with alternating nesting of array and list, for example List<String[]>[] but suffices for testing purposes)
+			} else { // find annotation of bracket pair
 				int lastAtsign = elementJavaType.substring(0,firstBrackets).lastIndexOf('@');
 				for (result = lastAtsign; elementJavaType.charAt(result - 1) == ' '; result--);
 			}
@@ -292,14 +293,36 @@ class JavaModel {
 
 		@Override
 		public String visitRecord(RecordType type, String typeString) {
-			System.out.println("computing java type for PLSQL record " + type.getName() + " and proposed representation " + typeString);
-			return null;
+			return typeString; /* record classes are annotated themselves, no need to annotate them at the point of use */
 		}
 
 		@Override
 		public String visitVarray(VarrayType type, String typeString) {
-			System.out.println("computing java type for PLSQL varray " + type.getName() + " and proposed representation " + typeString);
-			return null;
+			StringBuilder result = new StringBuilder();
+			int l = typeString.indexOf('<');
+			int r = typeString.lastIndexOf('>');
+			Preconditions.checkArgument(l != -1 && r != -1);
+			String typeName = typeString.substring(0,l);
+			AbstractType elementType = type.getElementType();
+			String elementTypeAnnotation = elementType.accept(new AnnotateType());
+			switch (typeName) {
+				case "java.lang.Array" : {
+					String elementTypeString = typeString.substring(l + 1,r);
+					String elementJavaType = elementType.accept(this,elementTypeString);
+					int splitPoint = findJavaArrayElementDeclarationInsertionPoint(elementJavaType);
+					String before = elementJavaType.substring(0,splitPoint), after = elementJavaType.substring(splitPoint);
+					Utils.appendf(result, "%s %s [] %s",before,elementTypeAnnotation,after);
+					break;
+				} case "java.util.List" : case "java.util.Vector" : {
+					String elementTypeString = typeString.substring(l + 1,r);
+					String elementJavaType = elementType.accept(this,elementTypeString);
+					Utils.appendf(result, "%s<%s%s>",typeName,elementTypeAnnotation,elementJavaType);
+					break;
+				} default : {
+					throw new IllegalStateException("java type " + typeName + " cannot be used for varrays");
+				}
+			}
+			return result.toString();
 		}
 
 		@Override
@@ -315,31 +338,54 @@ class JavaModel {
 				case "java.util.Map" : {
 					int c = typeString.indexOf(',',l);
 					Preconditions.checkArgument(c != -1);
-					String keyTypeName = typeString.substring(l + 1,c);
+					String keyJavaType = typeString.substring(l + 1,c);
 					String elementTypeString = typeString.substring(c + 1,r);
 					String elementJavaType = elementType.accept(this,elementTypeString);
-					Utils.appendf(result, "%s<%s,%s %s>",typeName,keyTypeName,elementTypeAnnotation,elementJavaType);
+					Utils.appendf(result, "%s<%s,%s%s>",typeName,keyJavaType,elementTypeAnnotation,elementJavaType);
 					break;
 				} case "java.lang.Array" : {
 					String elementTypeString = typeString.substring(l + 1,r);
 					String elementJavaType = elementType.accept(this,elementTypeString);
 					int splitPoint = findJavaArrayElementDeclarationInsertionPoint(elementJavaType);
 					String before = elementJavaType.substring(0,splitPoint), after = elementJavaType.substring(splitPoint);
-					Utils.appendf(result, "%s %s [] %s>",before,elementTypeAnnotation,after);
+					Utils.appendf(result, "%s %s[] %s",before,elementTypeAnnotation,after);
+					break;
+				} case "java.util.List" : case "java.util.Vector" : {
+					String elementTypeString = typeString.substring(l + 1,r);
+					String elementJavaType = elementType.accept(this,elementTypeString);
+					Utils.appendf(result, "%s<%s%s>",typeName,elementTypeAnnotation,elementJavaType);
+					break;
+				} default : {
+					throw new IllegalStateException("java type " + typeName + " cannot be used for nested table");
 				}
 			}
-			//String typeName;
-			//String elementAnnotation;
-			
-			
-			System.out.println("computing java type for PLSQL table " + type.getName() + " and proposed representation " + typeString);
-			return null;
+			return result.toString();
 		}
 
 		@Override
 		public String visitIndexByTable(IndexByTableType type, String typeString) {
-			System.out.println("computing java type for PLSQL indexbytable " + type.getName() + " and proposed representation " + typeString);
-			return null;
+			StringBuilder result = new StringBuilder();
+			int l = typeString.indexOf('<');
+			int r = typeString.lastIndexOf('>');
+			Preconditions.checkArgument(l != -1 && r != -1);
+			String typeName = typeString.substring(0,l);
+			AbstractType elementType = type.getElementType();
+			String elementTypeAnnotation = elementType.accept(new AnnotateType());
+			switch (typeName) {
+				case "java.util.Map" : {
+					int c = typeString.indexOf(',',l);
+					Preconditions.checkArgument(c != -1);
+					String keyJavaType = typeString.substring(l + 1,c);
+					String keyTypeAnnotation = type.getIndexType().accept(new AnnotateType());
+					String elementTypeString = typeString.substring(c + 1,r);
+					String elementJavaType = elementType.accept(this,elementTypeString);
+					Utils.appendf(result, "%s<%s%s,%s%s>",typeName,keyTypeAnnotation,keyJavaType,elementTypeAnnotation,elementJavaType);
+					break;
+				} default : {
+					throw new IllegalStateException("java type " + typeName + " cannot be used for nested table");
+				}
+			}
+			return result.toString();
 		}
 
 		@Override
