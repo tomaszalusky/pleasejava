@@ -95,9 +95,13 @@ class JavaModel {
 					if (typeAnnotation != null) {
 						parameterModel.annotations.add(typeAnnotation);
 					}
-					String javaType = parameter.getType().accept(new ComputeJavaType(),typeString);
-					System.out.println(typeString + " -> " + javaType);
-					// TODO generate type with annotated type arguments
+					parameterModel.type = parameter.getType().accept(new ComputeJavaType(),typeString);
+					// TODO promitnout JavaModel.toString do testu
+					// TODO bugfix anotace u m2/b2
+					// TODO bugfix varray anotace u inputNst2 - ma byt az mezi Record3 a []
+					// TODO vyresit prazdny radek u vypisu recordu (dusledek resultu visitoru na recordu)
+					// TODO bugfix zdvojeni anotaci u primitivnich typu
+					// TODO bugfix ibt3
 					// TODO sanitize imports
 				}
 			}
@@ -143,7 +147,7 @@ class JavaModel {
 					if (typeAnnotation != null) {
 						parameterModel.annotations.add(typeAnnotation);
 					}
-					// TODO generate type with annotated type arguments
+					parameterModel.type = parameter.getType().accept(new ComputeJavaType(),typeString);
 					// TODO sanitize imports
 					// TODO return type
 					// TODO ensure, isInterface - opravit
@@ -311,7 +315,7 @@ class JavaModel {
 					String elementJavaType = elementType.accept(this,elementTypeString);
 					int splitPoint = findJavaArrayElementDeclarationInsertionPoint(elementJavaType);
 					String before = elementJavaType.substring(0,splitPoint), after = elementJavaType.substring(splitPoint);
-					Utils.appendf(result, "%s %s [] %s",before,elementTypeAnnotation,after);
+					Utils.appendf(result, "%s %s[] %s",before,elementTypeAnnotation,after);
 					break;
 				} case "java.util.List" : case "java.util.Vector" : {
 					String elementTypeString = typeString.substring(l + 1,r);
@@ -372,7 +376,7 @@ class JavaModel {
 			AbstractType elementType = type.getElementType();
 			String elementTypeAnnotation = elementType.accept(new AnnotateType());
 			switch (typeName) {
-				case "java.util.Map" : {
+				case "java.util.Map" : case "java.util.SortedMap" : {
 					int c = typeString.indexOf(',',l);
 					Preconditions.checkArgument(c != -1);
 					String keyJavaType = typeString.substring(l + 1,c);
@@ -390,8 +394,9 @@ class JavaModel {
 
 		@Override
 		public String visitPrimitive(AbstractPrimitiveType type, String typeString) {
-			System.out.println("computing java type for PLSQL primitive " + type.getName() + " and proposed representation " + typeString);
-			return null;
+			String typeAnnotation = type.accept(new AnnotateType());
+			String result = String.format("%s %s",typeAnnotation,typeString);
+			return result;
 		}
 
 		
@@ -506,6 +511,7 @@ class JavaModel {
 			for (String annotation : annotations) {
 				Utils.appendf(result, "%n\t\t\t\t%s",annotation);
 			}
+			Utils.appendf(result, "%n\t\t\t\t%s",type);
 			return result.toString();
 		}
 
