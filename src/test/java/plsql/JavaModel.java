@@ -96,11 +96,10 @@ class JavaModel {
 						parameterModel.annotations.add(typeAnnotation);
 					}
 					parameterModel.type = parameter.getType().accept(new ComputeJavaType(),typeString);
-					// TODO promitnout JavaModel.toString do testu
+					// TODO bugfix zdvojeni anotaci u primitivnich typu
 					// TODO bugfix anotace u m2/b2
 					// TODO bugfix varray anotace u inputNst2 - ma byt az mezi Record3 a []
 					// TODO vyresit prazdny radek u vypisu recordu (dusledek resultu visitoru na recordu)
-					// TODO bugfix zdvojeni anotaci u primitivnich typu
 					// TODO bugfix ibt3
 					// TODO sanitize imports
 				}

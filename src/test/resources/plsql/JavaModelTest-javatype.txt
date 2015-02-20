@@ -1,0 +1,23 @@
+JAVA CODE MODEL
+	pleasejava.test.TestInterface:
+	CLASS MODEL (interface pleasejava.test.TestInterface)
+		m2:
+		METHOD MODEL (m2)
+			a2:
+			PARAMETER MODEL (a2)
+				@plsql.Plsql$NestedTable("a_test_package.tableofrec") 
+				java.util.Map<java.lang.Integer,pleasejava.test.RecordA2>
+			b2:
+			PARAMETER MODEL (b2)
+				@plsql.Plsql$NestedTable("a_test_package.tableofrec") 
+				pleasejava.test.RecordB2 [] 
+		m1:
+		METHOD MODEL (m1)
+			a1:
+			PARAMETER MODEL (a1)
+				@plsql.Plsql$NestedTable("a_test_package.tableofrec") 
+				java.util.List<pleasejava.test.RecordA1>
+			b1:
+			PARAMETER MODEL (b1)
+				@plsql.Plsql$NestedTable("a_test_package.tableofrec") 
+				java.util.Vector<pleasejava.test.RecordB1>
