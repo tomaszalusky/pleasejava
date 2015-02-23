@@ -96,7 +96,6 @@ class JavaModel {
 						parameterModel.annotations.add(typeAnnotation);
 					}
 					parameterModel.type = parameter.getType().accept(new ComputeJavaType(),typeString);
-					// TODO bugfix zdvojeni anotaci u primitivnich typu
 					// TODO bugfix anotace u m2/b2
 					// TODO bugfix varray anotace u inputNst2 - ma byt az mezi Record3 a []
 					// TODO vyresit prazdny radek u vypisu recordu (dusledek resultu visitoru na recordu)
@@ -393,8 +392,7 @@ class JavaModel {
 
 		@Override
 		public String visitPrimitive(AbstractPrimitiveType type, String typeString) {
-			String typeAnnotation = type.accept(new AnnotateType());
-			String result = String.format("%s %s",typeAnnotation,typeString);
+			String result = String.format("%s",typeString);
 			return result;
 		}
 
