@@ -12,6 +12,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -401,6 +403,16 @@ class JavaModel {
 
 	private static class ImportMapper {
 		
+		private SortedSet<String> imports = new TreeSet<>();
+		
+		String add(String className) {
+			String fullJavaName = className.replace('$','.');
+			imports.add(fullJavaName);
+			int index = fullJavaName.lastIndexOf('.');
+			String shortJavaName = className.substring(index + 1);
+			return shortJavaName;
+		}
+		
 	}
 	
 	private Map<String,ClassModel> classes = new LinkedHashMap<>();
@@ -422,7 +434,7 @@ class JavaModel {
 		
 		private final String name;
 		
-		private ImportMapper importMapper;
+		private ImportMapper importMapper = new ImportMapper();
 		
 		private boolean isInterface;
 		
