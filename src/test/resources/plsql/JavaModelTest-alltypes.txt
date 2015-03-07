@@ -10,6 +10,7 @@ JAVA MODEL:
 			pleasejava.test.alltypes.Record3
 			plsql.Plsql.BinaryInteger
 			plsql.Plsql.Clob
+			plsql.Plsql.Function
 			plsql.Plsql.IndexByTable
 			plsql.Plsql.Integer_
 			plsql.Plsql.Long_
@@ -21,6 +22,7 @@ JAVA MODEL:
 			plsql.Plsql.Varray
 		METHODS:
 			echo = METHOD MODEL (echo)
+				@Function("echo")
 				null = PARAMETER MODEL (null)
 					@Integer_ BigInteger
 				inputIbt1 = PARAMETER MODEL (inputIbt1)

@@ -75,6 +75,7 @@ class JavaModel {
 				ClassModel classModel = javaModel.classes.computeIfAbsent(className, cn -> new ClassModel(cn,true));
 				MethodModel methodModel = classModel.methods.computeIfAbsent(methodName, mn -> new MethodModel(mn));
 				System.out.printf("%s = %s%n",prefix,representation);
+				methodModel.annotations.add(type.accept(new AnnotateType(classModel.importMapper)));
 				for (Map.Entry<String,Parameter> parameterEntry : type.getParameters().entrySet()) {
 					String parameterName = parameterEntry.getKey();
 					Parameter parameter = parameterEntry.getValue();
@@ -115,6 +116,7 @@ class JavaModel {
 				ClassModel classModel = javaModel.classes.computeIfAbsent(className, cn -> new ClassModel(cn,true));
 				MethodModel methodModel = classModel.methods.computeIfAbsent(methodName, mn -> new MethodModel(mn));
 				System.out.printf("%s = %s%n",prefix,representation);
+				methodModel.annotations.add(type.accept(new AnnotateType(classModel.importMapper)));
 				{
 					XPathExpression<Attribute> returnTypeXPath = XPathFactory.instance().compile("return/@ns:type",
 							Filters.attribute(),Collections.emptyMap(),
@@ -145,7 +147,7 @@ class JavaModel {
 						parameterModel.annotations.add("@" + classModel.importMapper.add(Plsql.InOut.class.getName()));
 					}
 					parameterModel.type = parameter.getType().accept(new ComputeJavaType(classModel.importMapper),typeString);
-					// TODO ensure, isInterface - opravit
+					// TODO indentaci toStringu pro procedury a funkce
 					// TODO DRY
 					// TODO overit nutnost kontroly ruznosti NS
 				}
@@ -184,12 +186,12 @@ class JavaModel {
 
 		@Override
 		public String visitProcedureSignature(ProcedureSignature type) {
-			throw new UnsupportedOperationException();
+			return "@" + importMapper.add(Plsql.Procedure.class.getName()) + "(\"" + type.getName() + "\")";
 		}
 		
 		@Override
 		public String visitFunctionSignature(FunctionSignature type) {
-			throw new UnsupportedOperationException();
+			return "@" + importMapper.add(Plsql.Function.class.getName()) + "(\"" + type.getName() + "\")";
 		}
 		
 		@Override
@@ -487,12 +489,12 @@ class JavaModel {
 
 		private final String name;
 		
+		private final List<String> annotations = new ArrayList<>();
+		
+		private final Map<String,ParameterModel> parameters = new LinkedHashMap<>();
+		
 		private ParameterModel returnType;
 		
-		private List<Annotation> annotations;
-		
-		private Map<String,ParameterModel> parameters = new LinkedHashMap<>();
-
 		private String body;
 
 		private MethodModel(String name) {
@@ -502,6 +504,9 @@ class JavaModel {
 		public String toString() {
 			StringBuilder result = new StringBuilder();
 			Utils.appendf(result, "METHOD MODEL (%s)", name);
+			for (String annotation : annotations) {
+				Utils.appendf(result, "%n\t\t\t\t%s", annotation);
+			}
 			for (Map.Entry<String,ParameterModel> e : parameters.entrySet()) {
 				Utils.appendf(result, "%n\t\t\t\t%s = %s", e.getKey(), e.getValue());
 			}
@@ -512,11 +517,11 @@ class JavaModel {
 	
 	private static class ParameterModel {
 		
-		private String name;
+		private final String name;
+		
+		private final List<String> annotations = new ArrayList<>();
 		
 		private String type;
-		
-		private List<String> annotations = new ArrayList<>();
 		
 		public ParameterModel(String name) {
 			this.name = name;
