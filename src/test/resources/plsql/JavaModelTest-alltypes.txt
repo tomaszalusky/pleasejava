@@ -11,6 +11,7 @@ JAVA MODEL:
 			plsql.Plsql.BinaryInteger
 			plsql.Plsql.Clob
 			plsql.Plsql.IndexByTable
+			plsql.Plsql.Integer_
 			plsql.Plsql.Long_
 			plsql.Plsql.NestedTable
 			plsql.Plsql.Out
@@ -20,6 +21,8 @@ JAVA MODEL:
 			plsql.Plsql.Varray
 		METHODS:
 			echo = METHOD MODEL (echo)
+				null = PARAMETER MODEL (null)
+					@Integer_ BigInteger
 				inputIbt1 = PARAMETER MODEL (inputIbt1)
 					@IndexByTable("a_test_package.ibt1") Map<@PlsInteger Integer,Record2>
 				inputVar1 = PARAMETER MODEL (inputVar1)

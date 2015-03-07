@@ -117,6 +117,16 @@ class JavaModel {
 				classModel.isInterface = true;
 				MethodModel methodModel = classModel.ensureMethodModel(methodName);
 				System.out.printf("%s = %s%n",prefix,representation);
+				{
+					XPathExpression<Attribute> returnTypeXPath = XPathFactory.instance().compile("return/@ns:type",
+							Filters.attribute(),Collections.emptyMap(),
+							new Namespace[] {Namespace.getNamespace("ns",representation)}
+					);
+					String attrValue = returnTypeXPath.evaluateFirst(typeElement).getValue().replace('[','<').replace(']','>');
+					String typeString = attrValue;
+					ParameterModel returnTypeModel = methodModel.ensureParameterModel(null);
+					returnTypeModel.type = type.getReturnType().accept(new ComputeJavaType(classModel.importMapper),typeString);
+				}
 				for (Map.Entry<String,Parameter> parameterEntry : type.getParameters().entrySet()) {
 					String parameterName = parameterEntry.getKey();
 					Parameter parameter = parameterEntry.getValue();
@@ -137,7 +147,6 @@ class JavaModel {
 						parameterModel.annotations.add("@" + classModel.importMapper.add(Plsql.InOut.class.getName()));
 					}
 					parameterModel.type = parameter.getType().accept(new ComputeJavaType(classModel.importMapper),typeString);
-					// TODO return type
 					// TODO ensure, isInterface - opravit
 					// TODO DRY
 					// TODO overit nutnost kontroly ruznosti NS
@@ -487,7 +496,7 @@ class JavaModel {
 
 		private final String name;
 		
-		private TypeToken<?> returnType;
+		private ParameterModel returnType;
 		
 		private List<Annotation> annotations;
 		
@@ -499,6 +508,10 @@ class JavaModel {
 			this.name = name;
 		}
 
+		/**
+		 * @param parameterName parameter name, null for return type
+		 * @return
+		 */
 		ParameterModel ensureParameterModel(String parameterName) {
 			return parameters.computeIfAbsent(parameterName, pn -> new ParameterModel(pn));
 		}
