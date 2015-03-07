@@ -94,7 +94,6 @@ class JavaModel {
 						parameterModel.annotations.add("@" + Plsql.InOut.class.getName());
 					}
 					parameterModel.type = parameter.getType().accept(new ComputeJavaType(),typeString);
-					// TODO better spaces
 					// TODO sanitize imports
 				}
 			}
@@ -187,23 +186,23 @@ class JavaModel {
 
 		@Override
 		public String visitVarray(VarrayType type) {
-			return "@" + Plsql.Varray.class.getName() + "(\"" + type.getName() + "\") ";
+			return "@" + Plsql.Varray.class.getName() + "(\"" + type.getName() + "\")";
 		}
 
 		@Override
 		public String visitNestedTable(NestedTableType type) {
-			return "@" + Plsql.NestedTable.class.getName() + "(\"" + type.getName() + "\") ";
+			return "@" + Plsql.NestedTable.class.getName() + "(\"" + type.getName() + "\")";
 		}
 
 		@Override
 		public String visitIndexByTable(IndexByTableType type) {
-			return "@" + Plsql.IndexByTable.class.getName() + "(\"" + type.getName() + "\") ";
+			return "@" + Plsql.IndexByTable.class.getName() + "(\"" + type.getName() + "\")";
 		}
 
 		@Override
 		public String visitPrimitive(AbstractPrimitiveType type) {
 			Annotation annotation = type.getAnnotation();
-			return "@" + annotation.annotationType().getName() + annotationStateToString(annotation) + " ";
+			return "@" + annotation.annotationType().getName() + annotationStateToString(annotation);
 		}
 		
 	}
@@ -304,7 +303,7 @@ class JavaModel {
 					String elementJavaType = elementType.accept(this,elementTypeString);
 					int splitPoint = findJavaArrayElementDeclarationInsertionPoint(elementJavaType);
 					String before = elementJavaType.substring(0,splitPoint), after = elementJavaType.substring(splitPoint);
-					Utils.appendf(result, "%s %s[] %s",before,typeAnnotation,after);
+					Utils.appendf(result, "%s %s [] %s",before,typeAnnotation,after);
 					break;
 				} case "java.util.List" : case "java.util.Vector" : {
 					String elementTypeString = typeString.substring(l + 1,r);
@@ -341,7 +340,7 @@ class JavaModel {
 					String elementJavaType = elementType.accept(this,elementTypeString);
 					int splitPoint = findJavaArrayElementDeclarationInsertionPoint(elementJavaType);
 					String before = elementJavaType.substring(0,splitPoint), after = elementJavaType.substring(splitPoint);
-					Utils.appendf(result, "%s %s[] %s",before,typeAnnotation,after);
+					Utils.appendf(result, "%s %s [] %s",before,typeAnnotation,after);
 					break;
 				} case "java.util.List" : case "java.util.Vector" : {
 					String elementTypeString = typeString.substring(l + 1,r);
@@ -372,7 +371,7 @@ class JavaModel {
 					String keyTypeAnnotation = type.getIndexType().accept(new AnnotateType());
 					String elementTypeString = typeString.substring(c + 1,r);
 					String elementJavaType = elementType.accept(this,elementTypeString);
-					Utils.appendf(result, "%s %s<%s%s,%s>",typeAnnotation,typeName,keyTypeAnnotation,keyJavaType,elementJavaType);
+					Utils.appendf(result, "%s %s<%s %s,%s>",typeAnnotation,typeName,keyTypeAnnotation,keyJavaType,elementJavaType);
 					break;
 				} default : {
 					throw new IllegalStateException("java type " + typeName + " cannot be used for nested table");

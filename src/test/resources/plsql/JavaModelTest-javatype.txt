@@ -5,7 +5,7 @@ JAVA CODE MODEL
 		METHOD MODEL (m2)
 			a2:
 			PARAMETER MODEL (a2)
-				@plsql.Plsql$NestedTable("a_test_package.tableofrec")  java.util.Map<java.lang.Integer,pleasejava.test.RecordA2>
+				@plsql.Plsql$NestedTable("a_test_package.tableofrec") java.util.Map<java.lang.Integer,pleasejava.test.RecordA2>
 			b2:
 			PARAMETER MODEL (b2)
 				pleasejava.test.RecordB2 @plsql.Plsql$NestedTable("a_test_package.tableofrec") [] 
@@ -13,7 +13,7 @@ JAVA CODE MODEL
 		METHOD MODEL (m1)
 			a1:
 			PARAMETER MODEL (a1)
-				@plsql.Plsql$NestedTable("a_test_package.tableofrec")  java.util.List<pleasejava.test.RecordA1>
+				@plsql.Plsql$NestedTable("a_test_package.tableofrec") java.util.List<pleasejava.test.RecordA1>
 			b1:
 			PARAMETER MODEL (b1)
-				@plsql.Plsql$NestedTable("a_test_package.tableofrec")  java.util.Vector<pleasejava.test.RecordB1>
+				@plsql.Plsql$NestedTable("a_test_package.tableofrec") java.util.Vector<pleasejava.test.RecordB1>
