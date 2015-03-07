@@ -94,9 +94,7 @@ class JavaModel {
 						parameterModel.annotations.add("@" + Plsql.InOut.class.getName());
 					}
 					parameterModel.type = parameter.getType().accept(new ComputeJavaType(),typeString);
-					// TODO bugfix varray anotace u inputNst2 - ma byt az mezi Record3 a []
-					// TODO vyresit prazdny radek u vypisu recordu (dusledek resultu visitoru na recordu)
-					// TODO bugfix ibt3
+					// TODO better spaces
 					// TODO sanitize imports
 				}
 			}
@@ -385,7 +383,8 @@ class JavaModel {
 
 		@Override
 		public String visitPrimitive(AbstractPrimitiveType type, String typeString) {
-			String result = String.format("%s",typeString);
+			String typeAnnotation = type.accept(new AnnotateType());
+			String result = String.format("%s %s",typeAnnotation,typeString);
 			return result;
 		}
 
