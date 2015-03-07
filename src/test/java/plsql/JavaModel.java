@@ -89,10 +89,10 @@ class JavaModel {
 					System.out.printf("\t%s = %s,%s%n",parameterName,typeString,variableName);
 					ParameterModel parameterModel = methodModel.ensureParameterModel(variableName);
 					if (parameter.getParameterMode() == ParameterMode.OUT) {
-						parameterModel.annotations.add("@" + Plsql.Out.class.getName());
+						parameterModel.annotations.add("@" + classModel.importMapper.add(Plsql.Out.class.getName()));
 					}
 					if (parameter.getParameterMode() == ParameterMode.INOUT) {
-						parameterModel.annotations.add("@" + Plsql.InOut.class.getName());
+						parameterModel.annotations.add("@" + classModel.importMapper.add(Plsql.InOut.class.getName()));
 					}
 					parameterModel.type = parameter.getType().accept(new ComputeJavaType(classModel.importMapper),typeString);
 					// TODO sanitize imports
@@ -131,10 +131,10 @@ class JavaModel {
 					System.out.printf("\t%s = %s,%s%n",parameterName,typeString,variableName);
 					ParameterModel parameterModel = methodModel.ensureParameterModel(variableName);
 					if (parameter.getParameterMode() == ParameterMode.OUT) {
-						parameterModel.annotations.add("@" + Plsql.Out.class.getName());
+						parameterModel.annotations.add("@" + classModel.importMapper.add(Plsql.Out.class.getName()));
 					}
 					if (parameter.getParameterMode() == ParameterMode.INOUT) {
-						parameterModel.annotations.add("@" + Plsql.InOut.class.getName());
+						parameterModel.annotations.add("@" + classModel.importMapper.add(Plsql.InOut.class.getName()));
 					}
 					parameterModel.type = parameter.getType().accept(new ComputeJavaType(classModel.importMapper),typeString);
 					// TODO sanitize imports
