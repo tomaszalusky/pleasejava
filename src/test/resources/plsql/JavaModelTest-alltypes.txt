@@ -1,6 +1,8 @@
 JAVA CODE MODEL
 	pleasejava.test.alltypes.TestInterface:
 	CLASS MODEL (interface pleasejava.test.alltypes.TestInterface)
+		IMPORTS:
+		METHODS:
 		echo:
 		METHOD MODEL (echo)
 			inputIbt1:

@@ -19,7 +19,7 @@ import com.google.common.collect.Lists;
  */
 public class Utils {
 
-	private static final String LS = String.format("%n");
+	public static final String LS = String.format("%n");
 
 	public static void main(String[] args) {
 		System.out.println("Hello world");

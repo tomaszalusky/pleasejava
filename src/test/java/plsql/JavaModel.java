@@ -1,5 +1,6 @@
 package plsql;
 
+import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
@@ -396,10 +397,17 @@ class JavaModel {
 		
 		String add(String className) {
 			String fullJavaName = className.replace('$','.');
-			imports.add(fullJavaName);
-			int index = fullJavaName.lastIndexOf('.');
-			String shortJavaName = className.substring(index + 1);
+			if (!fullJavaName.startsWith("java.lang.")) {
+				imports.add(fullJavaName);
+			}
+			int lastDot = fullJavaName.lastIndexOf('.');
+			String shortJavaName = className.substring(lastDot + 1);
 			return shortJavaName;
+		}
+		
+		public String toString() {
+			String result = String.format("\t\tIMPORTS:%s",imports.stream().map(s -> String.format("%n\t\t\t%s",s)).collect(joining()));
+			return result;
 		}
 		
 	}
@@ -441,7 +449,7 @@ class JavaModel {
 		
 		public String toString() {
 			StringBuilder result = new StringBuilder();
-			Utils.appendf(result, "\tCLASS MODEL (%s %s)", isInterface ? "interface" : "class", name);
+			Utils.appendf(result, "\tCLASS MODEL (%s %s)%n%s%n\t\tMETHODS:", isInterface ? "interface" : "class", name, importMapper);
 			for (Map.Entry<String,MethodModel> e : methods.entrySet()) {
 				Utils.appendf(result, "%n\t\t%s:%n%s", e.getKey(), e.getValue());
 			}

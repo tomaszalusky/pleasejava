@@ -1,6 +1,8 @@
 JAVA CODE MODEL
 	pleasejava.test.TestInterface:
 	CLASS MODEL (interface pleasejava.test.TestInterface)
+		IMPORTS:
+		METHODS:
 		m2:
 		METHOD MODEL (m2)
 			a2:
