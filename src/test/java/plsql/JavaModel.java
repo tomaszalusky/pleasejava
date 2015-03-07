@@ -72,9 +72,8 @@ class JavaModel {
 				String representation = entry.getValue();
 				String className = representation.substring(0,representation.lastIndexOf('.'));
 				String methodName = representation.substring(representation.lastIndexOf('.') + 1);
-				ClassModel classModel = javaModel.ensureClassModel(className);
-				classModel.isInterface = true;
-				MethodModel methodModel = classModel.ensureMethodModel(methodName);
+				ClassModel classModel = javaModel.classes.computeIfAbsent(className, cn -> new ClassModel(cn,true));
+				MethodModel methodModel = classModel.methods.computeIfAbsent(methodName, mn -> new MethodModel(mn));
 				System.out.printf("%s = %s%n",prefix,representation);
 				for (Map.Entry<String,Parameter> parameterEntry : type.getParameters().entrySet()) {
 					String parameterName = parameterEntry.getKey();
@@ -88,7 +87,7 @@ class JavaModel {
 					String typeString = attrValue.substring(0, spc == -1 ? attrValue.length() : spc);
 					String variableName = spc == -1 ? parameterName : attrValue.substring(spc + 1);
 					System.out.printf("\t%s = %s,%s%n",parameterName,typeString,variableName);
-					ParameterModel parameterModel = methodModel.ensureParameterModel(variableName);
+					ParameterModel parameterModel = methodModel.parameters.computeIfAbsent(variableName, pn -> new ParameterModel(pn));
 					if (parameter.getParameterMode() == ParameterMode.OUT) {
 						parameterModel.annotations.add("@" + classModel.importMapper.add(Plsql.Out.class.getName()));
 					}
@@ -113,9 +112,8 @@ class JavaModel {
 				String representation = entry.getValue();
 				String className = representation.substring(0,representation.lastIndexOf('.'));
 				String methodName = representation.substring(representation.lastIndexOf('.') + 1);
-				ClassModel classModel = javaModel.ensureClassModel(className);
-				classModel.isInterface = true;
-				MethodModel methodModel = classModel.ensureMethodModel(methodName);
+				ClassModel classModel = javaModel.classes.computeIfAbsent(className, cn -> new ClassModel(cn,true));
+				MethodModel methodModel = classModel.methods.computeIfAbsent(methodName, mn -> new MethodModel(mn));
 				System.out.printf("%s = %s%n",prefix,representation);
 				{
 					XPathExpression<Attribute> returnTypeXPath = XPathFactory.instance().compile("return/@ns:type",
@@ -124,7 +122,7 @@ class JavaModel {
 					);
 					String attrValue = returnTypeXPath.evaluateFirst(typeElement).getValue().replace('[','<').replace(']','>');
 					String typeString = attrValue;
-					ParameterModel returnTypeModel = methodModel.ensureParameterModel(null);
+					ParameterModel returnTypeModel = methodModel.parameters.computeIfAbsent(null, pn -> new ParameterModel(pn));
 					returnTypeModel.type = type.getReturnType().accept(new ComputeJavaType(classModel.importMapper),typeString);
 				}
 				for (Map.Entry<String,Parameter> parameterEntry : type.getParameters().entrySet()) {
@@ -139,7 +137,7 @@ class JavaModel {
 					String typeString = attrValue.substring(0, spc == -1 ? attrValue.length() : spc);
 					String variableName = spc == -1 ? parameterName : attrValue.substring(spc + 1);
 					System.out.printf("\t%s = %s,%s%n",parameterName,typeString,variableName);
-					ParameterModel parameterModel = methodModel.ensureParameterModel(variableName);
+					ParameterModel parameterModel = methodModel.parameters.computeIfAbsent(variableName, pn -> new ParameterModel(pn));
 					if (parameter.getParameterMode() == ParameterMode.OUT) {
 						parameterModel.annotations.add("@" + classModel.importMapper.add(Plsql.Out.class.getName()));
 					}
@@ -447,30 +445,23 @@ class JavaModel {
 		return result.toString();
 	}
 	
-	ClassModel ensureClassModel(String className) {
-		return classes.computeIfAbsent(className, cn -> new ClassModel(cn));
-	}
-
 	private static class ClassModel {
 		
 		private final String name;
 		
-		private ImportMapper importMapper = new ImportMapper();
+		private final boolean isInterface;
 		
-		private boolean isInterface;
+		private final ImportMapper importMapper = new ImportMapper();
 		
-		private Map<String,FieldModel> fields = new LinkedHashMap<>();
+		private final Map<String,FieldModel> fields = new LinkedHashMap<>();
 		
-		private Map<String,MethodModel> methods = new LinkedHashMap<>();
+		private final Map<String,MethodModel> methods = new LinkedHashMap<>();
 		
-		ClassModel(String name) {
+		ClassModel(String name, boolean isInterface) {
 			this.name = name;
+			this.isInterface = isInterface;
 		}
 
-		MethodModel ensureMethodModel(String methodName) {
-			return methods.computeIfAbsent(methodName, mn -> new MethodModel(mn));
-		}
-		
 		public String toString() {
 			StringBuilder result = new StringBuilder();
 			Utils.appendf(result, "CLASS MODEL (%s %s)%n%s%n\t\tMETHODS:", isInterface ? "interface" : "class", name, importMapper);
@@ -506,14 +497,6 @@ class JavaModel {
 
 		private MethodModel(String name) {
 			this.name = name;
-		}
-
-		/**
-		 * @param parameterName parameter name, null for return type
-		 * @return
-		 */
-		ParameterModel ensureParameterModel(String parameterName) {
-			return parameters.computeIfAbsent(parameterName, pn -> new ParameterModel(pn));
 		}
 
 		public String toString() {
