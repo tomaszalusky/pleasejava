@@ -94,7 +94,7 @@ class JavaModel {
 					if (parameter.getParameterMode() == ParameterMode.INOUT) {
 						parameterModel.annotations.add("@" + Plsql.InOut.class.getName());
 					}
-					parameterModel.type = parameter.getType().accept(new ComputeJavaType(),typeString);
+					parameterModel.type = parameter.getType().accept(new ComputeJavaType(classModel.importMapper),typeString);
 					// TODO sanitize imports
 				}
 			}
@@ -136,7 +136,7 @@ class JavaModel {
 					if (parameter.getParameterMode() == ParameterMode.INOUT) {
 						parameterModel.annotations.add("@" + Plsql.InOut.class.getName());
 					}
-					parameterModel.type = parameter.getType().accept(new ComputeJavaType(),typeString);
+					parameterModel.type = parameter.getType().accept(new ComputeJavaType(classModel.importMapper),typeString);
 					// TODO sanitize imports
 					// TODO return type
 					// TODO ensure, isInterface - opravit
@@ -170,6 +170,12 @@ class JavaModel {
 
 	static class AnnotateType implements TypeVisitorR<String> {
 
+		private final ImportMapper importMapper;
+
+		AnnotateType(ImportMapper importMapper) {
+			this.importMapper = importMapper;
+		}
+
 		@Override
 		public String visitProcedureSignature(ProcedureSignature type) {
 			throw new UnsupportedOperationException();
@@ -187,23 +193,23 @@ class JavaModel {
 
 		@Override
 		public String visitVarray(VarrayType type) {
-			return "@" + Plsql.Varray.class.getName() + "(\"" + type.getName() + "\")";
+			return "@" + importMapper.add(Plsql.Varray.class.getName()) + "(\"" + type.getName() + "\")";
 		}
 
 		@Override
 		public String visitNestedTable(NestedTableType type) {
-			return "@" + Plsql.NestedTable.class.getName() + "(\"" + type.getName() + "\")";
+			return "@" + importMapper.add(Plsql.NestedTable.class.getName()) + "(\"" + type.getName() + "\")";
 		}
 
 		@Override
 		public String visitIndexByTable(IndexByTableType type) {
-			return "@" + Plsql.IndexByTable.class.getName() + "(\"" + type.getName() + "\")";
+			return "@" + importMapper.add(Plsql.IndexByTable.class.getName()) + "(\"" + type.getName() + "\")";
 		}
 
 		@Override
 		public String visitPrimitive(AbstractPrimitiveType type) {
 			Annotation annotation = type.getAnnotation();
-			return "@" + annotation.annotationType().getName() + annotationStateToString(annotation);
+			return "@" + importMapper.add(annotation.annotationType().getName()) + annotationStateToString(annotation);
 		}
 		
 	}
@@ -248,6 +254,12 @@ class JavaModel {
 	 * @author Tomas Zalusky
 	 */
 	static class ComputeJavaType implements TypeVisitorAR<String,String> {
+
+		private final AnnotateType computeJavaAnnotation;
+		
+		public ComputeJavaType(ImportMapper importMapper) {
+			this.computeJavaAnnotation = new AnnotateType(importMapper);
+		}
 
 		/**
 		 * Compute insertion point of array declaration into array element declaration.
@@ -296,7 +308,7 @@ class JavaModel {
 			int r = typeString.lastIndexOf('>');
 			Preconditions.checkArgument(l != -1 && r != -1);
 			String typeName = typeString.substring(0,l);
-			String typeAnnotation = type.accept(new AnnotateType());
+			String typeAnnotation = type.accept(computeJavaAnnotation);
 			AbstractType elementType = type.getElementType();
 			switch (typeName) {
 				case "java.lang.Array" : {
@@ -325,7 +337,7 @@ class JavaModel {
 			int r = typeString.lastIndexOf('>');
 			Preconditions.checkArgument(l != -1 && r != -1);
 			String typeName = typeString.substring(0,l);
-			String typeAnnotation = type.accept(new AnnotateType());
+			String typeAnnotation = type.accept(computeJavaAnnotation);
 			AbstractType elementType = type.getElementType();
 			switch (typeName) {
 				case "java.util.Map" : {
@@ -362,14 +374,14 @@ class JavaModel {
 			int r = typeString.lastIndexOf('>');
 			Preconditions.checkArgument(l != -1 && r != -1);
 			String typeName = typeString.substring(0,l);
-			String typeAnnotation = type.accept(new AnnotateType());
+			String typeAnnotation = type.accept(computeJavaAnnotation);
 			AbstractType elementType = type.getElementType();
 			switch (typeName) {
 				case "java.util.Map" : case "java.util.SortedMap" : {
 					int c = typeString.indexOf(',',l);
 					Preconditions.checkArgument(c != -1);
 					String keyJavaType = typeString.substring(l + 1,c);
-					String keyTypeAnnotation = type.getIndexType().accept(new AnnotateType());
+					String keyTypeAnnotation = type.getIndexType().accept(computeJavaAnnotation);
 					String elementTypeString = typeString.substring(c + 1,r);
 					String elementJavaType = elementType.accept(this,elementTypeString);
 					Utils.appendf(result, "%s %s<%s %s,%s>",typeAnnotation,typeName,keyTypeAnnotation,keyJavaType,elementJavaType);
@@ -383,7 +395,7 @@ class JavaModel {
 
 		@Override
 		public String visitPrimitive(AbstractPrimitiveType type, String typeString) {
-			String typeAnnotation = type.accept(new AnnotateType());
+			String typeAnnotation = type.accept(computeJavaAnnotation);
 			String result = String.format("%s %s",typeAnnotation,typeString);
 			return result;
 		}
