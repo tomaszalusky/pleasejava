@@ -1,6 +1,5 @@
-JAVA CODE MODEL
-	pleasejava.test.TestInterface:
-	CLASS MODEL (interface pleasejava.test.TestInterface)
+JAVA MODEL:
+	pleasejava.test.TestInterface = CLASS MODEL (interface pleasejava.test.TestInterface)
 		IMPORTS:
 			java.util.List
 			java.util.Map
@@ -11,19 +10,13 @@ JAVA CODE MODEL
 			pleasejava.test.RecordB2
 			plsql.Plsql.NestedTable
 		METHODS:
-		m2:
-		METHOD MODEL (m2)
-			a2:
-			PARAMETER MODEL (a2)
-				@NestedTable("a_test_package.tableofrec") Map<Integer,RecordA2>
-			b2:
-			PARAMETER MODEL (b2)
-				RecordB2 @NestedTable("a_test_package.tableofrec") []
-		m1:
-		METHOD MODEL (m1)
-			a1:
-			PARAMETER MODEL (a1)
-				@NestedTable("a_test_package.tableofrec") List<RecordA1>
-			b1:
-			PARAMETER MODEL (b1)
-				@NestedTable("a_test_package.tableofrec") Vector<RecordB1>
+			m1 = METHOD MODEL (m1)
+				a1 = PARAMETER MODEL (a1)
+					@NestedTable("a_test_package.tableofrec") List<RecordA1>
+				b1 = PARAMETER MODEL (b1)
+					@NestedTable("a_test_package.tableofrec") Vector<RecordB1>
+			m2 = METHOD MODEL (m2)
+				a2 = PARAMETER MODEL (a2)
+					@NestedTable("a_test_package.tableofrec") Map<Integer,RecordA2>
+				b2 = PARAMETER MODEL (b2)
+					RecordB2 @NestedTable("a_test_package.tableofrec") []

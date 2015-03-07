@@ -2,6 +2,7 @@ package plsql;
 
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
 
 import java.lang.annotation.Annotation;
@@ -64,7 +65,7 @@ class JavaModel {
 			XPathExpression<Element> xpath = XPathFactory.instance().compile("procedure[@name='" + name + "']", Filters.element());
 			Element typeElement = Iterables.getOnlyElement(xpath.evaluate(rootElement),null);
 			List<Namespace> javaNs = typeElement.getAdditionalNamespaces().stream().filter(n -> n.getPrefix().startsWith("java")).collect(toList());
-			Map<String,String> prefixToRepresentation = javaNs.stream().collect(Collectors.toMap(n -> n.getPrefix(), n -> n.getURI()));
+			Map<String,String> prefixToRepresentation = javaNs.stream().collect(toMap(n -> n.getPrefix(), n -> n.getURI(), (u,v) -> {throw new IllegalStateException(String.format("Duplicate key %s", u));}, LinkedHashMap::new));
 			Preconditions.checkState(Objects.equals(javaNs.size(),prefixToRepresentation.values().stream().collect(toSet()).size()),"Duplicit representation of procedure %s.",type.getName());
 			for (Map.Entry<String,String> entry : prefixToRepresentation.entrySet()) {
 				String prefix = entry.getKey();
@@ -95,7 +96,6 @@ class JavaModel {
 						parameterModel.annotations.add("@" + classModel.importMapper.add(Plsql.InOut.class.getName()));
 					}
 					parameterModel.type = parameter.getType().accept(new ComputeJavaType(classModel.importMapper),typeString);
-					// TODO sanitize imports
 				}
 			}
 		}
@@ -106,7 +106,7 @@ class JavaModel {
 			XPathExpression<Element> xpath = XPathFactory.instance().compile("function[@name='" + name + "']", Filters.element());
 			Element typeElement = Iterables.getOnlyElement(xpath.evaluate(rootElement),null);
 			List<Namespace> javaNs = typeElement.getAdditionalNamespaces().stream().filter(n -> n.getPrefix().startsWith("java")).collect(toList());
-			Map<String,String> prefixToRepresentation = javaNs.stream().collect(Collectors.toMap(n -> n.getPrefix(), n -> n.getURI()));
+			Map<String,String> prefixToRepresentation = javaNs.stream().collect(toMap(n -> n.getPrefix(), n -> n.getURI(), (u,v) -> {throw new IllegalStateException(String.format("Duplicate key %s", u));}, LinkedHashMap::new));
 			Preconditions.checkState(Objects.equals(javaNs.size(),prefixToRepresentation.values().stream().collect(toSet()).size()),"Duplicit representation of procedure %s.",type.getName());
 			for (Map.Entry<String,String> entry : prefixToRepresentation.entrySet()) {
 				String prefix = entry.getKey();
@@ -137,7 +137,6 @@ class JavaModel {
 						parameterModel.annotations.add("@" + classModel.importMapper.add(Plsql.InOut.class.getName()));
 					}
 					parameterModel.type = parameter.getType().accept(new ComputeJavaType(classModel.importMapper),typeString);
-					// TODO sanitize imports
 					// TODO return type
 					// TODO ensure, isInterface - opravit
 					// TODO DRY
@@ -432,9 +431,9 @@ class JavaModel {
 
 	public String toString() {
 		StringBuilder result = new StringBuilder();
-		Utils.appendf(result, "JAVA CODE MODEL%n");
+		Utils.appendf(result, "JAVA MODEL:%n");
 		for (Map.Entry<String,ClassModel> e : classes.entrySet()) {
-			Utils.appendf(result, "\t%s:%n%s%n", e.getKey(), e.getValue());
+			Utils.appendf(result, "\t%s = %s%n", e.getKey(), e.getValue());
 		}
 		return result.toString();
 	}
@@ -465,9 +464,9 @@ class JavaModel {
 		
 		public String toString() {
 			StringBuilder result = new StringBuilder();
-			Utils.appendf(result, "\tCLASS MODEL (%s %s)%n%s%n\t\tMETHODS:", isInterface ? "interface" : "class", name, importMapper);
+			Utils.appendf(result, "CLASS MODEL (%s %s)%n%s%n\t\tMETHODS:", isInterface ? "interface" : "class", name, importMapper);
 			for (Map.Entry<String,MethodModel> e : methods.entrySet()) {
-				Utils.appendf(result, "%n\t\t%s:%n%s", e.getKey(), e.getValue());
+				Utils.appendf(result, "%n\t\t\t%s = %s", e.getKey(), e.getValue());
 			}
 			return result.toString();
 		}
@@ -506,9 +505,9 @@ class JavaModel {
 
 		public String toString() {
 			StringBuilder result = new StringBuilder();
-			Utils.appendf(result, "\t\tMETHOD MODEL (%s)", name);
+			Utils.appendf(result, "METHOD MODEL (%s)", name);
 			for (Map.Entry<String,ParameterModel> e : parameters.entrySet()) {
-				Utils.appendf(result, "%n\t\t\t%s:%n%s", e.getKey(), e.getValue());
+				Utils.appendf(result, "%n\t\t\t\t%s = %s", e.getKey(), e.getValue());
 			}
 			return result.toString();
 		}
@@ -529,11 +528,11 @@ class JavaModel {
 
 		public String toString() {
 			StringBuilder result = new StringBuilder();
-			Utils.appendf(result, "\t\t\tPARAMETER MODEL (%s)", name);
+			Utils.appendf(result, "PARAMETER MODEL (%s)", name);
 			for (String annotation : annotations) {
-				Utils.appendf(result, "%n\t\t\t\t%s",annotation);
+				Utils.appendf(result, "%n\t\t\t\t\t%s",annotation);
 			}
-			Utils.appendf(result, "%n\t\t\t\t%s",type);
+			Utils.appendf(result, "%n\t\t\t\t\t%s",type);
 			return result.toString();
 		}
 
