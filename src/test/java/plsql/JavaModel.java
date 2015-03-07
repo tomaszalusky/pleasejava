@@ -255,9 +255,12 @@ class JavaModel {
 	 */
 	static class ComputeJavaType implements TypeVisitorAR<String,String> {
 
+		private final ImportMapper importMapper;
+		
 		private final AnnotateType computeJavaAnnotation;
 		
 		public ComputeJavaType(ImportMapper importMapper) {
+			this.importMapper = importMapper;
 			this.computeJavaAnnotation = new AnnotateType(importMapper);
 		}
 
@@ -298,7 +301,7 @@ class JavaModel {
 
 		@Override
 		public String visitRecord(RecordType type, String typeString) {
-			return typeString; /* record classes are annotated themselves, no need to annotate them at the point of use */
+			return importMapper.add(typeString); /* record classes are annotated themselves, no need to annotate them at the point of use */
 		}
 
 		@Override
@@ -321,7 +324,7 @@ class JavaModel {
 				} case "java.util.List" : case "java.util.Vector" : {
 					String elementTypeString = typeString.substring(l + 1,r);
 					String elementJavaType = elementType.accept(this,elementTypeString);
-					Utils.appendf(result, "%s %s<%s>",typeAnnotation,typeName,elementJavaType);
+					Utils.appendf(result, "%s %s<%s>",typeAnnotation,importMapper.add(typeName),elementJavaType);
 					break;
 				} default : {
 					throw new IllegalStateException("java type " + typeName + " cannot be used for varrays");
@@ -346,7 +349,7 @@ class JavaModel {
 					String keyJavaType = typeString.substring(l + 1,c);
 					String elementTypeString = typeString.substring(c + 1,r);
 					String elementJavaType = elementType.accept(this,elementTypeString);
-					Utils.appendf(result, "%s %s<%s,%s>",typeAnnotation,typeName,keyJavaType,elementJavaType);
+					Utils.appendf(result, "%s %s<%s,%s>",typeAnnotation,importMapper.add(typeName),importMapper.add(keyJavaType),elementJavaType);
 					break;
 				} case "java.lang.Array" : {
 					String elementTypeString = typeString.substring(l + 1,r);
@@ -358,7 +361,7 @@ class JavaModel {
 				} case "java.util.List" : case "java.util.Vector" : {
 					String elementTypeString = typeString.substring(l + 1,r);
 					String elementJavaType = elementType.accept(this,elementTypeString);
-					Utils.appendf(result, "%s %s<%s>",typeAnnotation,typeName,elementJavaType);
+					Utils.appendf(result, "%s %s<%s>",typeAnnotation,importMapper.add(typeName),elementJavaType);
 					break;
 				} default : {
 					throw new IllegalStateException("java type " + typeName + " cannot be used for nested table");
@@ -384,7 +387,7 @@ class JavaModel {
 					String keyTypeAnnotation = type.getIndexType().accept(computeJavaAnnotation);
 					String elementTypeString = typeString.substring(c + 1,r);
 					String elementJavaType = elementType.accept(this,elementTypeString);
-					Utils.appendf(result, "%s %s<%s %s,%s>",typeAnnotation,typeName,keyTypeAnnotation,keyJavaType,elementJavaType);
+					Utils.appendf(result, "%s %s<%s %s,%s>",typeAnnotation,importMapper.add(typeName),keyTypeAnnotation,importMapper.add(keyJavaType),elementJavaType);
 					break;
 				} default : {
 					throw new IllegalStateException("java type " + typeName + " cannot be used for nested table");
@@ -396,7 +399,7 @@ class JavaModel {
 		@Override
 		public String visitPrimitive(AbstractPrimitiveType type, String typeString) {
 			String typeAnnotation = type.accept(computeJavaAnnotation);
-			String result = String.format("%s %s",typeAnnotation,typeString);
+			String result = String.format("%s %s",typeAnnotation,importMapper.add(typeString));
 			return result;
 		}
 

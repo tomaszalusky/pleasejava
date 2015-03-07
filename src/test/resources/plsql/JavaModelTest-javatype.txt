@@ -2,21 +2,28 @@ JAVA CODE MODEL
 	pleasejava.test.TestInterface:
 	CLASS MODEL (interface pleasejava.test.TestInterface)
 		IMPORTS:
+			java.util.List
+			java.util.Map
+			java.util.Vector
+			pleasejava.test.RecordA1
+			pleasejava.test.RecordA2
+			pleasejava.test.RecordB1
+			pleasejava.test.RecordB2
 			plsql.Plsql.NestedTable
 		METHODS:
 		m2:
 		METHOD MODEL (m2)
 			a2:
 			PARAMETER MODEL (a2)
-				@NestedTable("a_test_package.tableofrec") java.util.Map<java.lang.Integer,pleasejava.test.RecordA2>
+				@NestedTable("a_test_package.tableofrec") Map<Integer,RecordA2>
 			b2:
 			PARAMETER MODEL (b2)
-				pleasejava.test.RecordB2 @NestedTable("a_test_package.tableofrec") [] 
+				RecordB2 @NestedTable("a_test_package.tableofrec") [] 
 		m1:
 		METHOD MODEL (m1)
 			a1:
 			PARAMETER MODEL (a1)
-				@NestedTable("a_test_package.tableofrec") java.util.List<pleasejava.test.RecordA1>
+				@NestedTable("a_test_package.tableofrec") List<RecordA1>
 			b1:
 			PARAMETER MODEL (b1)
-				@NestedTable("a_test_package.tableofrec") java.util.Vector<pleasejava.test.RecordB1>
+				@NestedTable("a_test_package.tableofrec") Vector<RecordB1>
