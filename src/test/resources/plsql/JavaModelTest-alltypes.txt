@@ -5,100 +5,78 @@ JAVA CODE MODEL
 		METHOD MODEL (echo)
 			inputIbt1:
 			PARAMETER MODEL (inputIbt1)
-				@plsql.Plsql$IndexByTable("a_test_package.ibt1") 
-				java.util.Map<@plsql.Plsql$PlsInteger java.lang.Integer,pleasejava.test.alltypes.Record2>
+				@plsql.Plsql$IndexByTable("a_test_package.ibt1")  java.util.Map<@plsql.Plsql$PlsInteger java.lang.Integer,pleasejava.test.alltypes.Record2>
 			inputVar1:
 			PARAMETER MODEL (inputVar1)
-				@plsql.Plsql$Varray("a_test_package.var1") 
-				java.util.List<@plsql.Plsql$Varray("a_test_package.var4") java.util.List<pleasejava.test.alltypes.Record3>>
+				@plsql.Plsql$Varray("a_test_package.var1")  java.util.List<@plsql.Plsql$Varray("a_test_package.var4")  java.util.List<pleasejava.test.alltypes.Record3>>
 			inputNst2:
 			PARAMETER MODEL (inputNst2)
-				@plsql.Plsql$NestedTable("a_test_package.nst2") 
-				java.util.List<@plsql.Plsql$Varray("a_test_package.var4") pleasejava.test.alltypes.Record3 [] >
+				@plsql.Plsql$NestedTable("a_test_package.nst2")  java.util.List<pleasejava.test.alltypes.Record3 @plsql.Plsql$Varray("a_test_package.var4") [] >
 			inputNst3:
 			PARAMETER MODEL (inputNst3)
-				@plsql.Plsql$NestedTable("a_test_package.nst3") 
-				java.util.Map<java.lang.Integer,@plsql.Plsql$NestedTable("a_test_package.nst4") java.util.List<pleasejava.test.alltypes.Record3>>
+				@plsql.Plsql$NestedTable("a_test_package.nst3")  java.util.Map<java.lang.Integer,@plsql.Plsql$NestedTable("a_test_package.nst4")  java.util.List<pleasejava.test.alltypes.Record3>>
 			inputRec1:
 			PARAMETER MODEL (inputRec1)
-				
 				pleasejava.test.alltypes.Record1
 			inputVar3:
 			PARAMETER MODEL (inputVar3)
-				@plsql.Plsql$Varray("a_test_package.var3") 
-				java.util.List<@plsql.Plsql$IndexByTable("a_test_package.ibt5") java.util.SortedMap<@plsql.Plsql$String_(20) java.lang.String,@plsql.Plsql$Varray("a_test_package.var5") java.util.List<@plsql.Plsql$Varchar2(100) java.lang.String>>>
+				@plsql.Plsql$Varray("a_test_package.var3")  java.util.List<@plsql.Plsql$IndexByTable("a_test_package.ibt5")  java.util.SortedMap<@plsql.Plsql$String_(20) java.lang.String,@plsql.Plsql$Varray("a_test_package.var5")  java.util.List<java.lang.String>>>
 			inputIbt2:
 			PARAMETER MODEL (inputIbt2)
-				@plsql.Plsql$IndexByTable("a_test_package.ibt2") 
-				java.util.Map<@plsql.Plsql$BinaryInteger java.math.BigInteger,@plsql.Plsql$IndexByTable("a_test_package.ibt5") java.util.Map<@plsql.Plsql$String_(20) java.lang.String,@plsql.Plsql$Varray("a_test_package.var5") java.util.List<@plsql.Plsql$Varchar2(100) java.lang.String>>>
+				@plsql.Plsql$IndexByTable("a_test_package.ibt2")  java.util.Map<@plsql.Plsql$BinaryInteger java.math.BigInteger,@plsql.Plsql$IndexByTable("a_test_package.ibt5")  java.util.Map<@plsql.Plsql$String_(20) java.lang.String,@plsql.Plsql$Varray("a_test_package.var5")  java.util.List<java.lang.String>>>
 			inputNst1:
 			PARAMETER MODEL (inputNst1)
-				@plsql.Plsql$NestedTable("a_test_package.nst1") 
-				java.util.List<@plsql.Plsql$IndexByTable("a_test_package.ibt5") java.util.Map<@plsql.Plsql$String_(20) java.lang.String,@plsql.Plsql$Varray("a_test_package.var5") java.util.List<@plsql.Plsql$Varchar2(100) java.lang.String>>>
+				@plsql.Plsql$NestedTable("a_test_package.nst1")  java.util.List<@plsql.Plsql$IndexByTable("a_test_package.ibt5")  java.util.Map<@plsql.Plsql$String_(20) java.lang.String,@plsql.Plsql$Varray("a_test_package.var5")  java.util.List<java.lang.String>>>
 			inputIbt3:
 			PARAMETER MODEL (inputIbt3)
-				@plsql.Plsql$IndexByTable("a_test_package.ibt3") 
-				java.util.Map<@plsql.Plsql$Long_ java.lang.String,@plsql.Plsql$NestedTable("a_test_package.nst5") java.lang.String @plsql.Plsql$Varchar2(200) [] >
+				@plsql.Plsql$IndexByTable("a_test_package.ibt3")  java.util.Map<@plsql.Plsql$Long_ java.lang.String,java.lang.String @plsql.Plsql$NestedTable("a_test_package.nst5") [] >
 			inputVar2:
 			PARAMETER MODEL (inputVar2)
-				@plsql.Plsql$Varray("a_test_package.var2") 
-				java.util.List<@plsql.Plsql$NestedTable("a_test_package.nst5") java.lang.String @plsql.Plsql$Varchar2(200) [] >
+				@plsql.Plsql$Varray("a_test_package.var2")  java.util.List<java.lang.String @plsql.Plsql$NestedTable("a_test_package.nst5") [] >
 			inputClob:
 			PARAMETER MODEL (inputClob)
-				@plsql.Plsql$Clob 
 				java.lang.String
 			outputIbt1:
 			PARAMETER MODEL (outputIbt1)
 				@plsql.Plsql$Out
-				@plsql.Plsql$IndexByTable("a_test_package.ibt1") 
-				java.util.Map<@plsql.Plsql$PlsInteger java.lang.Integer,pleasejava.test.alltypes.Record2>
+				@plsql.Plsql$IndexByTable("a_test_package.ibt1")  java.util.Map<@plsql.Plsql$PlsInteger java.lang.Integer,pleasejava.test.alltypes.Record2>
 			outputVar1:
 			PARAMETER MODEL (outputVar1)
 				@plsql.Plsql$Out
-				@plsql.Plsql$Varray("a_test_package.var1") 
-				java.util.List<@plsql.Plsql$Varray("a_test_package.var4") java.util.List<pleasejava.test.alltypes.Record3>>
+				@plsql.Plsql$Varray("a_test_package.var1")  java.util.List<@plsql.Plsql$Varray("a_test_package.var4")  java.util.List<pleasejava.test.alltypes.Record3>>
 			outputNst2:
 			PARAMETER MODEL (outputNst2)
 				@plsql.Plsql$Out
-				@plsql.Plsql$NestedTable("a_test_package.nst2") 
-				java.util.List<@plsql.Plsql$Varray("a_test_package.var4") pleasejava.test.alltypes.Record3 [] >
+				@plsql.Plsql$NestedTable("a_test_package.nst2")  java.util.List<pleasejava.test.alltypes.Record3 @plsql.Plsql$Varray("a_test_package.var4") [] >
 			outputNst3:
 			PARAMETER MODEL (outputNst3)
 				@plsql.Plsql$Out
-				@plsql.Plsql$NestedTable("a_test_package.nst3") 
-				java.util.Map<java.lang.Integer,@plsql.Plsql$NestedTable("a_test_package.nst4") java.util.List<pleasejava.test.alltypes.Record3>>
+				@plsql.Plsql$NestedTable("a_test_package.nst3")  java.util.Map<java.lang.Integer,@plsql.Plsql$NestedTable("a_test_package.nst4")  java.util.List<pleasejava.test.alltypes.Record3>>
 			outputRec1:
 			PARAMETER MODEL (outputRec1)
 				@plsql.Plsql$Out
-				
 				pleasejava.test.alltypes.Record1
 			outputVar3:
 			PARAMETER MODEL (outputVar3)
 				@plsql.Plsql$Out
-				@plsql.Plsql$Varray("a_test_package.var3") 
-				java.util.List<@plsql.Plsql$IndexByTable("a_test_package.ibt5") java.util.SortedMap<@plsql.Plsql$String_(20) java.lang.String,@plsql.Plsql$Varray("a_test_package.var5") java.util.List<@plsql.Plsql$Varchar2(100) java.lang.String>>>
+				@plsql.Plsql$Varray("a_test_package.var3")  java.util.List<@plsql.Plsql$IndexByTable("a_test_package.ibt5")  java.util.SortedMap<@plsql.Plsql$String_(20) java.lang.String,@plsql.Plsql$Varray("a_test_package.var5")  java.util.List<java.lang.String>>>
 			outputIbt2:
 			PARAMETER MODEL (outputIbt2)
 				@plsql.Plsql$Out
-				@plsql.Plsql$IndexByTable("a_test_package.ibt2") 
-				java.util.Map<@plsql.Plsql$BinaryInteger java.math.BigInteger,@plsql.Plsql$IndexByTable("a_test_package.ibt5") java.util.Map<@plsql.Plsql$String_(20) java.lang.String,@plsql.Plsql$Varray("a_test_package.var5") java.util.List<@plsql.Plsql$Varchar2(100) java.lang.String>>>
+				@plsql.Plsql$IndexByTable("a_test_package.ibt2")  java.util.Map<@plsql.Plsql$BinaryInteger java.math.BigInteger,@plsql.Plsql$IndexByTable("a_test_package.ibt5")  java.util.Map<@plsql.Plsql$String_(20) java.lang.String,@plsql.Plsql$Varray("a_test_package.var5")  java.util.List<java.lang.String>>>
 			outputNst1:
 			PARAMETER MODEL (outputNst1)
 				@plsql.Plsql$Out
-				@plsql.Plsql$NestedTable("a_test_package.nst1") 
-				java.util.List<@plsql.Plsql$IndexByTable("a_test_package.ibt5") java.util.Map<@plsql.Plsql$String_(20) java.lang.String,@plsql.Plsql$Varray("a_test_package.var5") java.util.List<@plsql.Plsql$Varchar2(100) java.lang.String>>>
+				@plsql.Plsql$NestedTable("a_test_package.nst1")  java.util.List<@plsql.Plsql$IndexByTable("a_test_package.ibt5")  java.util.Map<@plsql.Plsql$String_(20) java.lang.String,@plsql.Plsql$Varray("a_test_package.var5")  java.util.List<java.lang.String>>>
 			outputIbt3:
 			PARAMETER MODEL (outputIbt3)
 				@plsql.Plsql$Out
-				@plsql.Plsql$IndexByTable("a_test_package.ibt3") 
-				java.util.Map<@plsql.Plsql$Long_ java.lang.String,@plsql.Plsql$NestedTable("a_test_package.nst5") java.lang.String @plsql.Plsql$Varchar2(200) [] >
+				@plsql.Plsql$IndexByTable("a_test_package.ibt3")  java.util.Map<@plsql.Plsql$Long_ java.lang.String,java.lang.String @plsql.Plsql$NestedTable("a_test_package.nst5") [] >
 			outputVar2:
 			PARAMETER MODEL (outputVar2)
 				@plsql.Plsql$Out
-				@plsql.Plsql$Varray("a_test_package.var2") 
-				java.util.List<@plsql.Plsql$NestedTable("a_test_package.nst5") java.lang.String @plsql.Plsql$Varchar2(200) [] >
+				@plsql.Plsql$Varray("a_test_package.var2")  java.util.List<java.lang.String @plsql.Plsql$NestedTable("a_test_package.nst5") [] >
 			outputClob:
 			PARAMETER MODEL (outputClob)
 				@plsql.Plsql$Out
-				@plsql.Plsql$Clob 
 				java.lang.StringBuilder

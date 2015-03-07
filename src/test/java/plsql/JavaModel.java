@@ -93,12 +93,7 @@ class JavaModel {
 					if (parameter.getParameterMode() == ParameterMode.INOUT) {
 						parameterModel.annotations.add("@" + Plsql.InOut.class.getName());
 					}
-					String typeAnnotation = parameter.getType().accept(new AnnotateType());
-					if (typeAnnotation != null) {
-						parameterModel.annotations.add(typeAnnotation);
-					}
 					parameterModel.type = parameter.getType().accept(new ComputeJavaType(),typeString);
-					// TODO bugfix anotace u m2/b2
 					// TODO bugfix varray anotace u inputNst2 - ma byt az mezi Record3 a []
 					// TODO vyresit prazdny radek u vypisu recordu (dusledek resultu visitoru na recordu)
 					// TODO bugfix ibt3
@@ -142,10 +137,6 @@ class JavaModel {
 					}
 					if (parameter.getParameterMode() == ParameterMode.INOUT) {
 						parameterModel.annotations.add("@" + Plsql.InOut.class.getName());
-					}
-					String typeAnnotation = parameter.getType().accept(new AnnotateType());
-					if (typeAnnotation != null) {
-						parameterModel.annotations.add(typeAnnotation);
 					}
 					parameterModel.type = parameter.getType().accept(new ComputeJavaType(),typeString);
 					// TODO sanitize imports
@@ -307,20 +298,20 @@ class JavaModel {
 			int r = typeString.lastIndexOf('>');
 			Preconditions.checkArgument(l != -1 && r != -1);
 			String typeName = typeString.substring(0,l);
+			String typeAnnotation = type.accept(new AnnotateType());
 			AbstractType elementType = type.getElementType();
-			String elementTypeAnnotation = elementType.accept(new AnnotateType());
 			switch (typeName) {
 				case "java.lang.Array" : {
 					String elementTypeString = typeString.substring(l + 1,r);
 					String elementJavaType = elementType.accept(this,elementTypeString);
 					int splitPoint = findJavaArrayElementDeclarationInsertionPoint(elementJavaType);
 					String before = elementJavaType.substring(0,splitPoint), after = elementJavaType.substring(splitPoint);
-					Utils.appendf(result, "%s %s[] %s",before,elementTypeAnnotation,after);
+					Utils.appendf(result, "%s %s[] %s",before,typeAnnotation,after);
 					break;
 				} case "java.util.List" : case "java.util.Vector" : {
 					String elementTypeString = typeString.substring(l + 1,r);
 					String elementJavaType = elementType.accept(this,elementTypeString);
-					Utils.appendf(result, "%s<%s%s>",typeName,elementTypeAnnotation,elementJavaType);
+					Utils.appendf(result, "%s %s<%s>",typeAnnotation,typeName,elementJavaType);
 					break;
 				} default : {
 					throw new IllegalStateException("java type " + typeName + " cannot be used for varrays");
@@ -336,8 +327,8 @@ class JavaModel {
 			int r = typeString.lastIndexOf('>');
 			Preconditions.checkArgument(l != -1 && r != -1);
 			String typeName = typeString.substring(0,l);
+			String typeAnnotation = type.accept(new AnnotateType());
 			AbstractType elementType = type.getElementType();
-			String elementTypeAnnotation = elementType.accept(new AnnotateType());
 			switch (typeName) {
 				case "java.util.Map" : {
 					int c = typeString.indexOf(',',l);
@@ -345,19 +336,19 @@ class JavaModel {
 					String keyJavaType = typeString.substring(l + 1,c);
 					String elementTypeString = typeString.substring(c + 1,r);
 					String elementJavaType = elementType.accept(this,elementTypeString);
-					Utils.appendf(result, "%s<%s,%s%s>",typeName,keyJavaType,elementTypeAnnotation,elementJavaType);
+					Utils.appendf(result, "%s %s<%s,%s>",typeAnnotation,typeName,keyJavaType,elementJavaType);
 					break;
 				} case "java.lang.Array" : {
 					String elementTypeString = typeString.substring(l + 1,r);
 					String elementJavaType = elementType.accept(this,elementTypeString);
 					int splitPoint = findJavaArrayElementDeclarationInsertionPoint(elementJavaType);
 					String before = elementJavaType.substring(0,splitPoint), after = elementJavaType.substring(splitPoint);
-					Utils.appendf(result, "%s %s[] %s",before,elementTypeAnnotation,after);
+					Utils.appendf(result, "%s %s[] %s",before,typeAnnotation,after);
 					break;
 				} case "java.util.List" : case "java.util.Vector" : {
 					String elementTypeString = typeString.substring(l + 1,r);
 					String elementJavaType = elementType.accept(this,elementTypeString);
-					Utils.appendf(result, "%s<%s%s>",typeName,elementTypeAnnotation,elementJavaType);
+					Utils.appendf(result, "%s %s<%s>",typeAnnotation,typeName,elementJavaType);
 					break;
 				} default : {
 					throw new IllegalStateException("java type " + typeName + " cannot be used for nested table");
@@ -373,8 +364,8 @@ class JavaModel {
 			int r = typeString.lastIndexOf('>');
 			Preconditions.checkArgument(l != -1 && r != -1);
 			String typeName = typeString.substring(0,l);
+			String typeAnnotation = type.accept(new AnnotateType());
 			AbstractType elementType = type.getElementType();
-			String elementTypeAnnotation = elementType.accept(new AnnotateType());
 			switch (typeName) {
 				case "java.util.Map" : case "java.util.SortedMap" : {
 					int c = typeString.indexOf(',',l);
@@ -383,7 +374,7 @@ class JavaModel {
 					String keyTypeAnnotation = type.getIndexType().accept(new AnnotateType());
 					String elementTypeString = typeString.substring(c + 1,r);
 					String elementJavaType = elementType.accept(this,elementTypeString);
-					Utils.appendf(result, "%s<%s%s,%s%s>",typeName,keyTypeAnnotation,keyJavaType,elementTypeAnnotation,elementJavaType);
+					Utils.appendf(result, "%s %s<%s%s,%s>",typeAnnotation,typeName,keyTypeAnnotation,keyJavaType,elementJavaType);
 					break;
 				} default : {
 					throw new IllegalStateException("java type " + typeName + " cannot be used for nested table");
