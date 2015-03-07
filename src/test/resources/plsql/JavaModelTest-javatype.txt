@@ -18,7 +18,7 @@ JAVA CODE MODEL
 				@NestedTable("a_test_package.tableofrec") Map<Integer,RecordA2>
 			b2:
 			PARAMETER MODEL (b2)
-				RecordB2 @NestedTable("a_test_package.tableofrec") [] 
+				RecordB2 @NestedTable("a_test_package.tableofrec") []
 		m1:
 		METHOD MODEL (m1)
 			a1:

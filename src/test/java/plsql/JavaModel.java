@@ -318,8 +318,9 @@ class JavaModel {
 					String elementTypeString = typeString.substring(l + 1,r);
 					String elementJavaType = elementType.accept(this,elementTypeString);
 					int splitPoint = findJavaArrayElementDeclarationInsertionPoint(elementJavaType);
-					String before = elementJavaType.substring(0,splitPoint), after = elementJavaType.substring(splitPoint);
-					Utils.appendf(result, "%s %s [] %s",before,typeAnnotation,after);
+					String before = elementJavaType.substring(0,splitPoint);
+					String after = elementJavaType.substring(splitPoint);
+					Utils.appendf(result, "%s %s []%s",before,typeAnnotation,(after.isEmpty() ? "" : " ") + after);
 					break;
 				} case "java.util.List" : case "java.util.Vector" : {
 					String elementTypeString = typeString.substring(l + 1,r);
@@ -356,7 +357,7 @@ class JavaModel {
 					String elementJavaType = elementType.accept(this,elementTypeString);
 					int splitPoint = findJavaArrayElementDeclarationInsertionPoint(elementJavaType);
 					String before = elementJavaType.substring(0,splitPoint), after = elementJavaType.substring(splitPoint);
-					Utils.appendf(result, "%s %s [] %s",before,typeAnnotation,after);
+					Utils.appendf(result, "%s %s []%s",before,typeAnnotation,(after.isEmpty() ? "" : " ") + after);
 					break;
 				} case "java.util.List" : case "java.util.Vector" : {
 					String elementTypeString = typeString.substring(l + 1,r);
