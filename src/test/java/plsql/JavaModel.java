@@ -147,7 +147,6 @@ class JavaModel {
 						parameterModel.annotations.add("@" + classModel.importMapper.add(Plsql.InOut.class.getName()));
 					}
 					parameterModel.type = parameter.getType().accept(new ComputeJavaType(classModel.importMapper),typeString);
-					// TODO indentaci toStringu pro procedury a funkce
 					// TODO DRY
 					// TODO overit nutnost kontroly ruznosti NS
 				}
@@ -491,9 +490,11 @@ class JavaModel {
 		
 		private final List<String> annotations = new ArrayList<>();
 		
+		/**
+		 * All parameters.
+		 * For simplicity, return type is stored under null key.
+		 */
 		private final Map<String,ParameterModel> parameters = new LinkedHashMap<>();
-		
-		private ParameterModel returnType;
 		
 		private String body;
 
@@ -503,12 +504,13 @@ class JavaModel {
 
 		public String toString() {
 			StringBuilder result = new StringBuilder();
-			Utils.appendf(result, "METHOD MODEL (%s)", name);
+			Utils.appendf(result, "METHOD MODEL (%s)%n\t\t\t\tANNOTATIONS:", name);
 			for (String annotation : annotations) {
-				Utils.appendf(result, "%n\t\t\t\t%s", annotation);
+				Utils.appendf(result, "%n\t\t\t\t\t%s", annotation);
 			}
+			Utils.appendf(result, "%n\t\t\t\tPARAMETERS:", name);
 			for (Map.Entry<String,ParameterModel> e : parameters.entrySet()) {
-				Utils.appendf(result, "%n\t\t\t\t%s = %s", e.getKey(), e.getValue());
+				Utils.appendf(result, "%n\t\t\t\t\t%s = %s", e.getKey(), e.getValue());
 			}
 			return result.toString();
 		}
@@ -529,11 +531,11 @@ class JavaModel {
 
 		public String toString() {
 			StringBuilder result = new StringBuilder();
-			Utils.appendf(result, "PARAMETER MODEL (%s)", name);
+			Utils.appendf(result, "PARAMETER MODEL (%s)%n\t\t\t\t\t\tANNOTATIONS:", name);
 			for (String annotation : annotations) {
-				Utils.appendf(result, "%n\t\t\t\t\t%s",annotation);
+				Utils.appendf(result, "%n\t\t\t\t\t\t\t%s",annotation);
 			}
-			Utils.appendf(result, "%n\t\t\t\t\t%s",type);
+			Utils.appendf(result, "%n\t\t\t\t\t\tTYPE:%n\t\t\t\t\t\t\t%s",type);
 			return result.toString();
 		}
 

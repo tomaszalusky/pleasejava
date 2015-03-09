@@ -22,61 +22,109 @@ JAVA MODEL:
 			plsql.Plsql.Varray
 		METHODS:
 			echo = METHOD MODEL (echo)
-				@Function("echo")
-				null = PARAMETER MODEL (null)
-					@Integer_ BigInteger
-				inputIbt1 = PARAMETER MODEL (inputIbt1)
-					@IndexByTable("a_test_package.ibt1") Map<@PlsInteger Integer,Record2>
-				inputVar1 = PARAMETER MODEL (inputVar1)
-					@Varray("a_test_package.var1") List<@Varray("a_test_package.var4") List<Record3>>
-				inputNst2 = PARAMETER MODEL (inputNst2)
-					@NestedTable("a_test_package.nst2") List<Record3 @Varray("a_test_package.var4") []>
-				inputNst3 = PARAMETER MODEL (inputNst3)
-					@NestedTable("a_test_package.nst3") Map<Integer,@NestedTable("a_test_package.nst4") List<Record3>>
-				inputRec1 = PARAMETER MODEL (inputRec1)
-					Record1
-				inputVar3 = PARAMETER MODEL (inputVar3)
-					@Varray("a_test_package.var3") List<@IndexByTable("a_test_package.ibt5") SortedMap<@String_(20) String,@Varray("a_test_package.var5") List<@Varchar2(100) String>>>
-				inputIbt2 = PARAMETER MODEL (inputIbt2)
-					@IndexByTable("a_test_package.ibt2") Map<@BinaryInteger BigInteger,@IndexByTable("a_test_package.ibt5") Map<@String_(20) String,@Varray("a_test_package.var5") List<@Varchar2(100) String>>>
-				inputNst1 = PARAMETER MODEL (inputNst1)
-					@NestedTable("a_test_package.nst1") List<@IndexByTable("a_test_package.ibt5") Map<@String_(20) String,@Varray("a_test_package.var5") List<@Varchar2(100) String>>>
-				inputIbt3 = PARAMETER MODEL (inputIbt3)
-					@IndexByTable("a_test_package.ibt3") Map<@Long_ String,@Varchar2(200) String @NestedTable("a_test_package.nst5") []>
-				inputVar2 = PARAMETER MODEL (inputVar2)
-					@Varray("a_test_package.var2") List<@Varchar2(200) String @NestedTable("a_test_package.nst5") []>
-				inputClob = PARAMETER MODEL (inputClob)
-					@Clob String
-				outputIbt1 = PARAMETER MODEL (outputIbt1)
-					@Out
-					@IndexByTable("a_test_package.ibt1") Map<@PlsInteger Integer,Record2>
-				outputVar1 = PARAMETER MODEL (outputVar1)
-					@Out
-					@Varray("a_test_package.var1") List<@Varray("a_test_package.var4") List<Record3>>
-				outputNst2 = PARAMETER MODEL (outputNst2)
-					@Out
-					@NestedTable("a_test_package.nst2") List<Record3 @Varray("a_test_package.var4") []>
-				outputNst3 = PARAMETER MODEL (outputNst3)
-					@Out
-					@NestedTable("a_test_package.nst3") Map<Integer,@NestedTable("a_test_package.nst4") List<Record3>>
-				outputRec1 = PARAMETER MODEL (outputRec1)
-					@Out
-					Record1
-				outputVar3 = PARAMETER MODEL (outputVar3)
-					@Out
-					@Varray("a_test_package.var3") List<@IndexByTable("a_test_package.ibt5") SortedMap<@String_(20) String,@Varray("a_test_package.var5") List<@Varchar2(100) String>>>
-				outputIbt2 = PARAMETER MODEL (outputIbt2)
-					@Out
-					@IndexByTable("a_test_package.ibt2") Map<@BinaryInteger BigInteger,@IndexByTable("a_test_package.ibt5") Map<@String_(20) String,@Varray("a_test_package.var5") List<@Varchar2(100) String>>>
-				outputNst1 = PARAMETER MODEL (outputNst1)
-					@Out
-					@NestedTable("a_test_package.nst1") List<@IndexByTable("a_test_package.ibt5") Map<@String_(20) String,@Varray("a_test_package.var5") List<@Varchar2(100) String>>>
-				outputIbt3 = PARAMETER MODEL (outputIbt3)
-					@Out
-					@IndexByTable("a_test_package.ibt3") Map<@Long_ String,@Varchar2(200) String @NestedTable("a_test_package.nst5") []>
-				outputVar2 = PARAMETER MODEL (outputVar2)
-					@Out
-					@Varray("a_test_package.var2") List<@Varchar2(200) String @NestedTable("a_test_package.nst5") []>
-				outputClob = PARAMETER MODEL (outputClob)
-					@Out
-					@Clob StringBuilder
+				ANNOTATIONS:
+					@Function("echo")
+				PARAMETERS:
+					null = PARAMETER MODEL (null)
+						ANNOTATIONS:
+						TYPE:
+							@Integer_ BigInteger
+					inputIbt1 = PARAMETER MODEL (inputIbt1)
+						ANNOTATIONS:
+						TYPE:
+							@IndexByTable("a_test_package.ibt1") Map<@PlsInteger Integer,Record2>
+					inputVar1 = PARAMETER MODEL (inputVar1)
+						ANNOTATIONS:
+						TYPE:
+							@Varray("a_test_package.var1") List<@Varray("a_test_package.var4") List<Record3>>
+					inputNst2 = PARAMETER MODEL (inputNst2)
+						ANNOTATIONS:
+						TYPE:
+							@NestedTable("a_test_package.nst2") List<Record3 @Varray("a_test_package.var4") []>
+					inputNst3 = PARAMETER MODEL (inputNst3)
+						ANNOTATIONS:
+						TYPE:
+							@NestedTable("a_test_package.nst3") Map<Integer,@NestedTable("a_test_package.nst4") List<Record3>>
+					inputRec1 = PARAMETER MODEL (inputRec1)
+						ANNOTATIONS:
+						TYPE:
+							Record1
+					inputVar3 = PARAMETER MODEL (inputVar3)
+						ANNOTATIONS:
+						TYPE:
+							@Varray("a_test_package.var3") List<@IndexByTable("a_test_package.ibt5") SortedMap<@String_(20) String,@Varray("a_test_package.var5") List<@Varchar2(100) String>>>
+					inputIbt2 = PARAMETER MODEL (inputIbt2)
+						ANNOTATIONS:
+						TYPE:
+							@IndexByTable("a_test_package.ibt2") Map<@BinaryInteger BigInteger,@IndexByTable("a_test_package.ibt5") Map<@String_(20) String,@Varray("a_test_package.var5") List<@Varchar2(100) String>>>
+					inputNst1 = PARAMETER MODEL (inputNst1)
+						ANNOTATIONS:
+						TYPE:
+							@NestedTable("a_test_package.nst1") List<@IndexByTable("a_test_package.ibt5") Map<@String_(20) String,@Varray("a_test_package.var5") List<@Varchar2(100) String>>>
+					inputIbt3 = PARAMETER MODEL (inputIbt3)
+						ANNOTATIONS:
+						TYPE:
+							@IndexByTable("a_test_package.ibt3") Map<@Long_ String,@Varchar2(200) String @NestedTable("a_test_package.nst5") []>
+					inputVar2 = PARAMETER MODEL (inputVar2)
+						ANNOTATIONS:
+						TYPE:
+							@Varray("a_test_package.var2") List<@Varchar2(200) String @NestedTable("a_test_package.nst5") []>
+					inputClob = PARAMETER MODEL (inputClob)
+						ANNOTATIONS:
+						TYPE:
+							@Clob String
+					outputIbt1 = PARAMETER MODEL (outputIbt1)
+						ANNOTATIONS:
+							@Out
+						TYPE:
+							@IndexByTable("a_test_package.ibt1") Map<@PlsInteger Integer,Record2>
+					outputVar1 = PARAMETER MODEL (outputVar1)
+						ANNOTATIONS:
+							@Out
+						TYPE:
+							@Varray("a_test_package.var1") List<@Varray("a_test_package.var4") List<Record3>>
+					outputNst2 = PARAMETER MODEL (outputNst2)
+						ANNOTATIONS:
+							@Out
+						TYPE:
+							@NestedTable("a_test_package.nst2") List<Record3 @Varray("a_test_package.var4") []>
+					outputNst3 = PARAMETER MODEL (outputNst3)
+						ANNOTATIONS:
+							@Out
+						TYPE:
+							@NestedTable("a_test_package.nst3") Map<Integer,@NestedTable("a_test_package.nst4") List<Record3>>
+					outputRec1 = PARAMETER MODEL (outputRec1)
+						ANNOTATIONS:
+							@Out
+						TYPE:
+							Record1
+					outputVar3 = PARAMETER MODEL (outputVar3)
+						ANNOTATIONS:
+							@Out
+						TYPE:
+							@Varray("a_test_package.var3") List<@IndexByTable("a_test_package.ibt5") SortedMap<@String_(20) String,@Varray("a_test_package.var5") List<@Varchar2(100) String>>>
+					outputIbt2 = PARAMETER MODEL (outputIbt2)
+						ANNOTATIONS:
+							@Out
+						TYPE:
+							@IndexByTable("a_test_package.ibt2") Map<@BinaryInteger BigInteger,@IndexByTable("a_test_package.ibt5") Map<@String_(20) String,@Varray("a_test_package.var5") List<@Varchar2(100) String>>>
+					outputNst1 = PARAMETER MODEL (outputNst1)
+						ANNOTATIONS:
+							@Out
+						TYPE:
+							@NestedTable("a_test_package.nst1") List<@IndexByTable("a_test_package.ibt5") Map<@String_(20) String,@Varray("a_test_package.var5") List<@Varchar2(100) String>>>
+					outputIbt3 = PARAMETER MODEL (outputIbt3)
+						ANNOTATIONS:
+							@Out
+						TYPE:
+							@IndexByTable("a_test_package.ibt3") Map<@Long_ String,@Varchar2(200) String @NestedTable("a_test_package.nst5") []>
+					outputVar2 = PARAMETER MODEL (outputVar2)
+						ANNOTATIONS:
+							@Out
+						TYPE:
+							@Varray("a_test_package.var2") List<@Varchar2(200) String @NestedTable("a_test_package.nst5") []>
+					outputClob = PARAMETER MODEL (outputClob)
+						ANNOTATIONS:
+							@Out
+						TYPE:
+							@Clob StringBuilder
