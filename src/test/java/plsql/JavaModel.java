@@ -62,16 +62,12 @@ class JavaModel {
 			String name = type.getName();
 			XPathExpression<Element> xpath = XPathFactory.instance().compile("procedure[@name='" + name + "']", Filters.element());
 			Element typeElement = Iterables.getOnlyElement(xpath.evaluate(rootElement),null);
-			List<Namespace> javaNs = typeElement.getAdditionalNamespaces().stream().filter(n -> n.getPrefix().startsWith("java")).collect(toList());
-			Map<String,String> prefixToRepresentation = javaNs.stream().collect(toMap(n -> n.getPrefix(), n -> n.getURI(), (u,v) -> {throw new IllegalStateException(String.format("Duplicate key %s", u));}, LinkedHashMap::new));
-			for (Map.Entry<String,String> entry : prefixToRepresentation.entrySet()) {
-				String prefix = entry.getKey();
-				String representation = entry.getValue();
+			List<String> representations = typeElement.getAdditionalNamespaces().stream().map(n -> n.getURI()).collect(toList());
+			for (String representation : representations) {
 				String className = representation.substring(0,representation.lastIndexOf('.'));
 				String methodName = representation.substring(representation.lastIndexOf('.') + 1);
 				ClassModel classModel = javaModel.classes.computeIfAbsent(className, cn -> new ClassModel(cn,true));
 				MethodModel methodModel = classModel.methods.computeIfAbsent(methodName, mn -> new MethodModel(mn));
-				System.out.printf("%s = %s%n",prefix,representation);
 				methodModel.annotations.add(type.accept(new AnnotateType(classModel.importMapper)));
 				for (Map.Entry<String,Parameter> parameterEntry : type.getParameters().entrySet()) {
 					String parameterName = parameterEntry.getKey();
@@ -84,7 +80,6 @@ class JavaModel {
 					int spc = attrValue.indexOf(' ');
 					String typeString = attrValue.substring(0, spc == -1 ? attrValue.length() : spc);
 					String variableName = spc == -1 ? parameterName : attrValue.substring(spc + 1);
-					System.out.printf("\t%s = %s,%s%n",parameterName,typeString,variableName);
 					ParameterModel parameterModel = methodModel.parameters.computeIfAbsent(variableName, pn -> new ParameterModel(pn));
 					if (parameter.getParameterMode() == ParameterMode.OUT) {
 						parameterModel.annotations.add("@" + classModel.importMapper.add(Plsql.Out.class.getName()));
@@ -102,16 +97,12 @@ class JavaModel {
 			String name = type.getName();
 			XPathExpression<Element> xpath = XPathFactory.instance().compile("function[@name='" + name + "']", Filters.element());
 			Element typeElement = Iterables.getOnlyElement(xpath.evaluate(rootElement),null);
-			List<Namespace> javaNs = typeElement.getAdditionalNamespaces().stream().filter(n -> n.getPrefix().startsWith("java")).collect(toList());
-			Map<String,String> prefixToRepresentation = javaNs.stream().collect(toMap(n -> n.getPrefix(), n -> n.getURI(), (u,v) -> {throw new IllegalStateException(String.format("Duplicate key %s", u));}, LinkedHashMap::new));
-			for (Map.Entry<String,String> entry : prefixToRepresentation.entrySet()) {
-				String prefix = entry.getKey();
-				String representation = entry.getValue();
+			List<String> representations = typeElement.getAdditionalNamespaces().stream().map(n -> n.getURI()).collect(toList());
+			for (String representation : representations) {
 				String className = representation.substring(0,representation.lastIndexOf('.'));
 				String methodName = representation.substring(representation.lastIndexOf('.') + 1);
 				ClassModel classModel = javaModel.classes.computeIfAbsent(className, cn -> new ClassModel(cn,true));
 				MethodModel methodModel = classModel.methods.computeIfAbsent(methodName, mn -> new MethodModel(mn));
-				System.out.printf("%s = %s%n",prefix,representation);
 				methodModel.annotations.add(type.accept(new AnnotateType(classModel.importMapper)));
 				{
 					XPathExpression<Attribute> returnTypeXPath = XPathFactory.instance().compile("return/@ns:type",
@@ -134,7 +125,6 @@ class JavaModel {
 					int spc = attrValue.indexOf(' ');
 					String typeString = attrValue.substring(0, spc == -1 ? attrValue.length() : spc);
 					String variableName = spc == -1 ? parameterName : attrValue.substring(spc + 1);
-					System.out.printf("\t%s = %s,%s%n",parameterName,typeString,variableName);
 					ParameterModel parameterModel = methodModel.parameters.computeIfAbsent(variableName, pn -> new ParameterModel(pn));
 					if (parameter.getParameterMode() == ParameterMode.OUT) {
 						parameterModel.annotations.add("@" + classModel.importMapper.add(Plsql.Out.class.getName()));
