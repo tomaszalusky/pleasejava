@@ -3,7 +3,6 @@ package plsql;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
-import static java.util.stream.Collectors.toSet;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
@@ -13,7 +12,6 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
@@ -66,7 +64,6 @@ class JavaModel {
 			Element typeElement = Iterables.getOnlyElement(xpath.evaluate(rootElement),null);
 			List<Namespace> javaNs = typeElement.getAdditionalNamespaces().stream().filter(n -> n.getPrefix().startsWith("java")).collect(toList());
 			Map<String,String> prefixToRepresentation = javaNs.stream().collect(toMap(n -> n.getPrefix(), n -> n.getURI(), (u,v) -> {throw new IllegalStateException(String.format("Duplicate key %s", u));}, LinkedHashMap::new));
-			Preconditions.checkState(Objects.equals(javaNs.size(),prefixToRepresentation.values().stream().collect(toSet()).size()),"Duplicit representation of procedure %s.",type.getName());
 			for (Map.Entry<String,String> entry : prefixToRepresentation.entrySet()) {
 				String prefix = entry.getKey();
 				String representation = entry.getValue();
@@ -107,7 +104,6 @@ class JavaModel {
 			Element typeElement = Iterables.getOnlyElement(xpath.evaluate(rootElement),null);
 			List<Namespace> javaNs = typeElement.getAdditionalNamespaces().stream().filter(n -> n.getPrefix().startsWith("java")).collect(toList());
 			Map<String,String> prefixToRepresentation = javaNs.stream().collect(toMap(n -> n.getPrefix(), n -> n.getURI(), (u,v) -> {throw new IllegalStateException(String.format("Duplicate key %s", u));}, LinkedHashMap::new));
-			Preconditions.checkState(Objects.equals(javaNs.size(),prefixToRepresentation.values().stream().collect(toSet()).size()),"Duplicit representation of procedure %s.",type.getName());
 			for (Map.Entry<String,String> entry : prefixToRepresentation.entrySet()) {
 				String prefix = entry.getKey();
 				String representation = entry.getValue();
@@ -148,7 +144,6 @@ class JavaModel {
 					}
 					parameterModel.type = parameter.getType().accept(new ComputeJavaType(classModel.importMapper),typeString);
 					// TODO DRY
-					// TODO overit nutnost kontroly ruznosti NS
 				}
 			}
 		}
