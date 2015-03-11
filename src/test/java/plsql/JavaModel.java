@@ -2,7 +2,9 @@ package plsql;
 
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
+import static org.jdom2.filter.Filters.attribute;
+import static org.jdom2.filter.Filters.element;
+import static pleasejava.Utils.findOnly;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
@@ -17,10 +19,9 @@ import java.util.TreeSet;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.jdom2.Attribute;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
-import org.jdom2.filter.Filters;
+import org.jdom2.filter.Filter;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 
@@ -28,7 +29,6 @@ import pleasejava.Utils;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
-import com.google.common.collect.Iterables;
 import com.google.common.reflect.TypeToken;
 
 /**
@@ -48,7 +48,9 @@ class JavaModel {
 	static class Generator implements TypeVisitor {
 
 		private final JavaModel javaModel;
+		
 		private final Element rootElement;
+		
 		private TypeGraph typeGraph;
 
 		private Generator(JavaModel javaModel, TypeGraph typeGraph, Element rootElement) {
@@ -57,87 +59,70 @@ class JavaModel {
 			this.rootElement = rootElement;
 		}
 
+		private static <T> List<T> evalXpath(Object context, String xpath, Filter<T> filter, Namespace... namespaces) {
+			XPathExpression<T> xpathExpr = XPathFactory.instance().compile(xpath,filter,Collections.emptyMap(),namespaces);
+			List<T> result = xpathExpr.evaluate(context);
+			return result;
+		}
+		
 		@Override
 		public void visitProcedureSignature(ProcedureSignature type) {
 			String name = type.getName();
-			XPathExpression<Element> xpath = XPathFactory.instance().compile("procedure[@name='" + name + "']", Filters.element());
-			Element typeElement = Iterables.getOnlyElement(xpath.evaluate(rootElement),null);
-			List<String> representations = typeElement.getAdditionalNamespaces().stream().map(n -> n.getURI()).collect(toList());
+			Element typeElement = evalXpath(rootElement,"procedure[@name='" + name + "']",element())
+					.stream().collect(findOnly()).orElse(null);
+			List<String> representations = typeElement.getAdditionalNamespaces()
+					.stream().map(n -> n.getURI()).collect(toList());
 			for (String representation : representations) {
 				String className = representation.substring(0,representation.lastIndexOf('.'));
 				String methodName = representation.substring(representation.lastIndexOf('.') + 1);
 				ClassModel classModel = javaModel.classes.computeIfAbsent(className, cn -> new ClassModel(cn,true));
 				MethodModel methodModel = classModel.methods.computeIfAbsent(methodName, mn -> new MethodModel(mn));
-				methodModel.annotations.add(type.accept(new AnnotateType(classModel.importMapper)));
-				for (Map.Entry<String,Parameter> parameterEntry : type.getParameters().entrySet()) {
-					String parameterName = parameterEntry.getKey();
-					Parameter parameter = parameterEntry.getValue();
-					XPathExpression<Attribute> parameterXPath = XPathFactory.instance().compile("*[@name='" + parameterName + "']/@ns:type",
-							Filters.attribute(),Collections.emptyMap(),
-							new Namespace[] {Namespace.getNamespace("ns",representation)}
-					);
-					String attrValue = parameterXPath.evaluateFirst(typeElement).getValue().replace('[','<').replace(']','>');
-					int spc = attrValue.indexOf(' ');
-					String typeString = attrValue.substring(0, spc == -1 ? attrValue.length() : spc);
-					String variableName = spc == -1 ? parameterName : attrValue.substring(spc + 1);
-					ParameterModel parameterModel = methodModel.parameters.computeIfAbsent(variableName, pn -> new ParameterModel(pn));
-					if (parameter.getParameterMode() == ParameterMode.OUT) {
-						parameterModel.annotations.add("@" + classModel.importMapper.add(Plsql.Out.class.getName()));
-					}
-					if (parameter.getParameterMode() == ParameterMode.INOUT) {
-						parameterModel.annotations.add("@" + classModel.importMapper.add(Plsql.InOut.class.getName()));
-					}
-					parameterModel.type = parameter.getType().accept(new ComputeJavaType(classModel.importMapper),typeString);
-				}
+				methodModel.annotations.add(type.accept(new ComputeJavaAnnotation(classModel.importMapper)));
+				generateParameter(type, typeElement, representation, classModel.importMapper, methodModel);
 			}
 		}
-		
+
 		@Override
 		public void visitFunctionSignature(FunctionSignature type) {
 			String name = type.getName();
-			XPathExpression<Element> xpath = XPathFactory.instance().compile("function[@name='" + name + "']", Filters.element());
-			Element typeElement = Iterables.getOnlyElement(xpath.evaluate(rootElement),null);
-			List<String> representations = typeElement.getAdditionalNamespaces().stream().map(n -> n.getURI()).collect(toList());
+			Element typeElement = evalXpath(rootElement,"function[@name='" + name + "']",element())
+					.stream().collect(findOnly()).orElse(null);
+			List<String> representations = typeElement.getAdditionalNamespaces()
+					.stream().map(n -> n.getURI()).collect(toList());
 			for (String representation : representations) {
 				String className = representation.substring(0,representation.lastIndexOf('.'));
 				String methodName = representation.substring(representation.lastIndexOf('.') + 1);
 				ClassModel classModel = javaModel.classes.computeIfAbsent(className, cn -> new ClassModel(cn,true));
 				MethodModel methodModel = classModel.methods.computeIfAbsent(methodName, mn -> new MethodModel(mn));
-				methodModel.annotations.add(type.accept(new AnnotateType(classModel.importMapper)));
-				{
-					XPathExpression<Attribute> returnTypeXPath = XPathFactory.instance().compile("return/@ns:type",
-							Filters.attribute(),Collections.emptyMap(),
-							new Namespace[] {Namespace.getNamespace("ns",representation)}
-					);
-					String attrValue = returnTypeXPath.evaluateFirst(typeElement).getValue().replace('[','<').replace(']','>');
-					String typeString = attrValue;
-					ParameterModel returnTypeModel = methodModel.parameters.computeIfAbsent(null, pn -> new ParameterModel(pn));
-					returnTypeModel.type = type.getReturnType().accept(new ComputeJavaType(classModel.importMapper),typeString);
-				}
-				for (Map.Entry<String,Parameter> parameterEntry : type.getParameters().entrySet()) {
-					String parameterName = parameterEntry.getKey();
-					Parameter parameter = parameterEntry.getValue();
-					XPathExpression<Attribute> parameterXPath = XPathFactory.instance().compile("*[@name='" + parameterName + "']/@ns:type",
-							Filters.attribute(),Collections.emptyMap(),
-							new Namespace[] {Namespace.getNamespace("ns",representation)}
-					);
-					String attrValue = parameterXPath.evaluateFirst(typeElement).getValue().replace('[','<').replace(']','>');
-					int spc = attrValue.indexOf(' ');
-					String typeString = attrValue.substring(0, spc == -1 ? attrValue.length() : spc);
-					String variableName = spc == -1 ? parameterName : attrValue.substring(spc + 1);
-					ParameterModel parameterModel = methodModel.parameters.computeIfAbsent(variableName, pn -> new ParameterModel(pn));
-					if (parameter.getParameterMode() == ParameterMode.OUT) {
-						parameterModel.annotations.add("@" + classModel.importMapper.add(Plsql.Out.class.getName()));
-					}
-					if (parameter.getParameterMode() == ParameterMode.INOUT) {
-						parameterModel.annotations.add("@" + classModel.importMapper.add(Plsql.InOut.class.getName()));
-					}
-					parameterModel.type = parameter.getType().accept(new ComputeJavaType(classModel.importMapper),typeString);
-					// TODO DRY
-				}
+				methodModel.annotations.add(type.accept(new ComputeJavaAnnotation(classModel.importMapper)));
+				String javaTypeString = evalXpath(typeElement, "return/@ns:type", attribute(), Namespace.getNamespace("ns",representation))
+						.stream().findFirst().get().getValue().replace('[','<').replace(']','>');
+				ParameterModel returnTypeModel = methodModel.parameters.computeIfAbsent(null, pn -> new ParameterModel(pn));
+				returnTypeModel.type = type.getReturnType().accept(new ComputeJavaType(classModel.importMapper),javaTypeString);
+				generateParameter(type, typeElement, representation, classModel.importMapper, methodModel);
 			}
 		}
-		
+
+		private static void generateParameter(AbstractSignature type, Element typeElement, String representation, ImportMapper importMapper, MethodModel methodModel) {
+			for (Map.Entry<String,Parameter> parameterEntry : type.getParameters().entrySet()) {
+				String parameterName = parameterEntry.getKey();
+				Parameter parameter = parameterEntry.getValue();
+				String javaTypeStringAndParameterName = evalXpath(typeElement, "*[@name='" + parameterName + "']/@ns:type", attribute(), Namespace.getNamespace("ns",representation))
+						.stream().findFirst().get().getValue().replace('[','<').replace(']','>');
+				int space = javaTypeStringAndParameterName.indexOf(' ');
+				String javaTypeString = javaTypeStringAndParameterName.substring(0, space == -1 ? javaTypeStringAndParameterName.length() : space);
+				String javaParameterName = space == -1 ? parameterName : javaTypeStringAndParameterName.substring(space + 1);
+				ParameterModel parameterModel = methodModel.parameters.computeIfAbsent(javaParameterName, pn -> new ParameterModel(pn));
+				if (parameter.getParameterMode() == ParameterMode.OUT) {
+					parameterModel.annotations.add("@" + importMapper.add(Plsql.Out.class.getName()));
+				}
+				if (parameter.getParameterMode() == ParameterMode.INOUT) {
+					parameterModel.annotations.add("@" + importMapper.add(Plsql.InOut.class.getName()));
+				}
+				parameterModel.type = parameter.getType().accept(new ComputeJavaType(importMapper),javaTypeString);
+			}
+		}
+
 		@Override
 		public void visitRecord(RecordType type) {
 		}
@@ -160,11 +145,15 @@ class JavaModel {
 		
 	}
 
-	static class AnnotateType implements TypeVisitorR<String> {
+	/**
+	 * Generates Java annotation for particular use of PLSQL type. 
+	 * @author Tomas Zalusky
+	 */
+	static class ComputeJavaAnnotation implements TypeVisitorR<String> {
 
 		private final ImportMapper importMapper;
 
-		AnnotateType(ImportMapper importMapper) {
+		ComputeJavaAnnotation(ImportMapper importMapper) {
 			this.importMapper = importMapper;
 		}
 
@@ -204,38 +193,38 @@ class JavaModel {
 			return "@" + importMapper.add(annotation.annotationType().getName()) + annotationStateToString(annotation);
 		}
 		
-	}
-	
-	public static String annotationStateToString(Annotation a) {
-		StringBuilder result = new StringBuilder();
-		try {
-			Class<? extends Annotation> annotationType = a.annotationType();
-			Method[] declaredMethods = annotationType.getDeclaredMethods();
-			if (declaredMethods.length != 0) {
-				result.append("(");
-				if (declaredMethods.length == 1 && "value".equals(declaredMethods[0].getName())) {
-					Object value = declaredMethods[0].invoke(a);
-					result.append(value);
-				} else {
-					String s = Stream.of(annotationType.getDeclaredMethods())
-							.map(m -> {
+		static String annotationStateToString(Annotation a) {
+			StringBuilder result = new StringBuilder();
+			try {
+				Class<? extends Annotation> annotationType = a.annotationType();
+				Method[] declaredMethods = annotationType.getDeclaredMethods();
+				if (declaredMethods.length != 0) {
+					result.append("(");
+					if (declaredMethods.length == 1 && "value".equals(declaredMethods[0].getName())) {
+						Object value = declaredMethods[0].invoke(a);
+						result.append(value);
+					} else {
+						String s = Stream.of(annotationType.getDeclaredMethods())
+								.map(m -> {
 									try {
 										return m.getName() + "=" + m.invoke(a);
 									} catch (Exception e) {
 										throw Throwables.propagate(e);
 									}
-							})
-							.collect(Collectors.joining(", "));
-					result.append(s);
+								})
+								.collect(Collectors.joining(", "));
+						result.append(s);
+					}
+					result.append(")");
 				}
-				result.append(")");
+			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+				throw Throwables.propagate(e);
 			}
-		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-			throw Throwables.propagate(e);
+			return result.toString();
 		}
-		return result.toString();
+		
 	}
-
+	
 	/**
 	 * For given PLSQL type (acceptor) and Java representation (visitor argument), as declared in XML,
 	 * TODO(not true: "verifies if Java representation is legal for PLSQL type" - verification will be done during reading java code, not during generation)
@@ -249,11 +238,11 @@ class JavaModel {
 
 		private final ImportMapper importMapper;
 		
-		private final AnnotateType computeJavaAnnotation;
+		private final ComputeJavaAnnotation computeJavaAnnotation;
 		
 		public ComputeJavaType(ImportMapper importMapper) {
 			this.importMapper = importMapper;
-			this.computeJavaAnnotation = new AnnotateType(importMapper);
+			this.computeJavaAnnotation = new ComputeJavaAnnotation(importMapper);
 		}
 
 		/**
