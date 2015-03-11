@@ -2,9 +2,12 @@ package pleasejava;
 
 import static com.google.common.base.CharMatcher.WHITESPACE;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collector;
 
 import org.junit.Assert;
 import org.junit.ComparisonFailure;
@@ -192,5 +195,33 @@ public class Utils {
 		}
 
 	}
-	
+
+	/**
+	 * JDK8 equivalent to Guava Iterables.getOnlyElement.
+	 * Inspired by http://www.tagwith.com/question_454566_java-8-collector-that-returns-a-value-if-theres-only-a-single-value .
+	 * @return
+	 */
+	public static <T> Collector<T,List<T>,Optional<T>> findOnly() {
+		return Collector.<T,List<T>,Optional<T>>of(
+				() -> new ArrayList<T>(1),
+				(l,e) -> {
+					if (l.size() >= 1) {
+						throw new IllegalStateException("expected one element but was: " + e);
+					} else {
+						l.add(e);
+					}
+				},
+				(l1,l2) -> {
+			    	List<T> result = new ArrayList<T>(1);
+			    	result.addAll(l1);
+			    	result.addAll(l2);
+					if (result.size() >= 2) {
+						throw new IllegalStateException("expected one element but was: " + result.get(1));
+					}
+					return result;
+			    },
+				l -> l.isEmpty() ? Optional.empty() : Optional.of(l.get(0))
+		);
+	}
+
 }
