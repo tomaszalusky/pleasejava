@@ -1,5 +1,11 @@
 package plsql;
 
+import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toList;
+import static org.jdom2.filter.Filters.attribute;
+import static org.jdom2.filter.Filters.element;
+import static pleasejava.Utils.findOnly;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -24,12 +30,6 @@ import pleasejava.Utils;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
 import com.google.common.primitives.Primitives;
-
-import static java.util.stream.Collectors.joining;
-import static java.util.stream.Collectors.toList;
-import static org.jdom2.filter.Filters.attribute;
-import static org.jdom2.filter.Filters.element;
-import static pleasejava.Utils.findOnly;
 
 /**
  * @author Tomas Zalusky
@@ -69,7 +69,7 @@ class JavaModel {
 		public void visitProcedureSignature(ProcedureSignature type) {
 			String name = type.getName();
 			Element typeElement = evalXpath(rootElement,"procedure[@name='" + name + "']",element())
-					.stream().collect(findOnly()).orElse(null);
+					.stream().collect(findOnly()).get();
 			List<String> representations = typeElement.getAdditionalNamespaces()
 					.stream().map(n -> n.getURI()).collect(toList());
 			for (String representation : representations) {
@@ -77,8 +77,8 @@ class JavaModel {
 				String methodName = representation.substring(representation.lastIndexOf('.') + 1);
 				ClassModel classModel = javaModel.classes.computeIfAbsent(className, cn -> new ClassModel(cn,true));
 				MethodModel methodModel = classModel.methods.computeIfAbsent(methodName, mn -> new MethodModel(mn));
-				methodModel.annotations.add(type.accept(new ComputeJavaAnnotation(classModel.importMapper)));
-				generateParameter(type, typeElement, representation, classModel.importMapper, methodModel);
+				methodModel.annotations.add(type.accept(new ComputeJavaAnnotation(classModel.importModel)));
+				generateParameters(type, typeElement, representation, classModel.importModel, methodModel);
 			}
 		}
 
@@ -86,7 +86,7 @@ class JavaModel {
 		public void visitFunctionSignature(FunctionSignature type) {
 			String name = type.getName();
 			Element typeElement = evalXpath(rootElement,"function[@name='" + name + "']",element())
-					.stream().collect(findOnly()).orElse(null);
+					.stream().collect(findOnly()).get();
 			List<String> representations = typeElement.getAdditionalNamespaces()
 					.stream().map(n -> n.getURI()).collect(toList());
 			for (String representation : representations) {
@@ -94,16 +94,16 @@ class JavaModel {
 				String methodName = representation.substring(representation.lastIndexOf('.') + 1);
 				ClassModel classModel = javaModel.classes.computeIfAbsent(className, cn -> new ClassModel(cn,true));
 				MethodModel methodModel = classModel.methods.computeIfAbsent(methodName, mn -> new MethodModel(mn));
-				methodModel.annotations.add(type.accept(new ComputeJavaAnnotation(classModel.importMapper)));
+				methodModel.annotations.add(type.accept(new ComputeJavaAnnotation(classModel.importModel)));
 				String javaTypeString = evalXpath(typeElement, "return/@ns:type", attribute(), Namespace.getNamespace("ns",representation))
 						.stream().findFirst().get().getValue().replace('[','<').replace(']','>');
 				ParameterModel returnTypeModel = methodModel.parameters.computeIfAbsent(null, pn -> new ParameterModel(pn));
-				returnTypeModel.type = type.getReturnType().accept(new ComputeJavaType(classModel.importMapper),javaTypeString);
-				generateParameter(type, typeElement, representation, classModel.importMapper, methodModel);
+				returnTypeModel.type = type.getReturnType().accept(new ComputeJavaType(classModel.importModel),javaTypeString);
+				generateParameters(type, typeElement, representation, classModel.importModel, methodModel);
 			}
 		}
 
-		private static void generateParameter(AbstractSignature type, Element typeElement, String representation, ImportMapper importMapper, MethodModel methodModel) {
+		private static void generateParameters(AbstractSignature type, Element typeElement, String representation, ImportModel importModel, MethodModel methodModel) {
 			for (Map.Entry<String,Parameter> parameterEntry : type.getParameters().entrySet()) {
 				String parameterName = parameterEntry.getKey();
 				Parameter parameter = parameterEntry.getValue();
@@ -114,12 +114,12 @@ class JavaModel {
 				String javaParameterName = space == -1 ? parameterName : javaTypeStringAndParameterName.substring(space + 1);
 				ParameterModel parameterModel = methodModel.parameters.computeIfAbsent(javaParameterName, pn -> new ParameterModel(pn));
 				if (parameter.getParameterMode() == ParameterMode.OUT) {
-					parameterModel.annotations.add("@" + importMapper.add(Plsql.Out.class.getName()));
+					parameterModel.annotations.add("@" + importModel.add(Plsql.Out.class.getName()));
 				}
 				if (parameter.getParameterMode() == ParameterMode.INOUT) {
-					parameterModel.annotations.add("@" + importMapper.add(Plsql.InOut.class.getName()));
+					parameterModel.annotations.add("@" + importModel.add(Plsql.InOut.class.getName()));
 				}
-				parameterModel.type = parameter.getType().accept(new ComputeJavaType(importMapper),javaTypeString);
+				parameterModel.type = parameter.getType().accept(new ComputeJavaType(importModel),javaTypeString);
 			}
 		}
 
@@ -127,7 +127,7 @@ class JavaModel {
 		public void visitRecord(RecordType type) {
 			String name = type.getName();
 			Element typeElement = evalXpath(rootElement,"record[@name='" + name + "']",element())
-					.stream().collect(findOnly()).orElse(null);
+					.stream().collect(findOnly()).get();
 			List<String> representations = typeElement.getAdditionalNamespaces()
 					.stream().map(n -> n.getURI()).collect(toList());
 			for (String representation : representations) {
@@ -142,10 +142,9 @@ class JavaModel {
 					String javaTypeString = javaTypeStringAndFieldName.substring(0, space == -1 ? javaTypeStringAndFieldName.length() : space);
 					String javaFieldName = space == -1 ? fieldName : javaTypeStringAndFieldName.substring(space + 1);
 					FieldModel fieldModel = classModel.fields.computeIfAbsent(javaFieldName, fn -> new FieldModel(fn));
-					fieldModel.type = fieldType.accept(new ComputeJavaType(classModel.importMapper),javaTypeString);
+					fieldModel.type = fieldType.accept(new ComputeJavaType(classModel.importModel),javaTypeString);
 				}
 			}
-			// TODO bugs: orElse(null), generateParameters, importmodel, spacing in @Number
 		}
 
 		@Override
@@ -172,20 +171,20 @@ class JavaModel {
 	 */
 	static class ComputeJavaAnnotation implements TypeVisitorR<String> {
 
-		private final ImportMapper importMapper;
+		private final ImportModel importModel;
 
-		ComputeJavaAnnotation(ImportMapper importMapper) {
-			this.importMapper = importMapper;
+		ComputeJavaAnnotation(ImportModel importModel) {
+			this.importModel = importModel;
 		}
 
 		@Override
 		public String visitProcedureSignature(ProcedureSignature type) {
-			return "@" + importMapper.add(Plsql.Procedure.class.getName()) + "(\"" + type.getName() + "\")";
+			return "@" + importModel.add(Plsql.Procedure.class.getName()) + "(\"" + type.getName() + "\")";
 		}
 		
 		@Override
 		public String visitFunctionSignature(FunctionSignature type) {
-			return "@" + importMapper.add(Plsql.Function.class.getName()) + "(\"" + type.getName() + "\")";
+			return "@" + importModel.add(Plsql.Function.class.getName()) + "(\"" + type.getName() + "\")";
 		}
 		
 		@Override
@@ -195,23 +194,23 @@ class JavaModel {
 
 		@Override
 		public String visitVarray(VarrayType type) {
-			return "@" + importMapper.add(Plsql.Varray.class.getName()) + "(\"" + type.getName() + "\")";
+			return "@" + importModel.add(Plsql.Varray.class.getName()) + "(\"" + type.getName() + "\")";
 		}
 
 		@Override
 		public String visitNestedTable(NestedTableType type) {
-			return "@" + importMapper.add(Plsql.NestedTable.class.getName()) + "(\"" + type.getName() + "\")";
+			return "@" + importModel.add(Plsql.NestedTable.class.getName()) + "(\"" + type.getName() + "\")";
 		}
 
 		@Override
 		public String visitIndexByTable(IndexByTableType type) {
-			return "@" + importMapper.add(Plsql.IndexByTable.class.getName()) + "(\"" + type.getName() + "\")";
+			return "@" + importModel.add(Plsql.IndexByTable.class.getName()) + "(\"" + type.getName() + "\")";
 		}
 
 		@Override
 		public String visitPrimitive(AbstractPrimitiveType type) {
 			Annotation annotation = type.getAnnotation();
-			return "@" + importMapper.add(annotation.annotationType().getName()) + annotationStateToString(annotation);
+			return "@" + importModel.add(annotation.annotationType().getName()) + annotationStateToString(annotation);
 		}
 		
 		static String annotationStateToString(Annotation a) {
@@ -233,7 +232,7 @@ class JavaModel {
 										throw Throwables.propagate(e);
 									}
 								})
-								.collect(Collectors.joining(", "));
+								.collect(Collectors.joining(","));
 						result.append(s);
 					}
 					result.append(")");
@@ -257,13 +256,13 @@ class JavaModel {
 	 */
 	static class ComputeJavaType implements TypeVisitorAR<String,String> {
 
-		private final ImportMapper importMapper;
+		private final ImportModel importModel;
 		
 		private final ComputeJavaAnnotation computeJavaAnnotation;
 		
-		public ComputeJavaType(ImportMapper importMapper) {
-			this.importMapper = importMapper;
-			this.computeJavaAnnotation = new ComputeJavaAnnotation(importMapper);
+		public ComputeJavaType(ImportModel importModel) {
+			this.importModel = importModel;
+			this.computeJavaAnnotation = new ComputeJavaAnnotation(importModel);
 		}
 
 		/**
@@ -303,7 +302,7 @@ class JavaModel {
 
 		@Override
 		public String visitRecord(RecordType type, String typeString) {
-			return importMapper.add(typeString); /* record classes are annotated themselves, no need to annotate them at the point of use */
+			return importModel.add(typeString); /* record classes are annotated themselves, no need to annotate them at the point of use */
 		}
 
 		@Override
@@ -327,7 +326,7 @@ class JavaModel {
 				} case "java.util.List" : case "java.util.Vector" : {
 					String elementTypeString = typeString.substring(l + 1,r);
 					String elementJavaType = elementType.accept(this,elementTypeString);
-					Utils.appendf(result, "%s %s<%s>",typeAnnotation,importMapper.add(typeName),elementJavaType);
+					Utils.appendf(result, "%s %s<%s>",typeAnnotation,importModel.add(typeName),elementJavaType);
 					break;
 				} default : {
 					throw new IllegalStateException("java type " + typeName + " cannot be used for varrays");
@@ -352,7 +351,7 @@ class JavaModel {
 					String keyJavaType = typeString.substring(l + 1,c);
 					String elementTypeString = typeString.substring(c + 1,r);
 					String elementJavaType = elementType.accept(this,elementTypeString);
-					Utils.appendf(result, "%s %s<%s,%s>",typeAnnotation,importMapper.add(typeName),importMapper.add(keyJavaType),elementJavaType);
+					Utils.appendf(result, "%s %s<%s,%s>",typeAnnotation,importModel.add(typeName),importModel.add(keyJavaType),elementJavaType);
 					break;
 				} case "java.lang.Array" : {
 					String elementTypeString = typeString.substring(l + 1,r);
@@ -364,7 +363,7 @@ class JavaModel {
 				} case "java.util.List" : case "java.util.Vector" : {
 					String elementTypeString = typeString.substring(l + 1,r);
 					String elementJavaType = elementType.accept(this,elementTypeString);
-					Utils.appendf(result, "%s %s<%s>",typeAnnotation,importMapper.add(typeName),elementJavaType);
+					Utils.appendf(result, "%s %s<%s>",typeAnnotation,importModel.add(typeName),elementJavaType);
 					break;
 				} default : {
 					throw new IllegalStateException("java type " + typeName + " cannot be used for nested table");
@@ -390,7 +389,7 @@ class JavaModel {
 					String keyTypeAnnotation = type.getIndexType().accept(computeJavaAnnotation);
 					String elementTypeString = typeString.substring(c + 1,r);
 					String elementJavaType = elementType.accept(this,elementTypeString);
-					Utils.appendf(result, "%s %s<%s %s,%s>",typeAnnotation,importMapper.add(typeName),keyTypeAnnotation,importMapper.add(keyJavaType),elementJavaType);
+					Utils.appendf(result, "%s %s<%s %s,%s>",typeAnnotation,importModel.add(typeName),keyTypeAnnotation,importModel.add(keyJavaType),elementJavaType);
 					break;
 				} default : {
 					throw new IllegalStateException("java type " + typeName + " cannot be used for nested table");
@@ -402,14 +401,13 @@ class JavaModel {
 		@Override
 		public String visitPrimitive(AbstractPrimitiveType type, String typeString) {
 			String typeAnnotation = type.accept(computeJavaAnnotation);
-			String result = String.format("%s %s",typeAnnotation,importMapper.add(typeString));
+			String result = String.format("%s %s",typeAnnotation,importModel.add(typeString));
 			return result;
 		}
-
 		
 	}	
 
-	private static class ImportMapper {
+	private static class ImportModel {
 		
 		private SortedSet<String> imports = new TreeSet<>();
 		
@@ -448,7 +446,7 @@ class JavaModel {
 		
 		private final boolean isInterface;
 		
-		private final ImportMapper importMapper = new ImportMapper();
+		private final ImportModel importModel = new ImportModel();
 		
 		private final Map<String,FieldModel> fields = new LinkedHashMap<>();
 		
@@ -461,7 +459,7 @@ class JavaModel {
 
 		public String toString() {
 			StringBuilder result = new StringBuilder();
-			Utils.appendf(result, "CLASS MODEL (%s %s)%n%s%n\t\tFIELDS:", isInterface ? "interface" : "class", name, importMapper);
+			Utils.appendf(result, "CLASS MODEL (%s %s)%n%s%n\t\tFIELDS:", isInterface ? "interface" : "class", name, importModel);
 			for (Map.Entry<String,FieldModel> e : fields.entrySet()) {
 				Utils.appendf(result, "%n\t\t\t%s = %s", e.getKey(), e.getValue());
 			}

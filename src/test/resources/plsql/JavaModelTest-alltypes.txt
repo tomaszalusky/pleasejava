@@ -150,7 +150,7 @@ JAVA MODEL:
 			ibt4 = FIELD MODEL (ibt4)
 				ANNOTATIONS:
 				TYPE:
-					@IndexByTable("a_test_package.ibt4") Map<@Varchar2(10) String,@Number_(value=30, scale=0) BigInteger>
+					@IndexByTable("a_test_package.ibt4") Map<@Varchar2(10) String,@Number_(value=30,scale=0) BigInteger>
 			binary = FIELD MODEL (binary)
 				ANNOTATIONS:
 				TYPE:
