@@ -188,8 +188,6 @@ JAVA MODEL:
 		METHODS:
 	pleasejava.test.alltypes.Record3 = CLASS MODEL (class pleasejava.test.alltypes.Record3)
 		IMPORTS:
-			boolean
-			int
 			plsql.Plsql.Boolean_
 			plsql.Plsql.Integer_
 		FIELDS:

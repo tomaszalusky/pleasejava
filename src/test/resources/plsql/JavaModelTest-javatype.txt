@@ -38,7 +38,6 @@ JAVA MODEL:
 							RecordB2 @NestedTable("a_test_package.tableofrec") []
 	pleasejava.test.RecordA1 = CLASS MODEL (class pleasejava.test.RecordA1)
 		IMPORTS:
-			int
 			plsql.Plsql.Integer_
 			plsql.Plsql.Varchar2
 		FIELDS:
@@ -68,7 +67,6 @@ JAVA MODEL:
 		METHODS:
 	pleasejava.test.RecordA2 = CLASS MODEL (class pleasejava.test.RecordA2)
 		IMPORTS:
-			int
 			plsql.Plsql.Integer_
 			plsql.Plsql.Varchar2
 		FIELDS:

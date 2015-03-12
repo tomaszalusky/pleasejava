@@ -23,6 +23,7 @@ import pleasejava.Utils;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
+import com.google.common.primitives.Primitives;
 
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
@@ -144,7 +145,6 @@ class JavaModel {
 					fieldModel.type = fieldType.accept(new ComputeJavaType(classModel.importMapper),javaTypeString);
 				}
 			}
-			// TODO import primitives - bug
 			// TODO bugs: orElse(null), generateParameters, importmodel, spacing in @Number
 		}
 
@@ -415,7 +415,8 @@ class JavaModel {
 		
 		String add(String className) {
 			String fullJavaName = className.replace('$','.');
-			if (!fullJavaName.startsWith("java.lang.")) {
+			if (!fullJavaName.startsWith("java.lang.")
+					&& !Primitives.allPrimitiveTypes().stream().anyMatch(c -> c.getName().equals(className))) {
 				imports.add(fullJavaName);
 			}
 			int lastDot = fullJavaName.lastIndexOf('.');
