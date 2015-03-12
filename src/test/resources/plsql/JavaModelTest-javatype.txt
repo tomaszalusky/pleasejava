@@ -10,6 +10,7 @@ JAVA MODEL:
 			pleasejava.test.RecordB2
 			plsql.Plsql.NestedTable
 			plsql.Plsql.Procedure
+		FIELDS:
 		METHODS:
 			m1 = METHOD MODEL (m1)
 				ANNOTATIONS:
@@ -35,3 +36,63 @@ JAVA MODEL:
 						ANNOTATIONS:
 						TYPE:
 							RecordB2 @NestedTable("a_test_package.tableofrec") []
+	pleasejava.test.RecordA1 = CLASS MODEL (class pleasejava.test.RecordA1)
+		IMPORTS:
+			int
+			plsql.Plsql.Integer_
+			plsql.Plsql.Varchar2
+		FIELDS:
+			fi = FIELD MODEL (fi)
+				ANNOTATIONS:
+				TYPE:
+					@Integer_ int
+			fs = FIELD MODEL (fs)
+				ANNOTATIONS:
+				TYPE:
+					@Varchar2(200) String
+		METHODS:
+	pleasejava.test.RecordB1 = CLASS MODEL (class pleasejava.test.RecordB1)
+		IMPORTS:
+			java.math.BigInteger
+			plsql.Plsql.Integer_
+			plsql.Plsql.Varchar2
+		FIELDS:
+			fi = FIELD MODEL (fi)
+				ANNOTATIONS:
+				TYPE:
+					@Integer_ BigInteger
+			fs = FIELD MODEL (fs)
+				ANNOTATIONS:
+				TYPE:
+					@Varchar2(200) String
+		METHODS:
+	pleasejava.test.RecordA2 = CLASS MODEL (class pleasejava.test.RecordA2)
+		IMPORTS:
+			int
+			plsql.Plsql.Integer_
+			plsql.Plsql.Varchar2
+		FIELDS:
+			fi = FIELD MODEL (fi)
+				ANNOTATIONS:
+				TYPE:
+					@Integer_ int
+			fs = FIELD MODEL (fs)
+				ANNOTATIONS:
+				TYPE:
+					@Varchar2(200) StringBuilder
+		METHODS:
+	pleasejava.test.RecordB2 = CLASS MODEL (class pleasejava.test.RecordB2)
+		IMPORTS:
+			java.math.BigInteger
+			plsql.Plsql.Integer_
+			plsql.Plsql.Varchar2
+		FIELDS:
+			fi = FIELD MODEL (fi)
+				ANNOTATIONS:
+				TYPE:
+					@Integer_ BigInteger
+			fs = FIELD MODEL (fs)
+				ANNOTATIONS:
+				TYPE:
+					@Varchar2(200) StringBuilder
+		METHODS:

@@ -1,11 +1,5 @@
 package plsql;
 
-import static java.util.stream.Collectors.joining;
-import static java.util.stream.Collectors.toList;
-import static org.jdom2.filter.Filters.attribute;
-import static org.jdom2.filter.Filters.element;
-import static pleasejava.Utils.findOnly;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -29,7 +23,12 @@ import pleasejava.Utils;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
-import com.google.common.reflect.TypeToken;
+
+import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toList;
+import static org.jdom2.filter.Filters.attribute;
+import static org.jdom2.filter.Filters.element;
+import static pleasejava.Utils.findOnly;
 
 /**
  * @author Tomas Zalusky
@@ -125,6 +124,28 @@ class JavaModel {
 
 		@Override
 		public void visitRecord(RecordType type) {
+			String name = type.getName();
+			Element typeElement = evalXpath(rootElement,"record[@name='" + name + "']",element())
+					.stream().collect(findOnly()).orElse(null);
+			List<String> representations = typeElement.getAdditionalNamespaces()
+					.stream().map(n -> n.getURI()).collect(toList());
+			for (String representation : representations) {
+				String className = representation;
+				ClassModel classModel = javaModel.classes.computeIfAbsent(className, cn -> new ClassModel(cn,false));
+				for (Map.Entry<String,AbstractType> fieldEntry : type.getFields().entrySet()) {
+					String fieldName = fieldEntry.getKey();
+					AbstractType fieldType = fieldEntry.getValue();
+					String javaTypeStringAndFieldName = evalXpath(typeElement, "field[@name='" + fieldName + "']/@ns:type", attribute(), Namespace.getNamespace("ns",representation))
+							.stream().findFirst().get().getValue().replace('[','<').replace(']','>');
+					int space = javaTypeStringAndFieldName.indexOf(' ');
+					String javaTypeString = javaTypeStringAndFieldName.substring(0, space == -1 ? javaTypeStringAndFieldName.length() : space);
+					String javaFieldName = space == -1 ? fieldName : javaTypeStringAndFieldName.substring(space + 1);
+					FieldModel fieldModel = classModel.fields.computeIfAbsent(javaFieldName, fn -> new FieldModel(fn));
+					fieldModel.type = fieldType.accept(new ComputeJavaType(classModel.importMapper),javaTypeString);
+				}
+			}
+			// TODO import primitives - bug
+			// TODO bugs: orElse(null), generateParameters, importmodel, spacing in @Number
 		}
 
 		@Override
@@ -439,7 +460,11 @@ class JavaModel {
 
 		public String toString() {
 			StringBuilder result = new StringBuilder();
-			Utils.appendf(result, "CLASS MODEL (%s %s)%n%s%n\t\tMETHODS:", isInterface ? "interface" : "class", name, importMapper);
+			Utils.appendf(result, "CLASS MODEL (%s %s)%n%s%n\t\tFIELDS:", isInterface ? "interface" : "class", name, importMapper);
+			for (Map.Entry<String,FieldModel> e : fields.entrySet()) {
+				Utils.appendf(result, "%n\t\t\t%s = %s", e.getKey(), e.getValue());
+			}
+			Utils.appendf(result,"%n\t\tMETHODS:");
 			for (Map.Entry<String,MethodModel> e : methods.entrySet()) {
 				Utils.appendf(result, "%n\t\t\t%s = %s", e.getKey(), e.getValue());
 			}
@@ -450,12 +475,26 @@ class JavaModel {
 	
 	private static class FieldModel {
 		
-		private String name;
+		private final String name;
 		
-		private TypeToken<?> type;
+		private final List<String> annotations = new ArrayList<>();
 		
-		private List<Annotation> annotations;
+		private String type;
 		
+		public FieldModel(String name) {
+			this.name = name;
+		}
+
+		public String toString() {
+			StringBuilder result = new StringBuilder();
+			Utils.appendf(result, "FIELD MODEL (%s)%n\t\t\t\tANNOTATIONS:", name);
+			for (String annotation : annotations) {
+				Utils.appendf(result, "%n\t\t\t\t\t%s",annotation);
+			}
+			Utils.appendf(result, "%n\t\t\t\tTYPE:%n\t\t\t\t\t%s",type);
+			return result.toString();
+		}
+
 	}
 
 	private static class MethodModel {

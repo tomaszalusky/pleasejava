@@ -20,6 +20,7 @@ JAVA MODEL:
 			plsql.Plsql.String_
 			plsql.Plsql.Varchar2
 			plsql.Plsql.Varray
+		FIELDS:
 		METHODS:
 			echo = METHOD MODEL (echo)
 				ANNOTATIONS:
@@ -128,3 +129,76 @@ JAVA MODEL:
 							@Out
 						TYPE:
 							@Clob StringBuilder
+	pleasejava.test.alltypes.Record1 = CLASS MODEL (class pleasejava.test.alltypes.Record1)
+		IMPORTS:
+			java.math.BigInteger
+			java.util.List
+			java.util.Map
+			pleasejava.test.alltypes.Record3
+			plsql.Plsql.BinaryInteger
+			plsql.Plsql.IndexByTable
+			plsql.Plsql.NestedTable
+			plsql.Plsql.Number_
+			plsql.Plsql.String_
+			plsql.Plsql.Varchar2
+			plsql.Plsql.Varray
+		FIELDS:
+			nst4 = FIELD MODEL (nst4)
+				ANNOTATIONS:
+				TYPE:
+					@NestedTable("a_test_package.nst4") List<Record3>
+			ibt4 = FIELD MODEL (ibt4)
+				ANNOTATIONS:
+				TYPE:
+					@IndexByTable("a_test_package.ibt4") Map<@Varchar2(10) String,@Number_(value=30, scale=0) BigInteger>
+			binary = FIELD MODEL (binary)
+				ANNOTATIONS:
+				TYPE:
+					@BinaryInteger Integer
+			ibt5 = FIELD MODEL (ibt5)
+				ANNOTATIONS:
+				TYPE:
+					@IndexByTable("a_test_package.ibt5") Map<@String_(20) String,@Varchar2(100) String @Varray("a_test_package.var5") []>
+		METHODS:
+	pleasejava.test.alltypes.Record2 = CLASS MODEL (class pleasejava.test.alltypes.Record2)
+		IMPORTS:
+			java.math.BigInteger
+			java.util.List
+			pleasejava.test.alltypes.Record3
+			plsql.Plsql.PlsInteger
+			plsql.Plsql.Varchar2
+			plsql.Plsql.Varray
+		FIELDS:
+			var5 = FIELD MODEL (var5)
+				ANNOTATIONS:
+				TYPE:
+					@Varray("a_test_package.var5") List<@Varchar2(100) String>
+			firstRec3 = FIELD MODEL (firstRec3)
+				ANNOTATIONS:
+				TYPE:
+					Record3
+			pls = FIELD MODEL (pls)
+				ANNOTATIONS:
+				TYPE:
+					@PlsInteger BigInteger
+			secondRec3 = FIELD MODEL (secondRec3)
+				ANNOTATIONS:
+				TYPE:
+					Record3
+		METHODS:
+	pleasejava.test.alltypes.Record3 = CLASS MODEL (class pleasejava.test.alltypes.Record3)
+		IMPORTS:
+			boolean
+			int
+			plsql.Plsql.Boolean_
+			plsql.Plsql.Integer_
+		FIELDS:
+			theBoolean = FIELD MODEL (theBoolean)
+				ANNOTATIONS:
+				TYPE:
+					@Boolean_ boolean
+			theInt = FIELD MODEL (theInt)
+				ANNOTATIONS:
+				TYPE:
+					@Integer_ int
+		METHODS:
