@@ -43,6 +43,6 @@
 			<artifactId>saxpath</artifactId>
 			<version>1.0-FCS</version>
 			<scope>test</scope>
-		</dependency>		
+		</dependency>
 	</dependencies>
 </project>

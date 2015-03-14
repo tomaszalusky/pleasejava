@@ -1,5 +1,5 @@
 JAVA MODEL:
-	pleasejava.test.TestInterface = CLASS MODEL (interface pleasejava.test.TestInterface)
+	pleasejava.test.javatype.TestInterface = CLASS MODEL (interface pleasejava.test.javatype.TestInterface)
 		IMPORTS:
 			java.util.List
 			java.util.Map
@@ -36,7 +36,7 @@ JAVA MODEL:
 						ANNOTATIONS:
 						TYPE:
 							RecordB2 @NestedTable("a_test_package.tableofrec") []
-	pleasejava.test.RecordA1 = CLASS MODEL (class pleasejava.test.RecordA1)
+	pleasejava.test.javatype.RecordA1 = CLASS MODEL (class pleasejava.test.javatype.RecordA1)
 		IMPORTS:
 			plsql.Plsql.Integer_
 			plsql.Plsql.Varchar2
@@ -50,7 +50,7 @@ JAVA MODEL:
 				TYPE:
 					@Varchar2(200) String
 		METHODS:
-	pleasejava.test.RecordB1 = CLASS MODEL (class pleasejava.test.RecordB1)
+	pleasejava.test.javatype.RecordB1 = CLASS MODEL (class pleasejava.test.javatype.RecordB1)
 		IMPORTS:
 			java.math.BigInteger
 			plsql.Plsql.Integer_
@@ -65,7 +65,7 @@ JAVA MODEL:
 				TYPE:
 					@Varchar2(200) String
 		METHODS:
-	pleasejava.test.RecordA2 = CLASS MODEL (class pleasejava.test.RecordA2)
+	pleasejava.test.javatype.RecordA2 = CLASS MODEL (class pleasejava.test.javatype.RecordA2)
 		IMPORTS:
 			plsql.Plsql.Integer_
 			plsql.Plsql.Varchar2
@@ -79,7 +79,7 @@ JAVA MODEL:
 				TYPE:
 					@Varchar2(200) StringBuilder
 		METHODS:
-	pleasejava.test.RecordB2 = CLASS MODEL (class pleasejava.test.RecordB2)
+	pleasejava.test.javatype.RecordB2 = CLASS MODEL (class pleasejava.test.javatype.RecordB2)
 		IMPORTS:
 			java.math.BigInteger
 			plsql.Plsql.Integer_

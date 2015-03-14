@@ -3,9 +3,8 @@
  *   - smysl anotaci: pokryti PLSQL typu Java typy
  *     - rozlisit TypeGraph (k cemu se data v nem ulozena budou vyuzivat, a data XML pro Java model)
  *       - typeGraph.toJavaModel(xml);
- *         - vygenerovat recordy
- *         - JavaModel.toString
  *         - vygenerovat Java tridy
+ *         - record=true nahradit za systemovou property
  *         - co nejdrive element z input streamu
  *     - pak prizpusobit anotace reprezentujici PLSQL typy podobe struktury TypeGraph
  *   - vycet podporovanych typu: stabilizovat shodu Plsql s typy v XML, pozdeji rozsirit na uplny vycet, pozdeji doplnit i odkladane typy (REF cursor, objekty, uzivatelske subtypy - pocitat s nimi jiz ted)
@@ -42,5 +41,39 @@
  *     @NestedTable("NameList") public @interface DutyRoster {}
  *   - dalsi priklad @Integer_(3) public @interface MyInteger
  *   - metaanotaci Type nebude treba zverejnovat
+ * - generator postavit na
+  		<dependency>
+			<groupId>com.squareup</groupId>
+			<artifactId>javapoet</artifactId>
+			<version>1.0.0</version>
+			<scope>test</scope>
+		</dependency>
+     ale zatim nelze, neumi JDK8 type annotations, ceka na https://github.com/square/javapoet/issues/136
+     			// https://square.github.io/javapoet/javadoc/javapoet/index.html?com/squareup/javapoet/package-tree.html
+			TypeSpec clazz = TypeSpec.classBuilder(name.substring(name.lastIndexOf('.') + 1))
+				    .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
+				    .addField(FieldSpec.builder(ParameterizedTypeName.get(ClassName.get(List.class),ClassName.get(String.class)),
+				    		"foo", Modifier.FINAL)
+				    		.build())
+				    .addField(FieldSpec.builder(ClassName.get("com.example","Hoo"),
+				    		"foo2", Modifier.FINAL)
+				    		.build())
+				    .addField(FieldSpec.builder(ParameterizedTypeName.get(
+				    		ClassName.get(List.class),
+				    		AnnotationSpec.
+				    		ClassName.get("com.example","Hoo")
+				    ),
+				    		"foo3", Modifier.FINAL)
+				    		.build())
+				    .build();
+			JavaFile javaFile = JavaFile.builder(name.substring(0,name.lastIndexOf('.')),clazz)
+					.indent("\t").build();
+			try {
+				javaFile.writeTo(buf);
+			} catch (IOException e) {
+				throw Throwables.propagate(e);
+			}
+			System.out.println(javaFile.toString());
+
  */
 package pleasejava;

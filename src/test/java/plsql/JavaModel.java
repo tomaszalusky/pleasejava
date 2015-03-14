@@ -44,6 +44,29 @@ class JavaModel {
 		}
 		return javaModel;
 	}
+
+	private static String extractPackageName(String fullClassNameAndMaybeMethod) {
+		return fullClassNameAndMaybeMethod.substring(0,fullClassNameAndMaybeMethod.lastIndexOf('.'));
+	}
+
+	private static String extractFullClassName(String fullClassNameAndMaybeMethod) {
+		String result = extractPackageName(fullClassNameAndMaybeMethod) + "." + extractSimpleClassName(fullClassNameAndMaybeMethod);
+		return result;
+	}
+
+	private static String extractSimpleClassName(String fullClassNameAndMaybeMethod) {
+		String classAndMaybeMethod = fullClassNameAndMaybeMethod.substring(fullClassNameAndMaybeMethod.lastIndexOf('.') + 1);
+		int doubleColon = classAndMaybeMethod.indexOf("::");
+		String result = doubleColon == -1 ? classAndMaybeMethod : classAndMaybeMethod.substring(0,doubleColon);
+		return result;
+	}
+
+	private static String extractMethodName(String fullClassNameAndMaybeMethod) {
+		String classAndMaybeMethod = fullClassNameAndMaybeMethod.substring(fullClassNameAndMaybeMethod.lastIndexOf('.') + 1);
+		int doubleColon = classAndMaybeMethod.indexOf("::");
+		String result = doubleColon == -1 ? null : classAndMaybeMethod.substring(doubleColon + 2);
+		return result;
+	}
 	
 	static class Generator implements TypeVisitor {
 
@@ -73,8 +96,8 @@ class JavaModel {
 			List<String> representations = typeElement.getAdditionalNamespaces()
 					.stream().map(n -> n.getURI()).collect(toList());
 			for (String representation : representations) {
-				String className = representation.substring(0,representation.lastIndexOf('.'));
-				String methodName = representation.substring(representation.lastIndexOf('.') + 1);
+				String className = extractFullClassName(representation);
+				String methodName = extractMethodName(representation);
 				ClassModel classModel = javaModel.classes.computeIfAbsent(className, cn -> new ClassModel(cn,true));
 				MethodModel methodModel = classModel.methods.computeIfAbsent(methodName, mn -> new MethodModel(mn));
 				methodModel.annotations.add(type.accept(new ComputeJavaAnnotation(classModel.importModel)));
@@ -90,8 +113,8 @@ class JavaModel {
 			List<String> representations = typeElement.getAdditionalNamespaces()
 					.stream().map(n -> n.getURI()).collect(toList());
 			for (String representation : representations) {
-				String className = representation.substring(0,representation.lastIndexOf('.'));
-				String methodName = representation.substring(representation.lastIndexOf('.') + 1);
+				String className = extractFullClassName(representation);
+				String methodName = extractMethodName(representation);
 				ClassModel classModel = javaModel.classes.computeIfAbsent(className, cn -> new ClassModel(cn,true));
 				MethodModel methodModel = classModel.methods.computeIfAbsent(methodName, mn -> new MethodModel(mn));
 				methodModel.annotations.add(type.accept(new ComputeJavaAnnotation(classModel.importModel)));
@@ -426,18 +449,13 @@ class JavaModel {
 			String result = String.format("\t\tIMPORTS:%s",imports.stream().map(s -> String.format("%n\t\t\t%s",s)).collect(joining()));
 			return result;
 		}
-		
-	}
-	
-	private Map<String,ClassModel> classes = new LinkedHashMap<>();
 
-	public String toString() {
-		StringBuilder result = new StringBuilder();
-		Utils.appendf(result, "JAVA MODEL:%n");
-		for (Map.Entry<String,ClassModel> e : classes.entrySet()) {
-			Utils.appendf(result, "\t%s = %s%n", e.getKey(), e.getValue());
+		public String toJavaSource() {
+			StringBuilder result = new StringBuilder();
+			imports.stream().forEach(i -> Utils.appendf(result,"import %s;%n",i));
+			return result.toString();
 		}
-		return result.toString();
+		
 	}
 	
 	private static class ClassModel {
@@ -468,6 +486,14 @@ class JavaModel {
 				Utils.appendf(result, "%n\t\t\t%s = %s", e.getKey(), e.getValue());
 			}
 			return result.toString();
+		}
+
+		String toJavaSource() {
+			StringBuilder buf = new StringBuilder();
+			Utils.appendf(buf,"package %s;%n%n",extractPackageName(name));
+			Utils.appendf(buf,"%s%n",importModel.toJavaSource());
+			// TODO 
+			return buf.toString();
 		}
 		
 	}
@@ -553,4 +579,23 @@ class JavaModel {
 
 	}
 
+	private Map<String,ClassModel> classes = new LinkedHashMap<>();
+
+	public String toString() {
+		StringBuilder result = new StringBuilder();
+		Utils.appendf(result, "JAVA MODEL:%n");
+		for (Map.Entry<String,ClassModel> e : classes.entrySet()) {
+			Utils.appendf(result, "\t%s = %s%n", e.getKey(), e.getValue());
+		}
+		return result.toString();
+	}
+	
+	Map<String,String> toJavaSources() {
+		Map<String,String> result = new LinkedHashMap<>();
+		for (Map.Entry<String,ClassModel> e : classes.entrySet()) {
+			result.put(e.getKey(),e.getValue().toJavaSource());
+		}
+		return result;
+	}
+	
 }

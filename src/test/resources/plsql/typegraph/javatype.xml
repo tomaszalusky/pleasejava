@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <typegraph>
-	<procedure name="a_test_package.foo" xmlns:java1="pleasejava.test.TestInterface.m1" xmlns:java2="pleasejava.test.TestInterface.m2">
+	<procedure name="a_test_package.foo" xmlns:java1="pleasejava.test.javatype.TestInterface::m1" xmlns:java2="pleasejava.test.javatype.TestInterface::m2">
 		<in name="a" type="a_test_package.tableofrec" java1:type="java.util.List[pleasejava.test.RecordA1] a1"   java2:type="java.util.Map[java.lang.Integer,pleasejava.test.RecordA2] a2" />
 		<in name="b" type="a_test_package.tableofrec" java1:type="java.util.Vector[pleasejava.test.RecordB1] b1" java2:type="java.lang.Array[pleasejava.test.RecordB2] b2" />
 	</procedure>
 	<nestedtable name="a_test_package.tableofrec" of="a_test_package.rec" />
-	<record name="a_test_package.rec" xmlns:java1="pleasejava.test.RecordA1" xmlns:java2="pleasejava.test.RecordB1" xmlns:java3="pleasejava.test.RecordA2" xmlns:java4="pleasejava.test.RecordB2">
+	<record name="a_test_package.rec" xmlns:java1="pleasejava.test.javatype.RecordA1" xmlns:java2="pleasejava.test.javatype.RecordB1" xmlns:java3="pleasejava.test.javatype.RecordA2" xmlns:java4="pleasejava.test.javatype.RecordB2">
 		<field name="fi" type="integer"       java1:type="int"              java2:type="java.math.BigInteger" java3:type="int"                     java4:type="java.math.BigInteger" />
 		<field name="fs" type="varchar2(200)" java1:type="java.lang.String" java2:type="java.lang.String"     java3:type="java.lang.StringBuilder" java4:type="java.lang.StringBuilder" />
 	</record>

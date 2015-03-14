@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <typegraph>
-	<function name="echo" xmlns:java="pleasejava.test.alltypes.TestInterface.echo">
+	<function name="echo" xmlns:java="pleasejava.test.alltypes.TestInterface::echo">
 		<return type="integer" java:type="java.math.BigInteger" />
 		<in name="pi_ibt1" type="a_test_package.ibt1" java:type="java.util.Map[java.lang.Integer,pleasejava.test.alltypes.Record2] inputIbt1" />
 		<in name="pi_var1" type="a_test_package.var1" java:type="java.util.List[java.util.List[pleasejava.test.alltypes.Record3]] inputVar1" />
