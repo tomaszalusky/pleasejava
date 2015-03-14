@@ -428,7 +428,7 @@ class JavaModel {
 			return result;
 		}
 		
-	}	
+	}
 
 	private static class ImportModel {
 		
@@ -490,9 +490,14 @@ class JavaModel {
 
 		String toJavaSource() {
 			StringBuilder buf = new StringBuilder();
-			Utils.appendf(buf,"package %s;%n%n",extractPackageName(name));
-			Utils.appendf(buf,"%s%n",importModel.toJavaSource());
-			// TODO 
+			Utils.appendf(buf, "package %s;%n%n", extractPackageName(name));
+			Utils.appendf(buf, "%s%n", importModel.toJavaSource());
+			Utils.appendf(buf, "public %s %s {%n%n", isInterface ? "interface" : "class", extractSimpleClassName(name));
+			fields.values().forEach(fm -> Utils.appendf(buf, "%s%n", fm.toJavaSource()));
+			Utils.appendf(buf, "}%n",extractSimpleClassName(name));
+			
+			Utils.appendf(buf, "}%n",extractSimpleClassName(name));
+			// TODO
 			return buf.toString();
 		}
 		
@@ -520,6 +525,13 @@ class JavaModel {
 			return result.toString();
 		}
 
+		public String toJavaSource() {
+			StringBuilder result = new StringBuilder();
+			annotations.stream().forEach(a -> Utils.appendf(result, "\t%s%n", a));
+			Utils.appendf(result, "\t%s %s;%n",type,name);
+			return result.toString();
+		}
+		
 	}
 
 	private static class MethodModel {
