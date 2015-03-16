@@ -171,7 +171,7 @@ JAVA MODEL:
 					nst4 = PARAMETER MODEL (nst4)
 						ANNOTATIONS:
 						TYPE:
-							@NestedTable("a_test_package.nst4") List<Record3>
+							List<Record3>
 				BODY:
 					this.nst4 = nst4;
 			getIbt4 = METHOD MODEL ([public] getIbt4)
@@ -185,7 +185,7 @@ JAVA MODEL:
 					ibt4 = PARAMETER MODEL (ibt4)
 						ANNOTATIONS:
 						TYPE:
-							@IndexByTable("a_test_package.ibt4") Map<@Varchar2(10) String,@Number_(value=30,scale=0) BigInteger>
+							Map<String,BigInteger>
 				BODY:
 					this.ibt4 = ibt4;
 			getBinary = METHOD MODEL ([public] getBinary)
@@ -199,7 +199,7 @@ JAVA MODEL:
 					binary = PARAMETER MODEL (binary)
 						ANNOTATIONS:
 						TYPE:
-							@BinaryInteger Integer
+							Integer
 				BODY:
 					this.binary = binary;
 			getIbt5 = METHOD MODEL ([public] getIbt5)
@@ -213,7 +213,7 @@ JAVA MODEL:
 					ibt5 = PARAMETER MODEL (ibt5)
 						ANNOTATIONS:
 						TYPE:
-							@IndexByTable("a_test_package.ibt5") Map<@String_(20) String,@Varchar2(100) String @Varray("a_test_package.var5") []>
+							Map<String,String[]>
 				BODY:
 					this.ibt5 = ibt5;
 	pleasejava.test.alltypes.Record2 = CLASS MODEL (class pleasejava.test.alltypes.Record2)
@@ -253,7 +253,7 @@ JAVA MODEL:
 					var5 = PARAMETER MODEL (var5)
 						ANNOTATIONS:
 						TYPE:
-							@Varray("a_test_package.var5") List<@Varchar2(100) String>
+							List<String>
 				BODY:
 					this.var5 = var5;
 			getFirstRec3 = METHOD MODEL ([public] getFirstRec3)
@@ -281,7 +281,7 @@ JAVA MODEL:
 					pls = PARAMETER MODEL (pls)
 						ANNOTATIONS:
 						TYPE:
-							@PlsInteger BigInteger
+							BigInteger
 				BODY:
 					this.pls = pls;
 			getSecondRec3 = METHOD MODEL ([public] getSecondRec3)
@@ -323,7 +323,7 @@ JAVA MODEL:
 					theBoolean = PARAMETER MODEL (theBoolean)
 						ANNOTATIONS:
 						TYPE:
-							@Boolean_ boolean
+							boolean
 				BODY:
 					this.theBoolean = theBoolean;
 			getTheInt = METHOD MODEL ([public] getTheInt)
@@ -337,6 +337,6 @@ JAVA MODEL:
 					theInt = PARAMETER MODEL (theInt)
 						ANNOTATIONS:
 						TYPE:
-							@Integer_ int
+							int
 				BODY:
 					this.theInt = theInt;

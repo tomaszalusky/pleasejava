@@ -61,7 +61,7 @@ JAVA MODEL:
 					fi = PARAMETER MODEL (fi)
 						ANNOTATIONS:
 						TYPE:
-							@Integer_ int
+							int
 				BODY:
 					this.fi = fi;
 			getFs = METHOD MODEL ([public] getFs)
@@ -75,7 +75,7 @@ JAVA MODEL:
 					fs = PARAMETER MODEL (fs)
 						ANNOTATIONS:
 						TYPE:
-							@Varchar2(200) String
+							String
 				BODY:
 					this.fs = fs;
 	pleasejava.test.javatype.RecordB1 = CLASS MODEL (class pleasejava.test.javatype.RecordB1)
@@ -104,7 +104,7 @@ JAVA MODEL:
 					fi = PARAMETER MODEL (fi)
 						ANNOTATIONS:
 						TYPE:
-							@Integer_ BigInteger
+							BigInteger
 				BODY:
 					this.fi = fi;
 			getFs = METHOD MODEL ([public] getFs)
@@ -118,7 +118,7 @@ JAVA MODEL:
 					fs = PARAMETER MODEL (fs)
 						ANNOTATIONS:
 						TYPE:
-							@Varchar2(200) String
+							String
 				BODY:
 					this.fs = fs;
 	pleasejava.test.javatype.RecordA2 = CLASS MODEL (class pleasejava.test.javatype.RecordA2)
@@ -146,7 +146,7 @@ JAVA MODEL:
 					fi = PARAMETER MODEL (fi)
 						ANNOTATIONS:
 						TYPE:
-							@Integer_ int
+							int
 				BODY:
 					this.fi = fi;
 			getFs = METHOD MODEL ([public] getFs)
@@ -160,7 +160,7 @@ JAVA MODEL:
 					fs = PARAMETER MODEL (fs)
 						ANNOTATIONS:
 						TYPE:
-							@Varchar2(200) StringBuilder
+							StringBuilder
 				BODY:
 					this.fs = fs;
 	pleasejava.test.javatype.RecordB2 = CLASS MODEL (class pleasejava.test.javatype.RecordB2)
@@ -189,7 +189,7 @@ JAVA MODEL:
 					fi = PARAMETER MODEL (fi)
 						ANNOTATIONS:
 						TYPE:
-							@Integer_ BigInteger
+							BigInteger
 				BODY:
 					this.fi = fi;
 			getFs = METHOD MODEL ([public] getFs)
@@ -203,6 +203,6 @@ JAVA MODEL:
 					fs = PARAMETER MODEL (fs)
 						ANNOTATIONS:
 						TYPE:
-							@Varchar2(200) StringBuilder
+							StringBuilder
 				BODY:
 					this.fs = fs;

@@ -195,7 +195,7 @@ class JavaModel {
 							new MethodModel(EnumSet.of(PUBLIC),mn,String.format("this.%1$s = %1$s;",javaFieldName)));
 					setterModel.parameters.computeIfAbsent(javaFieldName, pn -> {
 						ParameterModel pm = new ParameterModel(pn);
-						pm.type = fieldModel.type;//.replaceAll("@[A-Za-z0-9_]+?(\\([^\\)]*\\))? *?","");
+						pm.type = fieldModel.type.replaceAll(" ?@[A-Za-z0-9_]++(\\([^\\)]*\\))? *+","");
 						return pm;
 					});
 				}
