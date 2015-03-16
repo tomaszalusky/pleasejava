@@ -22,7 +22,7 @@ JAVA MODEL:
 			plsql.Plsql.Varray
 		FIELDS:
 		METHODS:
-			echo = METHOD MODEL (echo)
+			echo = METHOD MODEL ([] echo)
 				ANNOTATIONS:
 					@Function("echo")
 				PARAMETERS:
@@ -143,23 +143,79 @@ JAVA MODEL:
 			plsql.Plsql.Varchar2
 			plsql.Plsql.Varray
 		FIELDS:
-			nst4 = FIELD MODEL (nst4)
+			nst4 = FIELD MODEL ([private] nst4)
 				ANNOTATIONS:
 				TYPE:
 					@NestedTable("a_test_package.nst4") List<Record3>
-			ibt4 = FIELD MODEL (ibt4)
+			ibt4 = FIELD MODEL ([private] ibt4)
 				ANNOTATIONS:
 				TYPE:
 					@IndexByTable("a_test_package.ibt4") Map<@Varchar2(10) String,@Number_(value=30,scale=0) BigInteger>
-			binary = FIELD MODEL (binary)
+			binary = FIELD MODEL ([private] binary)
 				ANNOTATIONS:
 				TYPE:
 					@BinaryInteger Integer
-			ibt5 = FIELD MODEL (ibt5)
+			ibt5 = FIELD MODEL ([private] ibt5)
 				ANNOTATIONS:
 				TYPE:
 					@IndexByTable("a_test_package.ibt5") Map<@String_(20) String,@Varchar2(100) String @Varray("a_test_package.var5") []>
 		METHODS:
+			getNst4 = METHOD MODEL ([public] getNst4)
+				ANNOTATIONS:
+				PARAMETERS:
+				BODY:
+					return nst4;
+			setNst4 = METHOD MODEL ([public] setNst4)
+				ANNOTATIONS:
+				PARAMETERS:
+					nst4 = PARAMETER MODEL (nst4)
+						ANNOTATIONS:
+						TYPE:
+							@NestedTable("a_test_package.nst4") List<Record3>
+				BODY:
+					this.nst4 = nst4;
+			getIbt4 = METHOD MODEL ([public] getIbt4)
+				ANNOTATIONS:
+				PARAMETERS:
+				BODY:
+					return ibt4;
+			setIbt4 = METHOD MODEL ([public] setIbt4)
+				ANNOTATIONS:
+				PARAMETERS:
+					ibt4 = PARAMETER MODEL (ibt4)
+						ANNOTATIONS:
+						TYPE:
+							@IndexByTable("a_test_package.ibt4") Map<@Varchar2(10) String,@Number_(value=30,scale=0) BigInteger>
+				BODY:
+					this.ibt4 = ibt4;
+			getBinary = METHOD MODEL ([public] getBinary)
+				ANNOTATIONS:
+				PARAMETERS:
+				BODY:
+					return binary;
+			setBinary = METHOD MODEL ([public] setBinary)
+				ANNOTATIONS:
+				PARAMETERS:
+					binary = PARAMETER MODEL (binary)
+						ANNOTATIONS:
+						TYPE:
+							@BinaryInteger Integer
+				BODY:
+					this.binary = binary;
+			getIbt5 = METHOD MODEL ([public] getIbt5)
+				ANNOTATIONS:
+				PARAMETERS:
+				BODY:
+					return ibt5;
+			setIbt5 = METHOD MODEL ([public] setIbt5)
+				ANNOTATIONS:
+				PARAMETERS:
+					ibt5 = PARAMETER MODEL (ibt5)
+						ANNOTATIONS:
+						TYPE:
+							@IndexByTable("a_test_package.ibt5") Map<@String_(20) String,@Varchar2(100) String @Varray("a_test_package.var5") []>
+				BODY:
+					this.ibt5 = ibt5;
 	pleasejava.test.alltypes.Record2 = CLASS MODEL (class pleasejava.test.alltypes.Record2)
 		IMPORTS:
 			java.math.BigInteger
@@ -169,34 +225,118 @@ JAVA MODEL:
 			plsql.Plsql.Varchar2
 			plsql.Plsql.Varray
 		FIELDS:
-			var5 = FIELD MODEL (var5)
+			var5 = FIELD MODEL ([private] var5)
 				ANNOTATIONS:
 				TYPE:
 					@Varray("a_test_package.var5") List<@Varchar2(100) String>
-			firstRec3 = FIELD MODEL (firstRec3)
+			firstRec3 = FIELD MODEL ([private] firstRec3)
 				ANNOTATIONS:
 				TYPE:
 					Record3
-			pls = FIELD MODEL (pls)
+			pls = FIELD MODEL ([private] pls)
 				ANNOTATIONS:
 				TYPE:
 					@PlsInteger BigInteger
-			secondRec3 = FIELD MODEL (secondRec3)
+			secondRec3 = FIELD MODEL ([private] secondRec3)
 				ANNOTATIONS:
 				TYPE:
 					Record3
 		METHODS:
+			getVar5 = METHOD MODEL ([public] getVar5)
+				ANNOTATIONS:
+				PARAMETERS:
+				BODY:
+					return var5;
+			setVar5 = METHOD MODEL ([public] setVar5)
+				ANNOTATIONS:
+				PARAMETERS:
+					var5 = PARAMETER MODEL (var5)
+						ANNOTATIONS:
+						TYPE:
+							@Varray("a_test_package.var5") List<@Varchar2(100) String>
+				BODY:
+					this.var5 = var5;
+			getFirstRec3 = METHOD MODEL ([public] getFirstRec3)
+				ANNOTATIONS:
+				PARAMETERS:
+				BODY:
+					return firstRec3;
+			setFirstRec3 = METHOD MODEL ([public] setFirstRec3)
+				ANNOTATIONS:
+				PARAMETERS:
+					firstRec3 = PARAMETER MODEL (firstRec3)
+						ANNOTATIONS:
+						TYPE:
+							Record3
+				BODY:
+					this.firstRec3 = firstRec3;
+			getPls = METHOD MODEL ([public] getPls)
+				ANNOTATIONS:
+				PARAMETERS:
+				BODY:
+					return pls;
+			setPls = METHOD MODEL ([public] setPls)
+				ANNOTATIONS:
+				PARAMETERS:
+					pls = PARAMETER MODEL (pls)
+						ANNOTATIONS:
+						TYPE:
+							@PlsInteger BigInteger
+				BODY:
+					this.pls = pls;
+			getSecondRec3 = METHOD MODEL ([public] getSecondRec3)
+				ANNOTATIONS:
+				PARAMETERS:
+				BODY:
+					return secondRec3;
+			setSecondRec3 = METHOD MODEL ([public] setSecondRec3)
+				ANNOTATIONS:
+				PARAMETERS:
+					secondRec3 = PARAMETER MODEL (secondRec3)
+						ANNOTATIONS:
+						TYPE:
+							Record3
+				BODY:
+					this.secondRec3 = secondRec3;
 	pleasejava.test.alltypes.Record3 = CLASS MODEL (class pleasejava.test.alltypes.Record3)
 		IMPORTS:
 			plsql.Plsql.Boolean_
 			plsql.Plsql.Integer_
 		FIELDS:
-			theBoolean = FIELD MODEL (theBoolean)
+			theBoolean = FIELD MODEL ([private] theBoolean)
 				ANNOTATIONS:
 				TYPE:
 					@Boolean_ boolean
-			theInt = FIELD MODEL (theInt)
+			theInt = FIELD MODEL ([private] theInt)
 				ANNOTATIONS:
 				TYPE:
 					@Integer_ int
 		METHODS:
+			isTheBoolean = METHOD MODEL ([public] isTheBoolean)
+				ANNOTATIONS:
+				PARAMETERS:
+				BODY:
+					return theBoolean;
+			setTheBoolean = METHOD MODEL ([public] setTheBoolean)
+				ANNOTATIONS:
+				PARAMETERS:
+					theBoolean = PARAMETER MODEL (theBoolean)
+						ANNOTATIONS:
+						TYPE:
+							@Boolean_ boolean
+				BODY:
+					this.theBoolean = theBoolean;
+			getTheInt = METHOD MODEL ([public] getTheInt)
+				ANNOTATIONS:
+				PARAMETERS:
+				BODY:
+					return theInt;
+			setTheInt = METHOD MODEL ([public] setTheInt)
+				ANNOTATIONS:
+				PARAMETERS:
+					theInt = PARAMETER MODEL (theInt)
+						ANNOTATIONS:
+						TYPE:
+							@Integer_ int
+				BODY:
+					this.theInt = theInt;

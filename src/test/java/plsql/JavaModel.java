@@ -2,6 +2,8 @@ package plsql;
 
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
+import static javax.lang.model.element.Modifier.PRIVATE;
+import static javax.lang.model.element.Modifier.PUBLIC;
 import static org.jdom2.filter.Filters.attribute;
 import static org.jdom2.filter.Filters.element;
 import static pleasejava.Utils.findOnly;
@@ -11,13 +13,17 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import javax.lang.model.element.Modifier;
 
 import org.jdom2.Element;
 import org.jdom2.Namespace;
@@ -67,6 +73,21 @@ class JavaModel {
 		String result = doubleColon == -1 ? null : classAndMaybeMethod.substring(doubleColon + 2);
 		return result;
 	}
+
+	private static String computeJavaGetterName(String javaFieldName, String type) {
+		String result = ("@Boolean_ boolean".equals(type) ? "is" : "get")
+				+ javaFieldName.substring(0,1).toUpperCase() + javaFieldName.substring(1);
+		return result;
+	}
+
+	private static String computeJavaSetterName(String javaFieldName) {
+		String result = "set" + javaFieldName.substring(0,1).toUpperCase() + javaFieldName.substring(1);
+		return result;
+	}
+
+	private static String indent(String input) {
+		return input.replaceAll("(?<=\\n|^)","\t");
+	}
 	
 	static class Generator implements TypeVisitor {
 
@@ -99,7 +120,7 @@ class JavaModel {
 				String className = extractFullClassName(representation);
 				String methodName = extractMethodName(representation);
 				ClassModel classModel = javaModel.classes.computeIfAbsent(className, cn -> new ClassModel(cn,true));
-				MethodModel methodModel = classModel.methods.computeIfAbsent(methodName, mn -> new MethodModel(mn));
+				MethodModel methodModel = classModel.methods.computeIfAbsent(methodName, mn -> new MethodModel(EnumSet.noneOf(Modifier.class),mn));
 				methodModel.annotations.add(type.accept(new ComputeJavaAnnotation(classModel.importModel)));
 				generateParameters(type, typeElement, representation, classModel.importModel, methodModel);
 			}
@@ -116,7 +137,7 @@ class JavaModel {
 				String className = extractFullClassName(representation);
 				String methodName = extractMethodName(representation);
 				ClassModel classModel = javaModel.classes.computeIfAbsent(className, cn -> new ClassModel(cn,true));
-				MethodModel methodModel = classModel.methods.computeIfAbsent(methodName, mn -> new MethodModel(mn));
+				MethodModel methodModel = classModel.methods.computeIfAbsent(methodName, mn -> new MethodModel(EnumSet.noneOf(Modifier.class),mn));
 				methodModel.annotations.add(type.accept(new ComputeJavaAnnotation(classModel.importModel)));
 				String javaTypeString = evalXpath(typeElement, "return/@ns:type", attribute(), Namespace.getNamespace("ns",representation))
 						.stream().findFirst().get().getValue().replace('[','<').replace(']','>');
@@ -164,8 +185,19 @@ class JavaModel {
 					int space = javaTypeStringAndFieldName.indexOf(' ');
 					String javaTypeString = javaTypeStringAndFieldName.substring(0, space == -1 ? javaTypeStringAndFieldName.length() : space);
 					String javaFieldName = space == -1 ? fieldName : javaTypeStringAndFieldName.substring(space + 1);
-					FieldModel fieldModel = classModel.fields.computeIfAbsent(javaFieldName, fn -> new FieldModel(fn));
+					FieldModel fieldModel = classModel.fields.computeIfAbsent(javaFieldName, fn -> new FieldModel(EnumSet.of(PRIVATE),fn));
 					fieldModel.type = fieldType.accept(new ComputeJavaType(classModel.importModel),javaTypeString);
+					String javaGetterName = computeJavaGetterName(javaFieldName,fieldModel.type); 
+					MethodModel getterModel = classModel.methods.computeIfAbsent(javaGetterName, mn ->
+							new MethodModel(EnumSet.of(PUBLIC),mn,String.format("return %s;",javaFieldName)));
+					String javaSetterName = computeJavaSetterName(javaFieldName); 
+					MethodModel setterModel = classModel.methods.computeIfAbsent(javaSetterName, mn ->
+							new MethodModel(EnumSet.of(PUBLIC),mn,String.format("this.%1$s = %1$s;",javaFieldName)));
+					setterModel.parameters.computeIfAbsent(javaFieldName, pn -> {
+						ParameterModel pm = new ParameterModel(pn);
+						pm.type = fieldModel.type;//.replaceAll("@[A-Za-z0-9_]+?(\\([^\\)]*\\))? *?","");
+						return pm;
+					});
 				}
 			}
 		}
@@ -495,8 +527,6 @@ class JavaModel {
 			Utils.appendf(buf, "public %s %s {%n%n", isInterface ? "interface" : "class", extractSimpleClassName(name));
 			fields.values().forEach(fm -> Utils.appendf(buf, "%s%n", fm.toJavaSource()));
 			Utils.appendf(buf, "}%n",extractSimpleClassName(name));
-			
-			Utils.appendf(buf, "}%n",extractSimpleClassName(name));
 			// TODO
 			return buf.toString();
 		}
@@ -505,19 +535,22 @@ class JavaModel {
 	
 	private static class FieldModel {
 		
+		private final Set<Modifier> modifiers;
+		
 		private final String name;
 		
 		private final List<String> annotations = new ArrayList<>();
 		
 		private String type;
-		
-		public FieldModel(String name) {
+
+		public FieldModel(Set<Modifier> modifiers, String name) {
+			this.modifiers = modifiers;
 			this.name = name;
 		}
 
 		public String toString() {
 			StringBuilder result = new StringBuilder();
-			Utils.appendf(result, "FIELD MODEL (%s)%n\t\t\t\tANNOTATIONS:", name);
+			Utils.appendf(result, "FIELD MODEL (%s %s)%n\t\t\t\tANNOTATIONS:", modifiers, name);
 			for (String annotation : annotations) {
 				Utils.appendf(result, "%n\t\t\t\t\t%s",annotation);
 			}
@@ -528,7 +561,7 @@ class JavaModel {
 		public String toJavaSource() {
 			StringBuilder result = new StringBuilder();
 			annotations.stream().forEach(a -> Utils.appendf(result, "\t%s%n", a));
-			Utils.appendf(result, "\t%s %s;%n",type,name);
+			Utils.appendf(result, "\t%s%s %s;%n",modifiers.stream().map(m -> m.toString() + " ").collect(joining()),type,name);
 			return result.toString();
 		}
 		
@@ -536,6 +569,8 @@ class JavaModel {
 
 	private static class MethodModel {
 
+		private final Set<Modifier> modifiers;
+		
 		private final String name;
 		
 		private final List<String> annotations = new ArrayList<>();
@@ -546,15 +581,21 @@ class JavaModel {
 		 */
 		private final Map<String,ParameterModel> parameters = new LinkedHashMap<>();
 		
-		private String body;
+		private final String body;
 
-		private MethodModel(String name) {
-			this.name = name;
+		private MethodModel(Set<Modifier> modifiers, String name) {
+			this(modifiers,name,null);
 		}
 
+		private MethodModel(Set<Modifier> modifiers, String name, String body) {
+			this.modifiers = modifiers;
+			this.name = name;
+			this.body = body;
+		}
+		
 		public String toString() {
 			StringBuilder result = new StringBuilder();
-			Utils.appendf(result, "METHOD MODEL (%s)%n\t\t\t\tANNOTATIONS:", name);
+			Utils.appendf(result, "METHOD MODEL (%s %s)%n\t\t\t\tANNOTATIONS:", modifiers, name);
 			for (String annotation : annotations) {
 				Utils.appendf(result, "%n\t\t\t\t\t%s", annotation);
 			}
@@ -562,9 +603,12 @@ class JavaModel {
 			for (Map.Entry<String,ParameterModel> e : parameters.entrySet()) {
 				Utils.appendf(result, "%n\t\t\t\t\t%s = %s", e.getKey(), e.getValue());
 			}
+			if (body != null) {
+				Utils.appendf(result, "%n\t\t\t\tBODY:%n%s",indent(indent(indent(indent(indent(body))))));
+			}
 			return result.toString();
 		}
-
+		
 	}
 	
 	private static class ParameterModel {
